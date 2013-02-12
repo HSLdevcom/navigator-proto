@@ -66,7 +66,7 @@ find_route = (latlng) ->
 
         legs = data[0][0].legs
         for leg in legs
-            points = (new L.LatLng(point.y, point.x) for point in legs[0].shape)
+            points = (new L.LatLng(point.y, point.x) for point in leg.shape)
             polyline = new L.Polyline(points, {color: 'red'})
             polyline.addTo(map)
     )
