@@ -59,6 +59,27 @@ $(document).bind("mobileinit", ->
 
 map = L.map('map'); # .setView([60.19308, 24.97192], 11);
 
+# from https://github.com/reitti/reittiopas/blob/master/web/js/utils.coffee
+transportColors =
+    walk: '#000000'
+    1:  '#193695' # Helsinki internal bus lines
+    2:  '#00ab66' # Trams
+    3:  '#193695' # Espoo internal bus lines
+    4:  '#193695' # Vantaa internal bus lines
+    5:  '#193695' # Regional bus lines
+    6:  '#fb6500' # Metro
+    7:  '#00aee7' # Ferry
+    8:  '#193695' # U-lines
+    12: '#ce1141' # Commuter trains
+    21: '#193695' # Helsinki service lines
+    22: '#193695' # Helsinki night buses
+    23: '#193695' # Espoo service lines
+    24: '#193695' # Vantaa service lines
+    25: '#193695' # Region night buses
+    36: '#193695' # Kirkkonummi internal bus lines
+    38: '#193695' # Undocumented, assumed bus
+    39: '#193695' # Kerava internal bus lines
+
 find_route = (latlng) ->
     window.latlng = latlng
     $.getJSON("http://tuukka.kapsi.fi/tmp/reittiopas.cgi?request=route&detail=full&epsg_in=wgs84&epsg_out=wgs84&from="+latlng.lng+","+latlng.lat+"&to=24.97192,60.19308&callback=?", (data) ->
@@ -67,7 +88,7 @@ find_route = (latlng) ->
         legs = data[0][0].legs
         for leg in legs
             points = (new L.LatLng(point.y, point.x) for point in leg.shape)
-            color = if leg.type == "walk" then 'black' else 'red'
+            color = transportColors[leg.type]
             polyline = new L.Polyline(points, {color: color})
             polyline.addTo(map)
             if leg == legs[0]
