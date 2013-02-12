@@ -1,48 +1,124 @@
 pk_base_url = 'http://www.hel.fi/palvelukarttaws/rest/v2/'
-cat_tree = null
 
-localStorage.clear()
+#get_pk_object = (url, callback) ->
+#    $.getJSON(pk_base_url + url + '?callback=?', callback)
 
-render_categories = (options) ->
-    console.log "render cats"
-    console.log cat_tree.length
-    page = $("#find-nearest")
-    content = page.children(":jqmData(role=content)")
-    content.empty()
-    list_el = $("<ul data-role='listview'></ul>")
-    for cat in cat_tree
-        item_el = $("<li>#{ cat.name_fi }</li>")
-        child_list = $("<ul></ul>")
-        item_el.append(child_list)
-        for child in cat.children
-            child_list.append($("<li>#{ child.name_fi }</li>"))
-        list_el.append(item_el)
-    content.append(list_el)
-    page.page()
-    list_el.listview()
-    $.mobile.changePage(page, options)
+class Service extends Backbone.Model
+    initialize: ->
+        @ls_key = "pk_service_" + @id
+    load_from_cache: ->
+        attrs = localStorage[@ls_key]
+        if not attrs
+            return false
+        return JSON.parse attrs
+    get_children: ->
+        child_list = []
+        for id in @.get 'child_ids'
+            child = @collection.get id
+            child_list.push child
+        return child_list
+    save: ->
+        if not localStorage
+            return
+        attrs = @.toJSON()
+        #delete attrs['unit_ids']
+        str = JSON.stringify attrs
+        localStorage[@ls_key] = str
+
+class ServiceList extends Backbone.Collection
+    model: Service
+    url: pk_base_url + 'service/'
+    initialize: ->
+        @.on "reset", @.handle_reset
+
+    handle_reset: ->
+        @.find_parents()
+        @.root_list = srv_list.filter (srv) ->
+            return not srv.get('parent')
+
+    find_parents: ->
+        @.forEach (srv) =>
+            if not srv.get('child_ids')
+                return
+            for child_id in srv.get('child_ids')
+                child = @.get(child_id)
+                if not child
+                    console.log "child #{ child_id } missing"
+                else
+                    child.set('parent', srv.id)
+    save_to_cache: ->
+        root_ids = @.root_list.map (srv) ->
+            return srv.id
+        if localStorage
+            localStorage["pk_service_root"] = JSON.stringify(root_ids)
+        @.forEach (srv) ->
+            srv.save()
+    load_from_cache: ->
+        console.log "load cache"
+        if not localStorage
+            return false
+        srv_root = localStorage["pk_service_root"]
+        if not srv_root
+            return false
+        root_ids = JSON.parse(srv_root)
+        srv_list = []
+        for id in root_ids
+            srv = new Service {id: id}
+            srv_attrs = srv.load_from_cache()
+            if not srv_attrs
+                return false
+            console.log srv_attrs
+            srv_list.push srv_attrs
+        console.log srv_list
+        @.reset srv_list
+        return true
+
+    sync: (method, collections, options) ->
+        options.dataType = 'jsonp'
+        super
+
+class ServiceListView extends Backbone.View
+    tagName: 'ul'
+    attributes:
+        'data-role': 'listview'
+    initialize: (opts) ->
+        @parent_id = opts.parent_id
+        @.listenTo @collection, "reset", @.render
+    render: ->
+        console.log "serviceview render"
+        if not @parent_id
+            srv_list = @collection.filter (srv) ->
+                if not srv.parent
+                    return true
+        else
+            srv_list = @collection.filter (srv) ->
+                if srv.parent == @parent_id
+                    return true
+        @$el.empty()
+        srv_list.forEach (srv) =>
+            srv_name = srv.get 'name_fi'
+            srv_el = $("<li>#{ srv_name }</li>")
+            @$el.append srv_el
+
+        page = $("#find-nearest")
+        content = page.children(":jqmData(role=content)")
+        content.empty()
+        content.append(@$el)
+        page.page()
+        @$el.listview()
+        $.mobile.changePage(page)
+
+root_list = null
+srv_list = new ServiceList
+srv_list_view = new ServiceListView {collection: srv_list}
 
 show_categories = (options) ->
-    cat_tree = null
-    if localStorage
-        if localStorage.cat_tree
-            cat_tree = JSON.parse(localStorage.cat_tree)
-    if cat_tree
-        render_categories(options)
-    else
-        fetch_categories(options)
-
-fetch_categories = (options) ->
-    $.mobile.showPageLoadingMsg()
-    $.getJSON(pk_base_url + 'servicetree/?callback=?', (data) ->
-        $.mobile.hidePageLoadingMsg()
-        cat_tree = data
-        localStorage.cat_tree = JSON.stringify(cat_tree)
-        render_categories(options)
-    )
+    if not srv_list.load_from_cache()
+        srv_list.fetch
+            success: ->
+                srv_list.save_to_cache()
 
 $(document).bind("pagebeforechange", (e, data) ->
-    console.log "here"
     if typeof data.toPage != "string"
         return
     u = $.mobile.path.parseUrl(data.toPage)
