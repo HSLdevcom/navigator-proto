@@ -67,8 +67,11 @@ find_route = (latlng) ->
         legs = data[0][0].legs
         for leg in legs
             points = (new L.LatLng(point.y, point.x) for point in leg.shape)
-            polyline = new L.Polyline(points, {color: 'red'})
+            color = if leg.type == "walk" then 'black' else 'red'
+            polyline = new L.Polyline(points, {color: color})
             polyline.addTo(map)
+            if leg == legs[0]
+                map.fitBounds(polyline.getBounds())
     )
 
 L.tileLayer('http://{s}.tile.cloudmade.com/{key}/22677/256/{z}/{x}/{y}.png', {
