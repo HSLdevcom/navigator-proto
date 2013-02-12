@@ -58,6 +58,19 @@ $(document).bind("mobileinit", ->
 )
 
 map = L.map('map'); # .setView([60.19308, 24.97192], 11);
+
+find_route = (latlng) ->
+    window.latlng = latlng
+    $.getJSON("http://tuukka.kapsi.fi/tmp/reittiopas.cgi?request=route&detail=full&epsg_in=wgs84&epsg_out=wgs84&from="+latlng.lng+","+latlng.lat+"&to=24.97192,60.19308&callback=?", (data) ->
+        window.data = data
+
+        legs = data[0][0].legs
+        for leg in legs
+            points = (new L.LatLng(point.y, point.x) for point in legs[0].shape)
+            polyline = new L.Polyline(points, {color: 'red'})
+            polyline.addTo(map)
+    )
+
 L.tileLayer('http://{s}.tile.cloudmade.com/{key}/22677/256/{z}/{x}/{y}.png', {
     attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2012 CloudMade',
     key: 'BC9A493B41014CAABB98F0471D759707'
@@ -68,4 +81,5 @@ onLocationFound = (e) ->
     L.marker(e.latlng).addTo(map)
         .bindPopup("You are within " + radius + " meters from this point").openPopup();
     L.circle(e.latlng, radius).addTo(map);
+    find_route(e.latlng);
 map.on('locationfound', onLocationFound);
