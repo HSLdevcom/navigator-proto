@@ -156,6 +156,20 @@ transportColors =
     38: '#193695' # Undocumented, assumed bus
     39: '#193695' # Kerava internal bus lines
 
+format_code = (code) ->
+    if code.substring(0,3) == "300" # local train
+        return code.charAt(4)
+    else if code.substring(0,4) == "1300" # metro
+        return "Metro"
+    else if code.substring(0,3) == "110" # helsinki night bus
+        return code.substring(2,5)
+    else if code.substring(0,4) == "1019" # suomenlinna ferry
+        return "Suomenlinna ferry"
+    return code.substring(1,5).replace(/^(0| )+| +$/, "")
+
+format_time = (time) ->
+    return time.replace(/(....)(..)(..)(..)(..)/,"$1-$2-$3 $4:$5")
+
 find_route = (latlng) ->
     window.latlng = latlng
     $.getJSON("http://tuukka.kapsi.fi/tmp/reittiopas.cgi?request=route&detail=full&epsg_in=wgs84&epsg_out=wgs84&from="+latlng.lng+","+latlng.lat+"&to=24.97192,60.19308&callback=?", (data) ->
@@ -167,6 +181,12 @@ find_route = (latlng) ->
             color = transportColors[leg.type]
             polyline = new L.Polyline(points, {color: color})
             polyline.addTo(map)
+            if leg.type != 'walk'
+                stop = leg.locs[0]
+                last_stop = leg.locs[leg.locs.length-1]
+                point = leg.shape[0]
+                L.marker(new L.LatLng(point.y, point.x)).addTo(map)
+                    .bindPopup("At time #{format_time(stop.depTime)}, take the line #{format_code(leg.code)} from stop #{stop.name} to stop #{last_stop.name}")
             if leg == legs[0]
                 map.fitBounds(polyline.getBounds())
     )
