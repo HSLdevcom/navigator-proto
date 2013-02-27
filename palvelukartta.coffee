@@ -133,6 +133,12 @@ $(document).bind("mobileinit", ->
     $.mobile.defaultHomeScroll = 0
 )
 
+$('#map-page').bind 'pageshow', (e, data) ->
+    height = window.innerHeight-$('[data-role=header]').height()-
+                                $('[data-role=footer]').height()-
+                                $('[data-role=listview]').height()
+    $('#map').height(height-11)
+
 map = L.map('map'); # .setView([60.19308, 24.97192], 11);
 
 # from https://github.com/reitti/reittiopas/blob/master/web/js/utils.coffee
