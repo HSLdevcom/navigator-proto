@@ -180,6 +180,8 @@ find_route = (latlng) ->
             points = (new L.LatLng(point.y, point.x) for point in leg.shape)
             color = transportColors[leg.type]
             polyline = new L.Polyline(points, {color: color})
+                .on 'click', (e) ->
+                    map.fitBounds(e.target.getBounds())
             polyline.addTo(map)
             if leg.type != 'walk'
                 stop = leg.locs[0]
