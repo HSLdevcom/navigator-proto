@@ -176,9 +176,8 @@ format_code = (code) ->
 format_time = (time) ->
     return time.replace(/(....)(..)(..)(..)(..)/,"$1-$2-$3 $4:$5")
 
-find_route = (latlng) ->
-    window.latlng = latlng
-    $.getJSON("http://tuukka.kapsi.fi/tmp/reittiopas.cgi?request=route&detail=full&epsg_in=wgs84&epsg_out=wgs84&from="+latlng.lng+","+latlng.lat+"&to=24.97192,60.19308&callback=?", (data) ->
+find_route = (source, target) ->
+    $.getJSON "http://tuukka.kapsi.fi/tmp/reittiopas.cgi?request=route&detail=full&epsg_in=wgs84&epsg_out=wgs84&from=#{source.lng},#{source.lat}&to=#{target.lng},#{target.lat}&callback=?", (data) ->
         window.data = data
 
         legs = data[0][0].legs
@@ -197,7 +196,6 @@ find_route = (latlng) ->
                     .bindPopup("At time #{format_time(stop.depTime)}, take the line #{format_code(leg.code)} from stop #{stop.name} to stop #{last_stop.name}")
             if leg == legs[0]
                 map.fitBounds(polyline.getBounds())
-    )
 
 L.tileLayer('http://{s}.tile.cloudmade.com/{key}/22677/256/{z}/{x}/{y}.png', {
     attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2012 CloudMade',
@@ -207,8 +205,10 @@ L.control.scale().addTo(map);
 map.locate({setView: true, maxZoom: 16});
 onLocationFound = (e) ->
     radius = e.accuracy / 2;
-    L.marker(e.latlng).addTo(map)
+    source = e.latlng
+    target = new L.LatLng(60.19308, 24.97192) # hardcoded demo for now
+    L.marker(source).addTo(map)
         .bindPopup("You are within " + radius + " meters from this point").openPopup();
-    L.circle(e.latlng, radius).addTo(map);
-    find_route(e.latlng);
+    L.circle(source, radius).addTo(map)
+    find_route(source, target)
 map.on('locationfound', onLocationFound);
