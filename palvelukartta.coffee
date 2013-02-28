@@ -138,6 +138,7 @@ $('#map-page').bind 'pageshow', (e, data) ->
                                 $('[data-role=footer]').height()-
                                 $('[data-role=listview]').height()
     $('#map').height(height-11)
+    map.invalidateSize()
 
 map = L.map('map'); # .setView([60.19308, 24.97192], 11);
 
