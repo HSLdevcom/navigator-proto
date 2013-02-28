@@ -200,17 +200,20 @@ find_route = (source, target) ->
 
         legs = data[0][0].legs
         for leg in legs
+          do () ->
             points = (new L.LatLng(point.y, point.x) for point in leg.shape)
             color = transportColors[leg.type]
             polyline = new L.Polyline(points, {color: color})
                 .on 'click', (e) ->
                     map.fitBounds(e.target.getBounds())
+                    if marker != null
+                        marker.openPopup()
             polyline.addTo(route)
             if leg.type != 'walk'
                 stop = leg.locs[0]
                 last_stop = leg.locs[leg.locs.length-1]
                 point = leg.shape[0]
-                L.marker(new L.LatLng(point.y, point.x)).addTo(route)
+                marker = L.marker(new L.LatLng(point.y, point.x)).addTo(route)
                     .bindPopup("At time #{format_time(stop.depTime)}, take the line #{format_code(leg.code)} from stop #{stop.name} to stop #{last_stop.name}")
 
         if not map.getBounds().contains(route.getBounds())
