@@ -140,7 +140,8 @@ $('#map-page').bind 'pageshow', (e, data) ->
     $('#map').height(height-11)
     map.invalidateSize()
 
-map = L.map('map'); # .setView([60.19308, 24.97192], 11);
+window.map = map = L.map('map', {minZoom: 10})
+    .setView([60.29532, 24.93073], 10)
 
 # from https://github.com/reitti/reittiopas/blob/master/web/js/utils.coffee
 transportColors =
@@ -177,9 +178,22 @@ format_code = (code) ->
 format_time = (time) ->
     return time.replace(/(....)(..)(..)(..)(..)/,"$1-$2-$3 $4:$5")
 
+onSourceDragEnd = (event) ->
+    if sourceMarker != null and targetMarker != null
+        find_route(sourceMarker.getLatLng(), targetMarker.getLatLng())
+
+routeLayer = null
+
 find_route = (source, target) ->
     $.getJSON "http://tuukka.kapsi.fi/tmp/reittiopas.cgi?request=route&detail=full&epsg_in=wgs84&epsg_out=wgs84&from=#{source.lng},#{source.lat}&to=#{target.lng},#{target.lat}&callback=?", (data) ->
         window.data = data
+
+        if routeLayer != null
+            map.removeLayer(routeLayer)
+            routeLayer = null
+
+        route = L.featureGroup().addTo(map)
+        routeLayer = route
 
         legs = data[0][0].legs
         for leg in legs
@@ -188,28 +202,45 @@ find_route = (source, target) ->
             polyline = new L.Polyline(points, {color: color})
                 .on 'click', (e) ->
                     map.fitBounds(e.target.getBounds())
-            polyline.addTo(map)
+            polyline.addTo(route)
             if leg.type != 'walk'
                 stop = leg.locs[0]
                 last_stop = leg.locs[leg.locs.length-1]
                 point = leg.shape[0]
-                L.marker(new L.LatLng(point.y, point.x)).addTo(map)
+                L.marker(new L.LatLng(point.y, point.x)).addTo(route)
                     .bindPopup("At time #{format_time(stop.depTime)}, take the line #{format_code(leg.code)} from stop #{stop.name} to stop #{last_stop.name}")
-            if leg == legs[0]
-                map.fitBounds(polyline.getBounds())
+
+        if not map.getBounds().contains(route.getBounds())
+            map.fitBounds(route.getBounds())
 
 L.tileLayer('http://{s}.tile.cloudmade.com/{key}/22677/256/{z}/{x}/{y}.png', {
     attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2012 CloudMade',
     key: 'BC9A493B41014CAABB98F0471D759707'
 }).addTo(map);
 L.control.scale().addTo(map);
-map.locate({setView: true, maxZoom: 16});
-onLocationFound = (e) ->
-    radius = e.accuracy / 2;
+map.locate({setView: true, maxZoom: 15})
+
+sourceMarker = targetMarker = null
+
+map.on 'locationfound', (e) ->
+#    radius = e.accuracy / 2
+    radius = e.accuracy
     source = e.latlng
-    target = new L.LatLng(60.19308, 24.97192) # hardcoded demo for now
-    L.marker(source).addTo(map)
-        .bindPopup("You are within " + radius + " meters from this point").openPopup();
-    L.circle(source, radius).addTo(map)
-    find_route(source, target)
-map.on('locationfound', onLocationFound);
+
+    sourceMarker = L.marker(source, {draggable: true}).addTo(map)
+        .on('dragend', onSourceDragEnd)
+        .bindPopup("The starting point for journey planner<p>You are within #{radius} meters from this point").openPopup()
+    L.circle(source, radius, {color: 'gray'}).addTo(map)
+
+map.on 'click', (e) ->
+    if sourceMarker == null
+        source = e.latlng
+        sourceMarker = L.marker(source, {draggable: true}).addTo(map)
+            .on('dragend', onSourceDragEnd)
+            .bindPopup("The starting point for journey<br>(drag the marker to change)").openPopup()
+    else if targetMarker == null
+        target = e.latlng
+        targetMarker = L.marker(target, {draggable: true}).addTo(map)
+            .on('dragend', onSourceDragEnd)
+            .bindPopup("The end point for journey<br>(drag the marker to change)").openPopup()
+        find_route(sourceMarker.getLatLng(), target)
