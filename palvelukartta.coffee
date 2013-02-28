@@ -191,6 +191,9 @@ find_route = (source, target) ->
         if routeLayer != null
             map.removeLayer(routeLayer)
             routeLayer = null
+        else
+            map.removeLayer(osm)
+            map.addLayer(cloudmade)
 
         route = L.featureGroup().addTo(map)
         routeLayer = route
@@ -213,11 +216,25 @@ find_route = (source, target) ->
         if not map.getBounds().contains(route.getBounds())
             map.fitBounds(route.getBounds())
 
-L.tileLayer('http://{s}.tile.cloudmade.com/{key}/22677/256/{z}/{x}/{y}.png', {
+cloudmade = L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{style}/256/{z}/{x}/{y}.png', 
     attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2012 CloudMade',
     key: 'BC9A493B41014CAABB98F0471D759707'
-}).addTo(map);
-L.control.scale().addTo(map);
+    style: 22677
+)
+osm = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
+    attribution: 'Map data &copy; 2011 OpenStreetMap contributors',
+).addTo(map)
+mapquest = L.tileLayer("http://otile{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg",
+    subdomains: "1234"
+    attribution: 'Map data &copy; 2013 OpenStreetMap contributors, Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">'
+)
+L.control.layers({
+    "OpenStreetMap": osm
+    "CloudMade": cloudmade
+    "MapQuest": mapquest
+},
+).addTo(map)
+L.control.scale().addTo(map)
 map.locate({setView: true, maxZoom: 15})
 
 sourceMarker = targetMarker = null
