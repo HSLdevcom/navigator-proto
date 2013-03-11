@@ -308,10 +308,10 @@ L.control.layers({
 ).addTo(map)
 L.control.scale().addTo(map)
 map.locate
-    setView: true
+    setView: false
     maxZoom: 15
     watch: true
-    timeout: 0
+    timeout: Infinity
     enableHighAccuracy: true
 
 positionMarker = sourceMarker = targetMarker = null
@@ -325,9 +325,12 @@ map.on 'locationfound', (e) ->
         map.remove(positionMarker)
         positionMarker = null
     else if sourceMarker == null
+        zoom = Math.min(map.getBoundsZoom(e.bounds), 15)
+        map.setView(point, zoom)
+
         sourceMarker = L.marker(point, {draggable: true}).addTo(map)
             .on('dragend', onSourceDragEnd)
-            .bindPopup("The starting point for journey planner<p>You are within #{radius} meters from this point").openPopup()
+            .bindPopup("The starting point for journey planner<p>You are within #{Math.round(radius)} meters from this point").openPopup()
         L.circle(point, radius, {color: 'gray'}).addTo(map)
 
     positionMarker = L.circle(point, radius, {color: 'red'}).addTo(map)
