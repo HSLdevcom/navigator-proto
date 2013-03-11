@@ -164,6 +164,15 @@ transportColors =
     38: '#193695' # Undocumented, assumed bus
     39: '#193695' # Kerava internal bus lines
 
+googleColors = 
+    null: transportColors.walk
+    0: transportColors[2]
+    1: transportColors[6]
+    2: transportColors[12]
+    3: transportColors[5]
+    4: transportColors[7]
+    109: transportColors[12]
+
 format_code = (code) ->
     if code.substring(0,3) == "300" # local train
         return code.charAt(4)
@@ -227,10 +236,19 @@ find_route = (source, target) ->
         for leg in legs
           do () ->
             points = (new L.LatLng(point[0]*1e-5, point[1]*1e-5) for point in decode_polyline(leg.legGeometry.points, 2))
-            leg.type = 'walk' # XXX
-            color = transportColors[leg.type]
+            color = googleColors[leg.routeType]
             polyline = new L.Polyline(points, {color: color})
+                .on 'click', (e) ->
+                    map.fitBounds(e.target.getBounds())
+                    if marker != null
+                        marker.openPopup()
             polyline.addTo(route)
+            if leg.routeType != null
+                stop = leg.from
+                last_stop = leg.to
+                point = {y: stop.lat, x: stop.lon}
+                marker = L.marker(new L.LatLng(point.y, point.x)).addTo(route)
+                    .bindPopup("At time #{moment(leg.startTime).format("YYYY-MM-DD HH:SS")}, take the line #{format_code(leg.routeId)} from stop #{stop.name} to stop #{last_stop.name}")
 
         if not map.getBounds().contains(route.getBounds())
             map.fitBounds(route.getBounds())
