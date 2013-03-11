@@ -184,7 +184,58 @@ onSourceDragEnd = (event) ->
 
 routeLayer = null
 
+# translated from https://github.com/ahocevar/openlayers/blob/master/lib/OpenLayers/Format/EncodedPolyline.js
+decode_polyline = (encoded, dims) -> 
+    # Start from origo
+    point = (0 for i in [0...dims])
+
+    # Loop over the encoded input string
+    i = 0
+    points = while i < encoded.length
+        for dim in [0...dims]
+            result = 0
+            shift = 0
+            loop
+                b = encoded.charCodeAt(i++) - 63
+                result |= (b & 0x1f) << shift
+                shift += 5
+                break unless b >= 0x20
+
+            point[dim] += if result & 1 then ~(result >> 1) else result >> 1
+
+        # Keep a copy in the result list
+        point.slice(0)
+
+    return points
+
 find_route = (source, target) ->
+    $.getJSON "http://dev.hsl.fi:8080/opentripplanner-api-webapp/ws/plan?_dc=1363006998513&arriveBy=false&time=3%3A45pm&ui_date=3%2F11%2F2013&mode=TRANSIT%2CWALK&optimize=QUICK&maxWalkDistance=840&walkSpeed=1.341&date=2013-03-11&toPlace=#{target.lat},#{target.lng}&fromPlace=#{source.lat},#{source.lng}&callback=?", (data) ->
+        window.data = data
+
+        if routeLayer != null
+            map.removeLayer(routeLayer)
+            routeLayer = null
+        else
+            map.removeLayer(osm)
+            map.addLayer(cloudmade)
+
+        route = L.featureGroup().addTo(map)
+        routeLayer = route
+
+        legs = data.plan.itineraries[0].legs
+
+        for leg in legs
+          do () ->
+            points = (new L.LatLng(point[0]*1e-5, point[1]*1e-5) for point in decode_polyline(leg.legGeometry.points, 2))
+            leg.type = 'walk' # XXX
+            color = transportColors[leg.type]
+            polyline = new L.Polyline(points, {color: color})
+            polyline.addTo(route)
+
+        if not map.getBounds().contains(route.getBounds())
+            map.fitBounds(route.getBounds())
+
+find_route_reittiopas = (source, target) ->
     $.getJSON "http://tuukka.kapsi.fi/tmp/reittiopas.cgi?request=route&detail=full&epsg_in=wgs84&epsg_out=wgs84&from=#{source.lng},#{source.lat}&to=#{target.lng},#{target.lat}&callback=?", (data) ->
         window.data = data
 
