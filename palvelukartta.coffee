@@ -137,8 +137,15 @@ $('#map-page').bind 'pageshow', (e, data) ->
     height = window.innerHeight-$('[data-role=header]').height()-
                                 $('[data-role=footer]').height()-
                                 $('[data-role=listview]').height()
-    $('#map').height(height-11)
+    $('#map').height(height)
     map.invalidateSize()
+
+    map.locate
+        setView: false
+        maxZoom: 15
+        watch: true
+        timeout: Infinity
+        enableHighAccuracy: true
 
 window.map = map = L.map('map', {minZoom: 10})
     .setView([60.29532, 24.93073], 10)
@@ -307,12 +314,6 @@ L.control.layers({
 },
 ).addTo(map)
 L.control.scale().addTo(map)
-map.locate
-    setView: false
-    maxZoom: 15
-    watch: true
-    timeout: Infinity
-    enableHighAccuracy: true
 
 positionMarker = sourceMarker = targetMarker = null
 sourceCircle = null
