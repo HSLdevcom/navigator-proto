@@ -225,7 +225,7 @@ decode_polyline = (encoded, dims) ->
     return points
 
 find_route = (source, target, callback) ->
-    $.getJSON "http://dev.hsl.fi:8080/opentripplanner-api-webapp/ws/plan?_dc=1363006998513&arriveBy=false&time=3%3A45pm&ui_date=3%2F11%2F2013&mode=TRANSIT%2CWALK&optimize=QUICK&maxWalkDistance=840&walkSpeed=1.341&date=2013-03-11&toPlace=#{target.lat},#{target.lng}&fromPlace=#{source.lat},#{source.lng}&callback=?", (data) ->
+    $.getJSON "http://dev.hsl.fi/opentripplanner-api-webapp/ws/plan?toPlace=#{target.lat},#{target.lng}&fromPlace=#{source.lat},#{source.lng}&callback=?", (data) ->
         window.data = data
 
         if routeLayer != null
@@ -255,7 +255,7 @@ find_route = (source, target, callback) ->
                 last_stop = leg.to
                 point = {y: stop.lat, x: stop.lon}
                 marker = L.marker(new L.LatLng(point.y, point.x)).addTo(route)
-                    .bindPopup("At time #{moment(leg.startTime).format("YYYY-MM-DD HH:SS")}, take the line #{format_code(leg.routeId)} from stop #{stop.name} to stop #{last_stop.name}")
+                    .bindPopup("At time #{moment(leg.startTime).format("YYYY-MM-DD HH:mm")}, take the line #{format_code(leg.routeId)} from stop #{stop.name} to stop #{last_stop.name}")
 
         if callback
             callback(route)
