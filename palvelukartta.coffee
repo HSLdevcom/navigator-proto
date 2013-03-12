@@ -321,6 +321,7 @@ sourceCircle = null
 map.on 'locationfound', (e) ->
 #    radius = e.accuracy / 2
     radius = e.accuracy
+    measure = if e.accuracy < 2000 then "#{Math.round(e.accuracy)} meters" else "#{Math.round(e.accuracy/1000)} km"
     point = e.latlng
 
     if positionMarker != null
@@ -332,9 +333,11 @@ map.on 'locationfound', (e) ->
 
         sourceMarker = L.marker(point, {draggable: true}).addTo(map)
             .on('dragend', onSourceDragEnd)
-            .bindPopup("The starting point for journey planner<br>(tap the red marker to update)<br>You are within #{Math.round(radius)} meters from this point").openPopup()
+            .bindPopup("The starting point for journey planner<br>(tap the red marker to update)<br>You are within #{measure} from this point").openPopup()
         sourceCircle = L.circle(point, radius, {color: 'gray'}).addTo(map)
 
+    if radius > 2000
+        return
     positionMarker = L.circle(point, radius, {color: 'red'}).addTo(map)
         .on 'click', (e) ->
             point = positionMarker.getLatLng()
