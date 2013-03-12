@@ -217,7 +217,7 @@ decode_polyline = (encoded, dims) ->
 
     return points
 
-find_route = (source, target) ->
+find_route = (source, target, callback) ->
     $.getJSON "http://dev.hsl.fi:8080/opentripplanner-api-webapp/ws/plan?_dc=1363006998513&arriveBy=false&time=3%3A45pm&ui_date=3%2F11%2F2013&mode=TRANSIT%2CWALK&optimize=QUICK&maxWalkDistance=840&walkSpeed=1.341&date=2013-03-11&toPlace=#{target.lat},#{target.lng}&fromPlace=#{source.lat},#{source.lng}&callback=?", (data) ->
         window.data = data
 
@@ -250,10 +250,10 @@ find_route = (source, target) ->
                 marker = L.marker(new L.LatLng(point.y, point.x)).addTo(route)
                     .bindPopup("At time #{moment(leg.startTime).format("YYYY-MM-DD HH:SS")}, take the line #{format_code(leg.routeId)} from stop #{stop.name} to stop #{last_stop.name}")
 
-        if not map.getBounds().contains(route.getBounds())
-            map.fitBounds(route.getBounds())
+        if callback
+            callback(route)
 
-find_route_reittiopas = (source, target) ->
+find_route_reittiopas = (source, target, callback) ->
     $.getJSON "http://tuukka.kapsi.fi/tmp/reittiopas.cgi?request=route&detail=full&epsg_in=wgs84&epsg_out=wgs84&from=#{source.lng},#{source.lat}&to=#{target.lng},#{target.lat}&callback=?", (data) ->
         window.data = data
 
@@ -315,6 +315,7 @@ map.locate
     enableHighAccuracy: true
 
 positionMarker = sourceMarker = targetMarker = null
+sourceCircle = null
 
 map.on 'locationfound', (e) ->
 #    radius = e.accuracy / 2
@@ -330,10 +331,20 @@ map.on 'locationfound', (e) ->
 
         sourceMarker = L.marker(point, {draggable: true}).addTo(map)
             .on('dragend', onSourceDragEnd)
-            .bindPopup("The starting point for journey planner<p>You are within #{Math.round(radius)} meters from this point").openPopup()
-        L.circle(point, radius, {color: 'gray'}).addTo(map)
+            .bindPopup("The starting point for journey planner<br>(tap the red marker to update)<br>You are within #{Math.round(radius)} meters from this point").openPopup()
+        sourceCircle = L.circle(point, radius, {color: 'gray'}).addTo(map)
 
     positionMarker = L.circle(point, radius, {color: 'red'}).addTo(map)
+        .on 'click', (e) ->
+            point = positionMarker.getLatLng()
+            radius = positionMarker.getRadius()
+            sourceMarker.setLatLng(point)
+            if sourceCircle != null
+                map.removeLayer(sourceCircle)
+                sourceCircle = null
+            sourceCircle = L.circle(point, radius, {color: 'gray'}).addTo(map)
+            if targetMarker != null
+                find_route(sourceMarker.getLatLng(), targetMarker.getLatLng())
 
 map.on 'click', (e) ->
     if sourceMarker == null
@@ -346,4 +357,6 @@ map.on 'click', (e) ->
         targetMarker = L.marker(target, {draggable: true}).addTo(map)
             .on('dragend', onSourceDragEnd)
             .bindPopup("The end point for journey<br>(drag the marker to change)").openPopup()
-        find_route(sourceMarker.getLatLng(), target)
+        find_route sourceMarker.getLatLng(), target, (route) ->
+            if not map.getBounds().contains(route.getBounds())
+                map.fitBounds(route.getBounds())
