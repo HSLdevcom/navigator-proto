@@ -226,6 +226,12 @@ decode_polyline = (encoded, dims) ->
 
 find_route = (source, target, callback) ->
     $.getJSON "http://dev.hsl.fi/opentripplanner-api-webapp/ws/plan?toPlace=#{target.lat},#{target.lng}&fromPlace=#{source.lat},#{source.lng}&callback=?", (data) ->
+
+        if data.error?.msg
+            $('#error-popup p').text(data.error.msg)
+            $('#error-popup').popup('open')
+            return
+
         window.data = data
 
         if routeLayer != null
