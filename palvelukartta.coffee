@@ -128,10 +128,10 @@ $(document).bind("pagebeforechange", (e, data) ->
     show_categories()
 )
 
-$(document).bind("mobileinit", ->
+$(document).bind "mobileinit", ->
     $.mobile.defaultPageTransition = "slide"
     $.mobile.defaultHomeScroll = 0
-)
+    $.mobile.page.prototype.options.keepNative = "form input"
 
 $('#map-page').bind 'pageshow', (e, data) ->
     height = window.innerHeight-$('[data-role=header]').height()-
