@@ -322,7 +322,7 @@ map.on 'locationfound', (e) ->
     point = e.latlng
 
     if positionMarker != null
-        map.remove(positionMarker)
+        map.removeLayer(positionMarker)
         positionMarker = null
     else if sourceMarker == null
         zoom = Math.min(map.getBoundsZoom(e.bounds), 15)
