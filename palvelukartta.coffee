@@ -147,7 +147,7 @@ $('#map-page').bind 'pageshow', (e, data) ->
         timeout: Infinity
         enableHighAccuracy: true
 
-window.map = map = L.map('map', {minZoom: 10})
+window.map = map = L.map('map', {minZoom: 10, zoomControl: false})
     .setView([60.29532, 24.93073], 10)
 
 # from https://github.com/reitti/reittiopas/blob/master/web/js/utils.coffee
@@ -314,6 +314,20 @@ L.control.layers({
 },
 ).addTo(map)
 L.control.scale().addTo(map)
+
+BackControl = L.Control.extend
+    options: {
+        position: 'topleft'
+    },
+
+    onAdd: (map) ->
+        $container = $("<div id='back-control'>")
+        $container.append($("<a href='' data-role='button' data-rel='back' data-icon='arrow-l' data-mini='true'>Takaisin</a>"))
+        return $container.get(0)
+
+new BackControl().addTo(map)
+
+L.control.zoom().addTo(map)
 
 positionMarker = sourceMarker = targetMarker = null
 sourceCircle = null
