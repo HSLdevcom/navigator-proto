@@ -240,7 +240,7 @@ find_route = (source, target, callback) ->
             polyline = new L.Polyline(points, {color: color})
                 .on 'click', (e) ->
                     map.fitBounds(e.target.getBounds())
-                    if marker != null
+                    if marker?
                         marker.openPopup()
             polyline.addTo(route)
             if leg.routeType != null
@@ -275,7 +275,7 @@ find_route_reittiopas = (source, target, callback) ->
             polyline = new L.Polyline(points, {color: color})
                 .on 'click', (e) ->
                     map.fitBounds(e.target.getBounds())
-                    if marker != null
+                    if marker?
                         marker.openPopup()
             polyline.addTo(route)
             if leg.type != 'walk'
