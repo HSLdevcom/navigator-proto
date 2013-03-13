@@ -119,18 +119,22 @@ show_categories = (options) ->
             success: ->
                 srv_list.save_to_cache()
 
-$(document).bind("pagebeforechange", (e, data) ->
+$(document).bind "pagebeforechange", (e, data) ->
     if typeof data.toPage != "string"
         return
     u = $.mobile.path.parseUrl(data.toPage)
     if u.hash == '#find-nearest'
         e.preventDefault()
         show_categories()
-    else if u.hash.indexOf('#map-page?') == 0
+
+$(document).bind "pagebeforechange", (e, data) ->
+    if typeof data.toPage != "string"
+        return
+    u = $.mobile.path.parseUrl(data.toPage)
+    if u.hash.indexOf('#map-page?') == 0
         srv_id = u.hash.replace(/.*\?/, "")
         e.preventDefault()
         route_to_service(srv_id)
-)
 
 positionMarker = sourceMarker = targetMarker = null
 sourceCircle = null
