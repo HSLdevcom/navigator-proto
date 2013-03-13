@@ -177,7 +177,7 @@ $('#map-page').bind 'pageshow', (e, data) ->
         sourceMarker.openPopup()
 
     if routeLayer?
-        map.fitBounds(route.getBounds())
+        map.fitBounds(routeLayer.getBounds())
     else if window.position_point?
         zoom = Math.min(map.getBoundsZoom(window.position_bounds), 15)
         map.setView(window.position_point, zoom)
