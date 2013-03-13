@@ -97,8 +97,11 @@ class ServiceListView extends Backbone.View
         @$el.empty()
         srv_list.forEach (srv) =>
             srv_name = srv.get 'name_fi'
-            srv_el = $("<li>#{ srv_name }</li>")
+            srv_id = srv.get 'id'
+            srv_el = $("<li><a href='#'>#{ srv_name }</a></li>")
             @$el.append srv_el
+            srv_el.click ->
+                route_to_service(srv_id)
 
         page = $("#find-nearest")
         content = page.children(":jqmData(role=content)")
@@ -128,6 +131,27 @@ $(document).bind("pagebeforechange", (e, data) ->
     show_categories()
 )
 
+positionMarker = sourceMarker = targetMarker = null
+sourceCircle = null
+
+window.route_to_service = (srv_id) ->
+    if not sourceMarker?
+        alert("Laite ei antanut nykyistä sijaintia!")
+        return
+    source = sourceMarker.getLatLng()
+    $.getJSON "http://www.hel.fi/palvelukarttaws/rest/v2/unit/?service=#{srv_id}&distance=100&lat=#{source.lat.toPrecision(7)}&lon=#{source.lng.toPrecision(7)}&callback=?", (data) ->
+        window.service_data = data
+        if data.length == 0
+            alert("Ei palvelua lähellä nykyistä sijaintia")
+            return
+        target = new L.LatLng(data[0].latitude, data[0].longitude)
+        targetMarker = L.marker(target, {draggable: true}).addTo(map)
+            .on('dragend', onSourceDragEnd)
+            .bindPopup("#{data[0].name_fi}<br>(lähin #{srv_id})").openPopup()
+        $.mobile.changePage("#map-page")
+        find_route sourceMarker.getLatLng(), target, (route) ->
+            map.fitBounds(route.getBounds())
+
 $(document).bind "mobileinit", ->
     $.mobile.defaultPageTransition = "slide"
     $.mobile.defaultHomeScroll = 0
@@ -140,15 +164,23 @@ $('#map-page').bind 'pageshow', (e, data) ->
     $('#map').height(height)
     map.invalidateSize()
 
-    map.locate
-        setView: false
-        maxZoom: 15
-        watch: true
-        timeout: Infinity
-        enableHighAccuracy: true
+    if targetMarker?
+        if sourceMarker?
+            sourceMarker.closePopup()
+        targetMarker.closePopup()
+        targetMarker.openPopup()
+    else if sourceMarker?
+        sourceMarker.closePopup()
+        sourceMarker.openPopup()
 
 window.map = map = L.map('map', {minZoom: 10, zoomControl: false})
     .setView([60.29532, 24.93073], 10)
+map.locate
+    setView: false
+    maxZoom: 15
+    watch: true
+    timeout: Infinity
+    enableHighAccuracy: true
 
 # from https://github.com/reitti/reittiopas/blob/master/web/js/utils.coffee
 transportColors =
@@ -335,8 +367,6 @@ new BackControl().addTo(map)
 
 L.control.zoom().addTo(map)
 
-positionMarker = sourceMarker = targetMarker = null
-sourceCircle = null
 
 map.on 'locationfound', (e) ->
 #    radius = e.accuracy / 2
