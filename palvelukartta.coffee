@@ -137,15 +137,17 @@ sourceCircle = null
 
 window.route_to_service = (srv_id) ->
     if not sourceMarker?
-        alert("Laite ei antanut nykyistä sijaintia!")
+        alert("Laite ei ole antanut nykyistä sijaintia!")
         return
     source = sourceMarker.getLatLng()
-    $.getJSON "http://www.hel.fi/palvelukarttaws/rest/v2/unit/?service=#{srv_id}&distance=100&lat=#{source.lat.toPrecision(7)}&lon=#{source.lng.toPrecision(7)}&callback=?", (data) ->
+    $.getJSON "http://www.hel.fi/palvelukarttaws/rest/v2/unit/?service=#{srv_id}&distance=1000&lat=#{source.lat.toPrecision(7)}&lon=#{source.lng.toPrecision(7)}&callback=?", (data) ->
         window.service_data = data
         if data.length == 0
             alert("Ei palvelua lähellä nykyistä sijaintia")
             return
         target = new L.LatLng(data[0].latitude, data[0].longitude)
+        if targetMarker?
+            map.removeLayer(targetMarker)
         targetMarker = L.marker(target, {draggable: true}).addTo(map)
             .on('dragend', onSourceDragEnd)
             .bindPopup("#{data[0].name_fi}<br>(lähin #{srv_id})").openPopup()
