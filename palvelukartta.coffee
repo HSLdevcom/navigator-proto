@@ -98,10 +98,8 @@ class ServiceListView extends Backbone.View
         srv_list.forEach (srv) =>
             srv_name = srv.get 'name_fi'
             srv_id = srv.get 'id'
-            srv_el = $("<li><a href='#'>#{ srv_name }</a></li>")
+            srv_el = $("<li><a href='#map-page?#{srv_id}'>#{ srv_name }</a></li>")
             @$el.append srv_el
-            srv_el.click ->
-                route_to_service(srv_id)
 
         page = $("#find-nearest")
         content = page.children(":jqmData(role=content)")
@@ -125,10 +123,13 @@ $(document).bind("pagebeforechange", (e, data) ->
     if typeof data.toPage != "string"
         return
     u = $.mobile.path.parseUrl(data.toPage)
-    if u.hash != '#find-nearest'
-        return
-    e.preventDefault()
-    show_categories()
+    if u.hash == '#find-nearest'
+        e.preventDefault()
+        show_categories()
+    else if u.hash.indexOf('#map-page?') == 0
+        srv_id = u.hash.replace(/.*\?/, "")
+        e.preventDefault()
+        route_to_service(srv_id)
 )
 
 positionMarker = sourceMarker = targetMarker = null
