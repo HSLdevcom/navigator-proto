@@ -377,6 +377,9 @@ new BackControl().addTo(map)
 L.control.zoom().addTo(map)
 
 
+map.on 'locationerror', (e) ->
+    alert(e.message)
+
 map.on 'locationfound', (e) ->
 #    radius = e.accuracy / 2
     radius = e.accuracy
