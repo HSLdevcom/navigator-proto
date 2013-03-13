@@ -174,6 +174,12 @@ $('#map-page').bind 'pageshow', (e, data) ->
         sourceMarker.closePopup()
         sourceMarker.openPopup()
 
+    if routeLayer?
+        map.fitBounds(route.getBounds())
+    else if window.position_point?
+        zoom = Math.min(map.getBoundsZoom(window.position_bounds), 15)
+        map.setView(window.position_point, zoom)
+
 window.map = map = L.map('map', {minZoom: 10, zoomControl: false})
     .setView([60.29532, 24.93073], 10)
 map.locate
@@ -374,6 +380,10 @@ map.on 'locationfound', (e) ->
     radius = e.accuracy
     measure = if e.accuracy < 2000 then "#{Math.round(e.accuracy)} meters" else "#{Math.round(e.accuracy/1000)} km"
     point = e.latlng
+
+    # save latest position info for later page change
+    window.position_point = point
+    window.position_bounds = e.bounds
 
     if positionMarker != null
         map.removeLayer(positionMarker)
