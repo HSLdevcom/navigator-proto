@@ -315,6 +315,11 @@ map.on 'locationfound', (e) ->
                 find_route(sourceMarker.getLatLng(), targetMarker.getLatLng())
 
 map.on 'click', (e) ->
+    # don't react to map clicks after both markers have been set
+    if sourceMarker? and targetMarker?
+        return
+
+    # place the marker that's missing, giving priority to the source marker
     if sourceMarker == null
         source = e.latlng
         sourceMarker = L.marker(source, {draggable: true}).addTo(map)
@@ -326,7 +331,9 @@ map.on 'click', (e) ->
             .on('dragend', onSourceDragEnd)
             .bindPopup("The end point for journey<br>(drag the marker to change)").openPopup()
 
+    # when the second marker has been placed, find the route between them
+    # and zoom out if necessary to fit the route on the screen
     if sourceMarker? and targetMarker?
-        find_route sourceMarker.getLatLng(), targetMarker.getLatLng, (route) ->
+        find_route sourceMarker.getLatLng(), targetMarker.getLatLng(), (route) ->
             if not map.getBounds().contains(route.getBounds())
                 map.fitBounds(route.getBounds())
