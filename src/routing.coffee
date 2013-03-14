@@ -4,17 +4,17 @@ $(document).bind "pagebeforechange", (e, data) ->
     if typeof data.toPage != "string"
         return
     u = $.mobile.path.parseUrl(data.toPage)
-    if u.hash.indexOf('#map-page?') == 0
-#        srv_id = u.hash.replace(/.*\?/, "")
+
+    if u.hash.indexOf('#map-page?service=') == 0
+        srv_id = u.hash.replace(/.*\?service=/, "")
+        e.preventDefault()
+        route_to_service(srv_id)
+
+    if u.hash.indexOf('#map-page?destination=') == 0
         destination = u.hash.replace(/.*\?destination=/, "")
         e.preventDefault()
-#        route_to_service(srv_id)
-        if not sourceMarker?
-            alert("Laite ei ole antanut nykyistä sijaintia!")
-            return
         location = location_history.get(destination)
         route_to_destination(location)
-        $.mobile.changePage("#map-page")
 
 positionMarker = sourceMarker = targetMarker = null
 sourceCircle = null
