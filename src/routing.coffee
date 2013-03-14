@@ -16,6 +16,14 @@ routeLayer = null
 # latest geolocation event info
 position_point = position_bounds = null
 
+
+## Events before the page is shown
+
+$(document).bind "mobileinit", ->
+    $.mobile.defaultPageTransition = "slide"
+    $.mobile.defaultHomeScroll = 0
+    $.mobile.page.prototype.options.keepNative = "form input"
+
 $(document).bind "pagebeforechange", (e, data) ->
     if typeof data.toPage != "string"
         return
@@ -31,45 +39,6 @@ $(document).bind "pagebeforechange", (e, data) ->
         e.preventDefault()
         location = location_history.get(destination)
         route_to_destination(location)
-
-route_to_destination = (target_location) ->
-    [lat, lng] = target_location.coords
-    target = new L.LatLng(lat, lng)
-    if targetMarker?
-        map.removeLayer(targetMarker)
-    targetMarker = L.marker(target, {draggable: true}).addTo(map)
-        .on('dragend', onSourceDragEnd)
-        .bindPopup("#{target_location.name}").openPopup()
-    $.mobile.changePage("#map-page")
-    if sourceMarker?
-        source = sourceMarker.getLatLng()
-        find_route sourceMarker.getLatLng(), target, (route) ->
-            map.fitBounds(route.getBounds())
-
-route_to_service = (srv_id) ->
-    if not sourceMarker?
-        alert("Laite ei ole antanut nykyistä sijaintia!")
-        return
-    source = sourceMarker.getLatLng()
-    $.getJSON "http://www.hel.fi/palvelukarttaws/rest/v2/unit/?service=#{srv_id}&distance=1000&lat=#{source.lat.toPrecision(7)}&lon=#{source.lng.toPrecision(7)}&callback=?", (data) ->
-        window.service_dbg = data
-        if data.length == 0
-            alert("Ei palvelua lähellä nykyistä sijaintia")
-            return
-        target = new L.LatLng(data[0].latitude, data[0].longitude)
-        if targetMarker?
-            map.removeLayer(targetMarker)
-        targetMarker = L.marker(target, {draggable: true}).addTo(map)
-            .on('dragend', onSourceDragEnd)
-            .bindPopup("#{data[0].name_fi}<br>(lähin #{srv_id})").openPopup()
-        $.mobile.changePage("#map-page")
-        find_route sourceMarker.getLatLng(), target, (route) ->
-            map.fitBounds(route.getBounds())
-
-$(document).bind "mobileinit", ->
-    $.mobile.defaultPageTransition = "slide"
-    $.mobile.defaultHomeScroll = 0
-    $.mobile.page.prototype.options.keepNative = "form input"
 
 $('#map-page').bind 'pageshow', (e, data) ->
     height = window.innerHeight-$('[data-role=header]').height()-
@@ -93,14 +62,8 @@ $('#map-page').bind 'pageshow', (e, data) ->
         zoom = Math.min(map.getBoundsZoom(position_bounds), 15)
         map.setView(position_point, zoom)
 
-window.map_dbg = map = L.map('map', {minZoom: 10, zoomControl: false})
-    .setView([60.29532, 24.93073], 10)
-map.locate
-    setView: false
-    maxZoom: 15
-    watch: true
-    timeout: Infinity
-    enableHighAccuracy: true
+
+## Utilities
 
 # from https://github.com/reitti/reittiopas/blob/master/web/js/utils.coffee
 transportColors =
@@ -146,10 +109,6 @@ format_code = (code) ->
 format_time = (time) ->
     return time.replace(/(....)(..)(..)(..)(..)/,"$1-$2-$3 $4:$5")
 
-onSourceDragEnd = (event) ->
-    if sourceMarker != null and targetMarker != null
-        find_route(sourceMarker.getLatLng(), targetMarker.getLatLng())
-
 # translated from https://github.com/ahocevar/openlayers/blob/master/lib/OpenLayers/Format/EncodedPolyline.js
 decode_polyline = (encoded, dims) -> 
     # Start from origo
@@ -173,6 +132,50 @@ decode_polyline = (encoded, dims) ->
         point.slice(0)
 
     return points
+
+
+## Markers
+
+onSourceDragEnd = (event) ->
+    if sourceMarker != null and targetMarker != null
+        find_route(sourceMarker.getLatLng(), targetMarker.getLatLng())
+
+
+## Routing
+
+route_to_destination = (target_location) ->
+    [lat, lng] = target_location.coords
+    target = new L.LatLng(lat, lng)
+    if targetMarker?
+        map.removeLayer(targetMarker)
+    targetMarker = L.marker(target, {draggable: true}).addTo(map)
+        .on('dragend', onSourceDragEnd)
+        .bindPopup("#{target_location.name}").openPopup()
+    $.mobile.changePage("#map-page")
+    if sourceMarker?
+        source = sourceMarker.getLatLng()
+        find_route sourceMarker.getLatLng(), target, (route) ->
+            map.fitBounds(route.getBounds())
+
+route_to_service = (srv_id) ->
+    if not sourceMarker?
+        alert("Laite ei ole antanut nykyistä sijaintia!")
+        return
+    source = sourceMarker.getLatLng()
+    $.getJSON "http://www.hel.fi/palvelukarttaws/rest/v2/unit/?service=#{srv_id}&distance=1000&lat=#{source.lat.toPrecision(7)}&lon=#{source.lng.toPrecision(7)}&callback=?", (data) ->
+        window.service_dbg = data
+        if data.length == 0
+            alert("Ei palvelua lähellä nykyistä sijaintia")
+            return
+        target = new L.LatLng(data[0].latitude, data[0].longitude)
+        if targetMarker?
+            map.removeLayer(targetMarker)
+        targetMarker = L.marker(target, {draggable: true}).addTo(map)
+            .on('dragend', onSourceDragEnd)
+            .bindPopup("#{data[0].name_fi}<br>(lähin #{srv_id})").openPopup()
+        $.mobile.changePage("#map-page")
+        find_route sourceMarker.getLatLng(), target, (route) ->
+            map.fitBounds(route.getBounds())
 
 find_route = (source, target, callback) ->
     $.getJSON "http://dev.hsl.fi/opentripplanner-api-webapp/ws/plan?toPlace=#{target.lat},#{target.lng}&fromPlace=#{source.lat},#{source.lng}&minTransferTime=180&walkSpeed=1.17&maxWalkDistance=-1&callback=?", (data) ->
@@ -250,6 +253,18 @@ find_route_reittiopas = (source, target, callback) ->
 
         if not map.getBounds().contains(route.getBounds())
             map.fitBounds(route.getBounds())
+
+
+## Map initialisation
+
+window.map_dbg = map = L.map('map', {minZoom: 10, zoomControl: false})
+    .setView([60.29532, 24.93073], 10)
+map.locate
+    setView: false
+    maxZoom: 15
+    watch: true
+    timeout: Infinity
+    enableHighAccuracy: true
 
 cloudmade = L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{style}/256/{z}/{x}/{y}.png', 
     attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2012 CloudMade',
