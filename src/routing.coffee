@@ -12,14 +12,16 @@ $(document).bind "pagebeforechange", (e, data) ->
         if not sourceMarker?
             alert("Laite ei ole antanut nykyistä sijaintia!")
             return
-        [lat, lng] = destination.split(",")
-        route_to_destination(new L.LatLng(lat, lng))
+        location = location_history.get(destination)
+        route_to_destination(location)
         $.mobile.changePage("#map-page")
 
 positionMarker = sourceMarker = targetMarker = null
 sourceCircle = null
 
-route_to_destination = (target) ->
+route_to_destination = (target_location) ->
+    [lat, lng] = target_location.coords
+    target = new L.LatLng(lat, lng)
     if not sourceMarker?
         alert("Laite ei ole antanut nykyistä sijaintia!")
         return
@@ -28,7 +30,7 @@ route_to_destination = (target) ->
         map.removeLayer(targetMarker)
     targetMarker = L.marker(target, {draggable: true}).addTo(map)
         .on('dragend', onSourceDragEnd)
-        .bindPopup("#{target}").openPopup()
+        .bindPopup("#{target_location.name}").openPopup()
     $.mobile.changePage("#map-page")
     find_route sourceMarker.getLatLng(), target, (route) ->
         map.fitBounds(route.getBounds())
