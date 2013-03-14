@@ -22,10 +22,10 @@ module.exports = (grunt) ->
         options:
           port: 9001
           base: "."
-          keepalive: true
 
   grunt.loadNpmTasks 'grunt-contrib-coffee'
   grunt.loadNpmTasks 'grunt-contrib-watch'
   grunt.loadNpmTasks 'grunt-contrib-connect'
 
   grunt.registerTask 'default', ['coffee']
+  grunt.registerTask 'server', ['connect', 'watch']
