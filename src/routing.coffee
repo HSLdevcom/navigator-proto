@@ -1,4 +1,20 @@
 
+## module state variables
+
+# map
+map = null
+
+# map markers for current position, routing source, routing target
+positionMarker = sourceMarker = targetMarker = null
+
+# map feature for accuracy of geolocated routing source
+sourceCircle = null
+
+# map layer for routing results
+routeLayer = null
+
+# latest geolocation event info
+position_point = position_bounds = null
 
 $(document).bind "pagebeforechange", (e, data) ->
     if typeof data.toPage != "string"
@@ -16,9 +32,6 @@ $(document).bind "pagebeforechange", (e, data) ->
         location = location_history.get(destination)
         route_to_destination(location)
 
-positionMarker = sourceMarker = targetMarker = null
-sourceCircle = null
-
 route_to_destination = (target_location) ->
     [lat, lng] = target_location.coords
     target = new L.LatLng(lat, lng)
@@ -33,13 +46,13 @@ route_to_destination = (target_location) ->
         find_route sourceMarker.getLatLng(), target, (route) ->
             map.fitBounds(route.getBounds())
 
-window.route_to_service = (srv_id) ->
+route_to_service = (srv_id) ->
     if not sourceMarker?
         alert("Laite ei ole antanut nykyistä sijaintia!")
         return
     source = sourceMarker.getLatLng()
     $.getJSON "http://www.hel.fi/palvelukarttaws/rest/v2/unit/?service=#{srv_id}&distance=1000&lat=#{source.lat.toPrecision(7)}&lon=#{source.lng.toPrecision(7)}&callback=?", (data) ->
-        window.service_data = data
+        window.service_dbg = data
         if data.length == 0
             alert("Ei palvelua lähellä nykyistä sijaintia")
             return
@@ -76,11 +89,11 @@ $('#map-page').bind 'pageshow', (e, data) ->
 
     if routeLayer?
         map.fitBounds(routeLayer.getBounds())
-    else if window.position_point?
-        zoom = Math.min(map.getBoundsZoom(window.position_bounds), 15)
-        map.setView(window.position_point, zoom)
+    else if position_point?
+        zoom = Math.min(map.getBoundsZoom(position_bounds), 15)
+        map.setView(position_point, zoom)
 
-window.map = map = L.map('map', {minZoom: 10, zoomControl: false})
+window.map_dbg = map = L.map('map', {minZoom: 10, zoomControl: false})
     .setView([60.29532, 24.93073], 10)
 map.locate
     setView: false
@@ -137,8 +150,6 @@ onSourceDragEnd = (event) ->
     if sourceMarker != null and targetMarker != null
         find_route(sourceMarker.getLatLng(), targetMarker.getLatLng())
 
-routeLayer = null
-
 # translated from https://github.com/ahocevar/openlayers/blob/master/lib/OpenLayers/Format/EncodedPolyline.js
 decode_polyline = (encoded, dims) -> 
     # Start from origo
@@ -171,7 +182,7 @@ find_route = (source, target, callback) ->
             $('#error-popup').popup('open')
             return
 
-        window.data = data
+        window.route_dbg = data
 
         if routeLayer != null
             map.removeLayer(routeLayer)
@@ -207,7 +218,7 @@ find_route = (source, target, callback) ->
 
 find_route_reittiopas = (source, target, callback) ->
     $.getJSON "http://tuukka.kapsi.fi/tmp/reittiopas.cgi?request=route&detail=full&epsg_in=wgs84&epsg_out=wgs84&from=#{source.lng},#{source.lat}&to=#{target.lng},#{target.lat}&callback=?", (data) ->
-        window.data = data
+        window.route_dbg = data
 
         if routeLayer != null
             map.removeLayer(routeLayer)
@@ -285,8 +296,8 @@ map.on 'locationfound', (e) ->
     point = e.latlng
 
     # save latest position info for later page change
-    window.position_point = point
-    window.position_bounds = e.bounds
+    position_point = point
+    position_bounds = e.bounds
 
     if positionMarker != null
         map.removeLayer(positionMarker)
