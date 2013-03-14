@@ -1,0 +1,23 @@
+{
+  "name": "navigator-proto",
+  "version": "0.1.0",
+  "description": "City Navigator prototype",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/codeforeurope/navigator-proto.git"
+  },
+  "author": "",
+  "license": "EUPL v1.2/AGPLv3",
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-jshint": "~0.1.1",
+    "grunt-contrib-nodeunit": "~0.1.2",
+    "grunt-contrib-watch": "~0.1.4",
+    "grunt-contrib-coffee": "~0.3.2"
+  }
+}
