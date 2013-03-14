@@ -59,7 +59,8 @@ $(document).on "listviewbeforefilter", "#navigate-to-input", (e, data) ->
                 e.preventDefault()
                 idx = $(this).data 'index'
                 adr = objs[idx]
-                loc = new Location adr.name, adr.location.coordinates
+                coords = adr.location.coordinates
+                loc = new Location adr.name, [coords[1], coords[0]]
                 navigate_to loc
             $ul.append $el
 
