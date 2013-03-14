@@ -23,6 +23,7 @@ class LocationHistory
         @array.push loc.to_json()
         @history.push loc
         localStorage[@ls_id] = JSON.stringify @array
+        return @history.length - 1
 
     get: (id) ->
         return @history[id]
@@ -34,25 +35,33 @@ class LocationHistory
 
 window.location_history = new LocationHistory "city-navigator-history"
 
+navigate_to = (loc) ->
+    idx = location_history.add loc
+    page = "#map-page?destination=#{ idx }"
+    $.mobile.changePage page
+
 $(document).on "listviewbeforefilter", "#navigate-to-input", (e, data) ->
-    console.log "autocomplete"
     val = $(data.input).val()
-    console.log val
     if (!val)
         return
     $ul = $(this)
-    $ul.html "<li><div class='ui-loader'><span class='ui-icon ui-icon-loading'></span></div></li>"
-    $ul.listview "refresh"
     $.getJSON URL_BASE + "&callback=?",
         name: val
         limit: 10
     , (data) ->
         objs = data.objects
-        html = ''
+        autocomplete_locs = []
+        $ul.html ''
         for adr in objs
-            coords = adr.location.coordinates
-            link = "#map-page?destination=#{ coords[1]},#{ coords[0] }"
-            html += "<li><a href=\"#{ link }\">" + adr.name + "</a></li>"
-        $ul.html html
+            $el = $("<li><a href='#map-page'>#{ adr.name }</a></li>")
+            $el.data 'index', objs.indexOf(adr)
+            $el.click (e) ->
+                e.preventDefault()
+                idx = $(this).data 'index'
+                adr = objs[idx]
+                loc = new Location adr.name, adr.location.coordinates
+                navigate_to loc
+            $ul.append $el
+
         $ul.listview "refresh"
         $ul.trigger "updatelayout"
