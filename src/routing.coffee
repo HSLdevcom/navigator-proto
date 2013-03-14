@@ -175,7 +175,7 @@ decode_polyline = (encoded, dims) ->
     return points
 
 find_route = (source, target, callback) ->
-    $.getJSON "http://dev.hsl.fi/opentripplanner-api-webapp/ws/plan?toPlace=#{target.lat},#{target.lng}&fromPlace=#{source.lat},#{source.lng}&callback=?", (data) ->
+    $.getJSON "http://dev.hsl.fi/opentripplanner-api-webapp/ws/plan?toPlace=#{target.lat},#{target.lng}&fromPlace=#{source.lat},#{source.lng}&minTransferTime=180&walkSpeed=1.17&maxWalkDistance=-1&callback=?", (data) ->
 
         if data.error?.msg
             $('#error-popup p').text(data.error.msg)
