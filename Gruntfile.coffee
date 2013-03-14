@@ -28,4 +28,4 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-connect'
 
   grunt.registerTask 'default', ['coffee']
-  grunt.registerTask 'server', ['connect', 'watch']
+  grunt.registerTask 'server', ['coffee', 'connect', 'watch']
