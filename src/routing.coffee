@@ -5,12 +5,33 @@ $(document).bind "pagebeforechange", (e, data) ->
         return
     u = $.mobile.path.parseUrl(data.toPage)
     if u.hash.indexOf('#map-page?') == 0
-        srv_id = u.hash.replace(/.*\?/, "")
+#        srv_id = u.hash.replace(/.*\?/, "")
+        destination = u.hash.replace(/.*\?destination=/, "")
         e.preventDefault()
-        route_to_service(srv_id)
+#        route_to_service(srv_id)
+        if not sourceMarker?
+            alert("Laite ei ole antanut nykyistä sijaintia!")
+            return
+        [lat, lng] = destination.split(",")
+        route_to_destination(new L.LatLng(lat, lng))
+        $.mobile.changePage("#map-page")
 
 positionMarker = sourceMarker = targetMarker = null
 sourceCircle = null
+
+route_to_destination = (target) ->
+    if not sourceMarker?
+        alert("Laite ei ole antanut nykyistä sijaintia!")
+        return
+    source = sourceMarker.getLatLng()
+    if targetMarker?
+        map.removeLayer(targetMarker)
+    targetMarker = L.marker(target, {draggable: true}).addTo(map)
+        .on('dragend', onSourceDragEnd)
+        .bindPopup("#{target}").openPopup()
+    $.mobile.changePage("#map-page")
+    find_route sourceMarker.getLatLng(), target, (route) ->
+        map.fitBounds(route.getBounds())
 
 window.route_to_service = (srv_id) ->
     if not sourceMarker?
