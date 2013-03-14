@@ -22,18 +22,16 @@ sourceCircle = null
 route_to_destination = (target_location) ->
     [lat, lng] = target_location.coords
     target = new L.LatLng(lat, lng)
-    if not sourceMarker?
-        alert("Laite ei ole antanut nykyistä sijaintia!")
-        return
-    source = sourceMarker.getLatLng()
     if targetMarker?
         map.removeLayer(targetMarker)
     targetMarker = L.marker(target, {draggable: true}).addTo(map)
         .on('dragend', onSourceDragEnd)
         .bindPopup("#{target_location.name}").openPopup()
     $.mobile.changePage("#map-page")
-    find_route sourceMarker.getLatLng(), target, (route) ->
-        map.fitBounds(route.getBounds())
+    if sourceMarker?
+        source = sourceMarker.getLatLng()
+        find_route sourceMarker.getLatLng(), target, (route) ->
+            map.fitBounds(route.getBounds())
 
 window.route_to_service = (srv_id) ->
     if not sourceMarker?
@@ -327,6 +325,8 @@ map.on 'click', (e) ->
         targetMarker = L.marker(target, {draggable: true}).addTo(map)
             .on('dragend', onSourceDragEnd)
             .bindPopup("The end point for journey<br>(drag the marker to change)").openPopup()
-        find_route sourceMarker.getLatLng(), target, (route) ->
+
+    if sourceMarker? and targetMarker?
+        find_route sourceMarker.getLatLng(), targetMarker.getLatLng, (route) ->
             if not map.getBounds().contains(route.getBounds())
                 map.fitBounds(route.getBounds())
