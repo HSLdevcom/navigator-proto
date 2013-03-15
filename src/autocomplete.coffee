@@ -40,13 +40,13 @@ navigate_to = (loc) ->
     page = "#map-page?destination=#{ idx }"
     $.mobile.changePage page
 
-$(document).on "listviewbeforefilter", "#navigate-to-input", (e, data) ->
-    val = $(data.input).val()
-    if (!val)
-        return
-    $ul = $(this)
+autocomplete_xhr = null
+autocomplete_timeout = null
+
+fetch_autocomplete_results = (query, $ul) ->
+    autocomplete_timeout = null
     $.getJSON URL_BASE + "&callback=?",
-        name: val
+        name: query
         limit: 10
     , (data) ->
         objs = data.objects
@@ -66,3 +66,20 @@ $(document).on "listviewbeforefilter", "#navigate-to-input", (e, data) ->
 
         $ul.listview "refresh"
         $ul.trigger "updatelayout"
+
+abort_autocomplete = ->
+    if autocomplete_timeout
+        window.clearTimeout autocomplete_timeout
+        autocomplete_timeout = null
+    if autocomplete_xhr
+        autocomplete_xhr.abort()
+        autocomplete_xhr = null
+
+
+$(document).on "listviewbeforefilter", "#navigate-to-input", (e, data) ->
+    val = $(data.input).val()
+    if (!val)
+        return
+    $ul = $(this)
+    abort_autocomplete()
+    autocomplete_timeout = window.setTimeout fetch_autocomplete_results, 200, val, $ul
