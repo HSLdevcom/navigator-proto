@@ -20,13 +20,16 @@ position_point = position_bounds = null
 ## Events before the page is shown
 
 $(document).bind "mobileinit", ->
+    console.log "mobileinit"
     $.mobile.defaultPageTransition = "slide"
     $.mobile.defaultHomeScroll = 0
     $.mobile.page.prototype.options.keepNative = "form input"
 
 $(document).bind "pagebeforechange", (e, data) ->
     if typeof data.toPage != "string"
+        console.log "pagebeforechange without toPage"
         return
+    console.log "pagebeforechange", data.toPage
     u = $.mobile.path.parseUrl(data.toPage)
 
     if u.hash.indexOf('#map-page?service=') == 0
@@ -41,6 +44,7 @@ $(document).bind "pagebeforechange", (e, data) ->
         route_to_destination(location)
 
 $('#map-page').bind 'pageshow', (e, data) ->
+    console.log "#map-page pageshow"
     height = window.innerHeight-$('[data-role=header]').height()-
                                 $('[data-role=footer]').height()-
                                 $('[data-role=listview]').height()
@@ -144,6 +148,7 @@ onSourceDragEnd = (event) ->
 ## Routing
 
 route_to_destination = (target_location) ->
+    console.log "route_to_destination", target_location.name
     [lat, lng] = target_location.coords
     target = new L.LatLng(lat, lng)
     if targetMarker?
@@ -156,13 +161,16 @@ route_to_destination = (target_location) ->
         source = sourceMarker.getLatLng()
         find_route sourceMarker.getLatLng(), target, (route) ->
             map.fitBounds(route.getBounds())
+    console.log "route_to_destination done"
 
 route_to_service = (srv_id) ->
+    console.log "route_to_service", srv_id
     if not sourceMarker?
         alert("Laite ei ole antanut nykyistä sijaintia!")
         return
     source = sourceMarker.getLatLng()
     $.getJSON "http://www.hel.fi/palvelukarttaws/rest/v2/unit/?service=#{srv_id}&distance=1000&lat=#{source.lat.toPrecision(7)}&lon=#{source.lng.toPrecision(7)}&callback=?", (data) ->
+        console.log "palvelukartta callback got data"
         window.service_dbg = data
         if data.length == 0
             alert("Ei palvelua lähellä nykyistä sijaintia")
@@ -176,10 +184,13 @@ route_to_service = (srv_id) ->
         $.mobile.changePage("#map-page")
         find_route sourceMarker.getLatLng(), target, (route) ->
             map.fitBounds(route.getBounds())
+        console.log "palvelukartta callback done"
+    console.log "route_to_service done"
 
 find_route = (source, target, callback) ->
+    console.log "find_route", source.toString(), target.toString(), callback?
     $.getJSON "http://dev.hsl.fi/opentripplanner-api-webapp/ws/plan?toPlace=#{target.lat},#{target.lng}&fromPlace=#{source.lat},#{source.lng}&minTransferTime=180&walkSpeed=1.17&maxWalkDistance=-1&callback=?", (data) ->
-
+        console.log "opentripplanner callback got data"
         if data.error?.msg
             $('#error-popup p').text(data.error.msg)
             $('#error-popup').popup('open')
@@ -218,6 +229,8 @@ find_route = (source, target, callback) ->
 
         if callback
             callback(route)
+        console.log "opentripplanner callback done"
+    console.log "find_route done"
 
 find_route_reittiopas = (source, target, callback) ->
     $.getJSON "http://tuukka.kapsi.fi/tmp/reittiopas.cgi?request=route&detail=full&epsg_in=wgs84&epsg_out=wgs84&from=#{source.lng},#{source.lat}&to=#{target.lng},#{target.lat}&callback=?", (data) ->
