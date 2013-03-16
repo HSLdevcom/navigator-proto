@@ -155,7 +155,9 @@ route_to_destination = (target_location) ->
         map.removeLayer(targetMarker)
     targetMarker = L.marker(target, {draggable: true}).addTo(map)
         .on('dragend', onSourceDragEnd)
-        .bindPopup("#{target_location.name}").openPopup()
+        .bindPopup("#{target_location.name}")
+# crashes on Mobile Safari:
+#    targetMarker.openPopup()
     $.mobile.changePage("#map-page")
     if sourceMarker?
         source = sourceMarker.getLatLng()
@@ -180,7 +182,9 @@ route_to_service = (srv_id) ->
             map.removeLayer(targetMarker)
         targetMarker = L.marker(target, {draggable: true}).addTo(map)
             .on('dragend', onSourceDragEnd)
-            .bindPopup("#{data[0].name_fi}<br>(lähin #{srv_id})").openPopup()
+            .bindPopup("#{data[0].name_fi}<br>(lähin #{srv_id})")
+# crashes on Mobile Safari:
+#        targetMarker.openPopup()
         $.mobile.changePage("#map-page")
         find_route sourceMarker.getLatLng(), target, (route) ->
             map.fitBounds(route.getBounds())
