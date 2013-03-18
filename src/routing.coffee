@@ -168,14 +168,14 @@ route_to_destination = (target_location) ->
 route_to_service = (srv_id) ->
     console.log "route_to_service", srv_id
     if not sourceMarker?
-        alert("Laite ei ole antanut nykyistä sijaintia!")
+        alert("The device hasn't provided the current position!")
         return
     source = sourceMarker.getLatLng()
     $.getJSON "http://www.hel.fi/palvelukarttaws/rest/v2/unit/?service=#{srv_id}&distance=1000&lat=#{source.lat.toPrecision(7)}&lon=#{source.lng.toPrecision(7)}&callback=?", (data) ->
         console.log "palvelukartta callback got data"
         window.service_dbg = data
         if data.length == 0
-            alert("Ei palvelua lähellä nykyistä sijaintia")
+            alert("No service near the current position.")
             return
         target = new L.LatLng(data[0].latitude, data[0].longitude)
         if targetMarker?
@@ -310,7 +310,7 @@ BackControl = L.Control.extend
 
     onAdd: (map) ->
         $container = $("<div id='back-control'>")
-        $container.append($("<a href='' data-role='button' data-rel='back' data-icon='arrow-l' data-mini='true'>Takaisin</a>"))
+        $container.append($("<a href='' data-role='button' data-rel='back' data-icon='arrow-l' data-mini='true'>Back</a>"))
         return $container.get(0)
 
 new BackControl().addTo(map)
