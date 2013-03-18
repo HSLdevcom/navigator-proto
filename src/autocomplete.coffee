@@ -78,8 +78,9 @@ abort_autocomplete = ->
 
 $(document).on "listviewbeforefilter", "#navigate-to-input", (e, data) ->
     val = $(data.input).val()
-    if (!val)
-        return
     $ul = $(this)
     abort_autocomplete()
-    autocomplete_timeout = window.setTimeout fetch_autocomplete_results, 200, val, $ul
+    if val
+        autocomplete_timeout = window.setTimeout fetch_autocomplete_results, 200, val, $ul
+    else
+        $ul.html ''
