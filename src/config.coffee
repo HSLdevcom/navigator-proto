@@ -20,6 +20,7 @@ helsinki = new Area(
     bbox_ne: [60.653728, 25.576590]
     bbox_sw: [59.903339, 23.692820]
     center: [60.170833, 24.9375]
+)
 
 config =
     area: manchester
