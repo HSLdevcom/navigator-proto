@@ -2,10 +2,6 @@ class Area
     constructor: (opts) ->
         _.extend @, opts
 
-
-
-    (@name, @country, @bbox_ne, @bbox_sw, @center) ->
-
 manchester = new Area(
     name: "Greater Manchester"
     country: "gb"

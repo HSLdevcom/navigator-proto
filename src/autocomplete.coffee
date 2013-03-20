@@ -76,7 +76,7 @@ class GeocoderCompleter extends Autocompleter
                 loc_list.push loc
             @.callback @.callback_args, loc_list
 
-GOOGLE_URL_BASE = "http://localhost:8000/google/"
+GOOGLE_URL_BASE = "http://dev.hel.fi:8000/google/"
 
 class GoogleLocation extends Location
     constructor: (pred) ->
