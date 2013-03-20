@@ -96,7 +96,7 @@ class ServiceListView extends Backbone.View
                     return true
         @$el.empty()
         srv_list.forEach (srv) =>
-            srv_name = srv.get 'name_fi'
+            srv_name = srv.get 'name_en'
             srv_id = srv.get 'id'
             srv_el = $("<li><a href='#map-page?service=#{srv_id}'>#{ srv_name }</a></li>")
             @$el.append srv_el
