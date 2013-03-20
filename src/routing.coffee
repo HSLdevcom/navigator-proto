@@ -229,7 +229,7 @@ find_route = (source, target, callback) ->
                 last_stop = leg.to
                 point = {y: stop.lat, x: stop.lon}
                 marker = L.marker(new L.LatLng(point.y, point.x)).addTo(route)
-                    .bindPopup("At time #{moment(leg.startTime).format("YYYY-MM-DD HH:mm")}, take the line #{format_code(leg.routeId)} from stop #{stop.name} to stop #{last_stop.name}")
+                    .bindPopup("At time #{moment(leg.startTime).format("YYYY-MM-DD HH:mm")}, take the line #{leg.route} from stop #{stop.name} to stop #{last_stop.name}")
 
         if callback
             callback(route)
