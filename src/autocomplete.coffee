@@ -94,16 +94,20 @@ class GoogleLocation extends Location
 class GoogleCompleter extends Autocompleter
     fetch_results: ->
         url = GOOGLE_URL_BASE + "autocomplete/?callback=?"
-        location = navi_config.area.center
+        area = citynavi.config.area
+        location = area.center
         # FIXME
         radius = 12000
         data = {query: @.query, location: location.join(','), radius: radius}
-        data['country'] = navi_config.area.country
+        data['country'] = area.country
         @xhr = $.getJSON url, data, (data) =>
             @xhr = null
             preds = data.predictions
             loc_list = []
             for pred in preds
+                city_name = pred.terms[1].value
+                if city_name not in area.cities
+                    continue
                 loc = new GoogleLocation pred
                 loc_list.push loc
             @.callback @.callback_args, loc_list
@@ -113,13 +117,14 @@ NOMINATIM_URL = "http://nominatim.openstreetmap.org/search/"
 class OSMCompleter extends Autocompleter
     fetch_results: ->
         url = NOMINATIM_URL + "?json_callback=?"
-        ne = navi_config.area.bbox_ne
-        sw = navi_config.area.bbox_sw
+        area = citynavi.config.area
+        ne = area.bbox_ne
+        sw = area.bbox_sw
         bbox = [sw[1], ne[0], ne[1], sw[0]]
         data =
             q: @.query
             format: "json"
-            countrycodes: navi_config.area.country
+            countrycodes: area.country
             limit: 10
             bounded: 1
             addressdetails: 1
@@ -134,20 +139,6 @@ class OSMCompleter extends Autocompleter
                 loc_list.push loc
             @.callback @.callback_args, loc_list
 
-###class MapquestCompleter extends Autocompleter
-    fetch_results: ->
-        url = 'http://www.mapquestapi.com/geocoding/v1/address' + "?callback=?"
-        ne = navi_config.area.bbox_ne
-        sw = navi_config.area.bbox_sw
-        data =
-            key: "Fmjtd|luub2l0725,a5=o5-96ys1w"
-            outFormat: "json"
-            location: @.query
-        @xhr = $.getJSON url, data, (data) =>
-            @xhr = null
-            console.log data
-###
-
 geocoder = new GoogleCompleter()
 
 test_completer = ->
@@ -155,7 +146,7 @@ test_completer = ->
         console.log data
     geocoder.get_predictions "Piccadilly", callback
 
-test_completer()
+#test_completer()
 
 navigate_to = (loc) ->
     idx = location_history.add loc

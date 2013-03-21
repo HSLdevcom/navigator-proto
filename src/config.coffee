@@ -5,6 +5,7 @@ class Area
 manchester = new Area(
     name: "Greater Manchester"
     country: "gb"
+    cities: ["Bolton", "Bury", "Oldham", "Rochdale", "Stockport", "Tameside", "Trafford", "Wigan", "Manchester", "Salford"]
     bbox_ne: [53.685760, -1.909630]
     bbox_sw: [53.327332, -2.730550]
     center: [53.479167, -2.244167]
@@ -20,7 +21,10 @@ helsinki = new Area(
     otp_base_url: "http://dev.hsl.fi/opentripplanner-api-webapp/ws/"
 )
 
-config =
-    area: manchester
+class CityNavigator
+    constructor: (opts) ->
+        _.extend @, opts
 
-window.navi_config = config
+window.citynavi = new CityNavigator
+    config:
+        area: manchester
