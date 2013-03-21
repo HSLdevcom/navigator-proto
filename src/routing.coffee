@@ -275,7 +275,7 @@ find_route_reittiopas = (source, target, callback) ->
 ## Map initialisation
 
 window.map_dbg = map = L.map('map', {minZoom: 10, zoomControl: false})
-    .setView([60.29532, 24.93073], 10)
+    .setView(navi_config.area.center, 10)
 map.locate
     setView: false
     maxZoom: 15
