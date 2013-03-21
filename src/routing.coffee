@@ -193,7 +193,7 @@ route_to_service = (srv_id) ->
 
 find_route = (source, target, callback) ->
     console.log "find_route", source.toString(), target.toString(), callback?
-    $.getJSON "http://dev.hsl.fi/opentripplanner-api-webapp/ws/plan?toPlace=#{target.lat},#{target.lng}&fromPlace=#{source.lat},#{source.lng}&minTransferTime=180&walkSpeed=1.17&maxWalkDistance=-1&callback=?", (data) ->
+    $.getJSON navi_config.area.otp_base_url + "plan?toPlace=#{target.lat},#{target.lng}&fromPlace=#{source.lat},#{source.lng}&minTransferTime=180&walkSpeed=1.17&maxWalkDistance=-1&callback=?", (data) ->
         console.log "opentripplanner callback got data"
         if data.error?.msg
             $('#error-popup p').text(data.error.msg)
