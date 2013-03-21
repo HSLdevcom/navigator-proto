@@ -43,7 +43,7 @@ class ServiceList extends Backbone.Collection
             for child_id in srv.get('child_ids')
                 child = @.get(child_id)
                 if not child
-                    console.log "child #{ child_id } missing"
+                    # console.log "child #{ child_id } missing"
                 else
                     child.set('parent', srv.id)
     save_to_cache: ->
@@ -67,9 +67,9 @@ class ServiceList extends Backbone.Collection
             srv_attrs = srv.load_from_cache()
             if not srv_attrs
                 return false
-            console.log srv_attrs
+            # console.log srv_attrs
             srv_list.push srv_attrs
-        console.log srv_list
+        # console.log srv_list
         @.reset srv_list
         return true
 
