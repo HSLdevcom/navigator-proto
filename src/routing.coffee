@@ -354,6 +354,9 @@ map.on 'locationfound', (e) ->
             .bindPopup("The starting point for journey planner<br>(tap the red marker to update)<br>You are within #{measure} from this point").openPopup()
         sourceCircle = L.circle(point, radius, {color: 'gray'}).addTo(map)
 
+        if targetMarker != null
+            find_route(sourceMarker.getLatLng(), targetMarker.getLatLng())
+
     if radius > 2000
         return
     positionMarker = L.circle(point, radius, {color: 'red'}).addTo(map)
