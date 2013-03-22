@@ -12,7 +12,7 @@ class POIProvider
 class GeocoderPOIProvider extends POIProvider
     fetch_pois: (category, opts) ->
         params =
-            category__type: @type
+            category__type: category.type
             municipality__id: citynavi.config.area.poi_muni_id
         if opts.location
             params.lat = opts.location[0]
