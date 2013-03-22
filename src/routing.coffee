@@ -341,6 +341,7 @@ map.on 'locationfound', (e) ->
     # save latest position info for later page change
     position_point = point
     position_bounds = e.bounds
+    citynavi.set_source_location [point.lat, point.lng]
 
     if positionMarker != null
         map.removeLayer(positionMarker)

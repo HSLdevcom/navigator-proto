@@ -6,10 +6,12 @@ manchester = new Area(
     name: "Greater Manchester"
     country: "gb"
     cities: ["Bolton", "Bury", "Oldham", "Rochdale", "Stockport", "Tameside", "Trafford", "Wigan", "Manchester", "Salford"]
+    google_autocomplete_append: "Manchester"
     bbox_ne: [53.685760, -1.909630]
     bbox_sw: [53.327332, -2.730550]
     center: [53.479167, -2.244167]
     otp_base_url: "http://dev.hsl.fi:8081/opentripplanner-api-webapp/ws/"
+    poi_muni_id: 44001
 )
 
 helsinki = new Area(
@@ -23,7 +25,12 @@ helsinki = new Area(
 
 class CityNavigator
     constructor: (opts) ->
+        @source_location = null
         _.extend @, opts
+    get_source_location: ->
+        return @source_location
+    set_source_location: (loc) ->
+        @source_location = loc
 
 window.citynavi = new CityNavigator
     config:

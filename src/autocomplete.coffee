@@ -38,10 +38,46 @@ class LocationHistory
 
 window.location_history = new LocationHistory "city-navigator-history"
 
+class Prediction
+    select: ->
+        $.mobile.showPageLoadingMsg()
+        if @type == "location"
+            @location.fetch_details navigate_to_location, @location
+        else
+            args = {callback: navigate_to_poi, location: citynavi.get_source_location()}
+            @category.fetch_pois args
+    render: ->
+        icon_html = ''
+        name = @name
+        if @type == "category"
+            dest_page = "select-nearest"
+            icon_html = @category.get_icon_html()
+            name = "Closest " + name.toLowerCase()
+        else
+            dest_page = "map-page"
+        $el = $("<li><a href='##{dest_page}'>#{icon_html}#{name}</a></li>")
+        $el.find('img').height(20).addClass('ui-li-icon')
+        return $el
+
+class LocationPrediction extends Prediction
+    constructor: (loc) ->
+        @location = loc
+        @type = "location"
+        @name = loc.name
+
+class CategoryPrediction extends Prediction
+    constructor: (cat) ->
+        @category = cat
+        @type = "category"
+        @name = cat.name
+
 class Autocompleter
+
+class RemoteAutocompleter extends Autocompleter
     constructor: ->
         @.xhr = null
         @.timeout = null
+        @.remote = true
 
     get_predictions: (query, callback, args) ->
         @.abort()
@@ -53,6 +89,12 @@ class Autocompleter
         @.query = query
         @timeout = window.setTimeout timeout_handler, 200
 
+    submit_location_predictions: (loc_list) ->
+        pred_list = []
+        for loc in loc_list
+            pred_list.push new LocationPrediction(loc)
+        @.callback @.callback_args, pred_list
+
     abort: ->
         if @timeout
             window.clearTimeout @timeout
@@ -61,7 +103,7 @@ class Autocompleter
             @xhr.abort()
             @xhr = null
 
-class GeocoderCompleter extends Autocompleter
+class GeocoderCompleter extends RemoteAutocompleter
     fetch_results: ->
         @xhr = $.getJSON URL_BASE + "&callback=?",
             name: @.query
@@ -74,7 +116,7 @@ class GeocoderCompleter extends Autocompleter
                 coords = adr.location.coordinates
                 loc = new Location adr.name, [coords[1], coords[0]]
                 loc_list.push loc
-            @.callback @.callback_args, loc_list
+            @.submit_location_predictions loc_list
 
 GOOGLE_URL_BASE = "http://dev.hel.fi:8000/google/"
 
@@ -91,14 +133,14 @@ class GoogleLocation extends Location
             @coords = [loc.lat, loc.lng]
             callback args, @
 
-class GoogleCompleter extends Autocompleter
+class GoogleCompleter extends RemoteAutocompleter
     fetch_results: ->
         url = GOOGLE_URL_BASE + "autocomplete/?callback=?"
         area = citynavi.config.area
         location = area.center
         # FIXME
         radius = 12000
-        data = {query: @.query, location: location.join(','), radius: radius}
+        data = {query: @query, location: location.join(','), radius: radius}
         data['country'] = area.country
         @xhr = $.getJSON url, data, (data) =>
             @xhr = null
@@ -110,11 +152,11 @@ class GoogleCompleter extends Autocompleter
                     continue
                 loc = new GoogleLocation pred
                 loc_list.push loc
-            @.callback @.callback_args, loc_list
+            @.submit_location_predictions loc_list
 
 NOMINATIM_URL = "http://nominatim.openstreetmap.org/search/"
 
-class OSMCompleter extends Autocompleter
+class OSMCompleter extends RemoteAutocompleter
     fetch_results: ->
         url = NOMINATIM_URL + "?json_callback=?"
         area = citynavi.config.area
@@ -137,9 +179,22 @@ class OSMCompleter extends Autocompleter
                 name = obj.address.road + ", " + obj.address.city
                 loc = new Location name, [obj.lat, obj.lon]
                 loc_list.push loc
-            @.callback @.callback_args, loc_list
+            @.submit_location_predictions loc_list
 
-geocoder = new GoogleCompleter()
+class POICategoryCompleter extends Autocompleter
+    get_predictions: (query, callback, args) ->
+        if not query.length
+            return
+        pred_list = []
+        q = query.toLowerCase()
+        for cat in citynavi.poi_categories
+            ss = cat.name[0...q.length].toLowerCase()
+            if ss != q
+                continue
+            pred_list.push new CategoryPrediction(cat)
+        callback args, pred_list
+
+completers = [new POICategoryCompleter, new GoogleCompleter]
 
 test_completer = ->
     callback = (args, data) ->
@@ -148,31 +203,52 @@ test_completer = ->
 
 #test_completer()
 
-navigate_to = (loc) ->
+navigate_to_location = (loc) ->
     idx = location_history.add loc
     page = "#map-page?destination=#{ idx }"
     $.mobile.changePage page
 
-render_autocomplete_results = (args, loc_list) ->
+navigate_to_poi = (poi_list) ->
+    poi = poi_list[0]
+    loc = new Location poi.name, poi.coords
+    console.log loc
+    idx = location_history.add loc
+    page = "#map-page?destination=#{ idx }"
+    $.mobile.changePage page
+
+get_all_predictions = (input, callback, callback_args) ->
+    input = $.trim input
+    for c in completers
+        if c.remote
+            # Do not do remote autocompletion if less than 3 characters
+            # input.
+            if input.length < 3
+                continue
+        c.get_predictions input, callback, callback_args
+
+pred_list = []
+
+render_autocomplete_results = (args, new_preds) ->
     $ul = args.$ul
-    $ul.html ''
-    for loc in loc_list
-        $el = $("<li><a href='#map-page'>#{ loc.name }</a></li>")
-        $el.data 'index', loc_list.indexOf(loc)
+    pred_list = pred_list.concat new_preds
+    for pred in pred_list
+        if pred.rendered
+            continue
+        $el = pred.render()
+        $el.data 'index', pred_list.indexOf(pred)
+        pred.rendered = true
         $el.click (e) ->
             e.preventDefault()
             idx = $(this).data 'index'
-            loc = loc_list[idx]
-            loc.fetch_details navigate_to, loc
+            pred = pred_list[idx]
+            pred.select()
         $ul.append $el
-
     $ul.listview "refresh"
     $ul.trigger "updatelayout"
-
+        
 $(document).on "listviewbeforefilter", "#navigate-to-input", (e, data) ->
     val = $(data.input).val()
     $ul = $(this)
-    if (!val)
-        $ul.html ''
-        return
-    geocoder.get_predictions val, render_autocomplete_results, {$ul: $ul}
+    $ul.html('')
+    pred_list = []
+    get_all_predictions val, render_autocomplete_results, {$ul: $ul}
