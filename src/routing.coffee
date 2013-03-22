@@ -231,7 +231,7 @@ find_route = (source, target, callback) ->
         routeLayer = L.featureGroup().addTo(map)
 
         polylines = render_route_layer(itinerary, routeLayer)
-        render_route_buttons(itinerary, polylines)
+        render_route_buttons(itinerary, routeLayer, polylines)
 
         if callback
             callback(routeLayer)
@@ -262,13 +262,24 @@ render_route_layer = (itinerary, route) ->
                     .showLabel()
             polyline
 
-render_route_buttons = (itinerary, polylines) ->
+render_route_buttons = (itinerary, route_layer, polylines) ->
     $list = $('#route-buttons')
     $list.empty()
     trip_duration = itinerary.duration
     trip_start = itinerary.startTime
 
-    length = itinerary.legs.length
+    length = itinerary.legs.length + 1
+
+    $full_trip = $("<li class='leg'><div class='leg-bar' style='margin-right: 3px'><i style='font-weight: lighter'><img src='' />Journey</i><div class='leg-indicator'>#{Math.ceil(trip_duration/1000/60)}min</div></div></li>")
+
+    $full_trip.css("left", "{0}%")
+    $full_trip.css("width", "#{1/length*100}%")
+    $full_trip.click (e) ->
+        map.fitBounds(route_layer.getBounds())
+        sourceMarker.closePopup()
+        targetMarker.closePopup()
+        sourceMarker.openPopup()
+    $list.append($full_trip)
 
     for leg, index in itinerary.legs
       do (index) ->
@@ -280,7 +291,7 @@ render_route_buttons = (itinerary, polylines) ->
 #        leg_subscript = "#{leg.route}"
 
 # YetAnotherJourneyPlanner style:
-        leg_start = index/length
+        leg_start = (index+1)/length
         leg_duration = 1/length
         leg_label = "<img src='static/images/#{googleIcons[leg.routeType]}' height='100%' /> #{leg.route}"
         leg_subscript = "#{Math.ceil(leg.duration/1000/60)}min"
