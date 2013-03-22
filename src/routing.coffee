@@ -45,11 +45,8 @@ $(document).bind "pagebeforechange", (e, data) ->
 
 $('#map-page').bind 'pageshow', (e, data) ->
     console.log "#map-page pageshow"
-    height = window.innerHeight-$('[data-role=header]').height()-
-                                $('[data-role=footer]').height()-
-                                $('[data-role=listview]').height()
-    $('#map').height(height)
-    map.invalidateSize()
+
+    resize_map()
 
     if targetMarker?
         if sourceMarker?
@@ -221,6 +218,8 @@ find_route = (source, target, callback) ->
         route = L.featureGroup().addTo(map)
         routeLayer = route
 
+        render_route_buttons(data.plan.itineraries[0])
+
         legs = data.plan.itineraries[0].legs
 
         for leg in legs
@@ -246,6 +245,28 @@ find_route = (source, target, callback) ->
             callback(route)
         console.log "opentripplanner callback done"
     console.log "find_route done"
+
+render_route_buttons = (itinerary) ->
+    $list = $('#route-buttons')
+    $list.empty()
+    trip_duration = itinerary.duration
+    trip_start = itinerary.startTime
+
+    for leg, index in itinerary.legs
+        leg_start = (leg.startTime-trip_start)/trip_duration
+        leg_duration = leg.duration/trip_duration
+        console.log leg_duration, "/", trip_duration
+
+        $leg = $("<li class='leg'><div class='leg-bar'><i><img src='static/images/#{googleIcons[leg.routeType]}' height='100%' /></i><span class='leg-indicator'>#{leg.route}</span></div></li>")
+
+        $leg.css("left", "#{leg_start*100}%")
+        $leg.css("width", "#{leg_duration*100}%")
+
+        $list.append($leg)
+
+    $list.show()
+
+    resize_map()
 
 find_route_reittiopas = (source, target, callback) ->
     $.getJSON "http://tuukka.kapsi.fi/tmp/reittiopas.cgi?request=route&detail=full&epsg_in=wgs84&epsg_out=wgs84&from=#{source.lng},#{source.lat}&to=#{target.lng},#{target.lat}&callback=?", (data) ->
@@ -284,6 +305,17 @@ find_route_reittiopas = (source, target, callback) ->
 
 
 ## Map initialisation
+
+resize_map = () ->
+    console.log "resize_map"
+    height = window.innerHeight - 
+                                  # $('#map-page [data-role=header]').height() -
+                                  $('#map-page [data-role=footer]').height() -
+                                  # $('#route-buttons').height()
+                                  2
+    console.log "#map height", height
+    $('#map').height(height)
+    map.invalidateSize()
 
 window.map_dbg = map = L.map('map', {minZoom: 10, zoomControl: false})
     .setView(citynavi.config.area.center, 10)

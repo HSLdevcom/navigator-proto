@@ -2,6 +2,7 @@
 .navigator-div-icon {
     height: 100%
 }
+
 .leaflet-label {
 //	background: #193695;
 	background: #ffffff;
@@ -37,4 +38,42 @@
 	position: absolute;
 	top: 5px;
 	left: -8px;
+}
+
+.route-graph {
+    height: 40px;
+    position: relative;
+    margin-left: 1px;
+}
+.route-graph li {
+    font-size: 18px;
+    height: 24px;
+    position: absolute;
+    top: 0;
+}
+.route-graph .leg-bar {
+    height: 20px;
+    margin-right: 1px;
+    padding: 2px;
+    vertical-align: middle;
+    background-color: white;
+    color: black;
+    text-align: center;
+}
+
+.route-graph .leg-bar i {
+    display: block;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+}
+
+.route-graph .leg-bar .leg-indicator {
+   color: white;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
 }
