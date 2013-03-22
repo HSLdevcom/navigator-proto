@@ -1,0 +1,40 @@
+
+.navigator-div-icon {
+    height: 100%
+}
+.leaflet-label {
+//	background: #193695;
+	background: #ffffff;
+	background: rgba(255, 255, 255, 0.81);
+//	background: rgba(25, 54, 149, 0.81);
+	background-clip: padding-box;
+	border-color: #777;
+	border-color: rgba(0,0,0,0.25);
+	border-radius: 2px;
+	border-style: solid;
+	border-width: 2px;
+	color: #111;
+	display: block;
+	font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	padding: 3px 3px 0px;
+	position: absolute;
+	-webkit-user-select: none;
+	   -moz-user-select: none;
+	    -ms-user-select: none;
+	        user-select: none;
+	white-space: nowrap;
+	z-index: 6;
+        left: -2px;
+}
+
+.leaflet-label:before {
+	border-right: 6px solid black;
+	border-right-color: inherit;
+	border-top: 6px solid transparent;
+	border-bottom: 6px solid transparent;
+	content: "";
+	position: absolute;
+	top: 5px;
+	left: -8px;
+}

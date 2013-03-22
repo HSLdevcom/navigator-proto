@@ -99,6 +99,15 @@ googleColors =
     4: transportColors[7]
     109: transportColors[12]
 
+googleIcons =
+    null: 'walking.svg'
+    0: 'tram_stop.svg'
+    1: 'subway.svg'
+    2: 'train_station2.svg'
+    3: 'bus_stop.svg'
+    4: 'port.svg'
+    109: 'train_station2.svg'
+
 format_code = (code) ->
     if code.substring(0,3) == "300" # local train
         return code.charAt(4)
@@ -228,9 +237,11 @@ find_route = (source, target, callback) ->
                 stop = leg.from
                 last_stop = leg.to
                 point = {y: stop.lat, x: stop.lon}
-                marker = L.marker(new L.LatLng(point.y, point.x)).addTo(route)
-                    .bindPopup("At time #{moment(leg.startTime).format("YYYY-MM-DD HH:mm")}, take the line #{leg.route} from stop #{stop.name} to stop #{last_stop.name}")
-
+                icon = L.divIcon({className: "navigator-div-icon"})
+                marker = L.marker(new L.LatLng(point.y, point.x), {icon: icon}).addTo(route)
+                    .bindPopup("At time #{moment(leg.startTime).format("HH:mm")}, from stop #{stop.name} to stop #{last_stop.name}")
+                    .bindLabel("<span style='font-size: 24px'><img src='static/images/#{googleIcons[leg.routeType]}' style='vertical-align: sub; height: 24px '/> #{leg.route}", {noHide: true})
+                    .showLabel()
         if callback
             callback(route)
         console.log "opentripplanner callback done"
