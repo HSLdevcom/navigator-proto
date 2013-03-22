@@ -177,7 +177,12 @@ route_to_service = (srv_id) ->
         alert("The device hasn't provided the current position!")
         return
     source = sourceMarker.getLatLng()
-    $.getJSON "http://www.hel.fi/palvelukarttaws/rest/v2/unit/?service=#{srv_id}&distance=1000&lat=#{source.lat.toPrecision(7)}&lon=#{source.lng.toPrecision(7)}&callback=?", (data) ->
+    params = 
+        service: srv_id
+        distance: 1000
+        lat: source.lat.toPrecision(7)
+        lon: source.lng.toPrecision(7)
+    $.getJSON "http://www.hel.fi/palvelukarttaws/rest/v2/unit/?callback=?", params, (data) ->
         console.log "palvelukartta callback got data"
         window.service_dbg = data
         if data.length == 0
@@ -199,7 +204,13 @@ route_to_service = (srv_id) ->
 
 find_route = (source, target, callback) ->
     console.log "find_route", source.toString(), target.toString(), callback?
-    $.getJSON citynavi.config.area.otp_base_url + "plan?toPlace=#{target.lat},#{target.lng}&fromPlace=#{source.lat},#{source.lng}&minTransferTime=180&walkSpeed=1.17&maxWalkDistance=-1&callback=?", (data) ->
+    params = 
+        toPlace: "#{target.lat},#{target.lng}"
+        fromPlace: "#{source.lat},#{source.lng}"
+        minTransferTime: 180
+        walkSpeed: 1.17
+        maxWalkDistance: -1
+    $.getJSON citynavi.config.area.otp_base_url + "plan?callback=?", params, (data) ->
         console.log "opentripplanner callback got data"
         if data.error?.msg
             $('#error-popup p').text(data.error.msg)
@@ -269,7 +280,14 @@ render_route_buttons = (itinerary) ->
     resize_map()
 
 find_route_reittiopas = (source, target, callback) ->
-    $.getJSON "http://tuukka.kapsi.fi/tmp/reittiopas.cgi?request=route&detail=full&epsg_in=wgs84&epsg_out=wgs84&from=#{source.lng},#{source.lat}&to=#{target.lng},#{target.lat}&callback=?", (data) ->
+    params = 
+        request: "route"
+        detail: "full"
+        epsg_in: "wgs84"
+        epsg_out: "wgs84"
+        from: "#{source.lng},#{source.lat}"
+        to: "#{target.lng},#{target.lat}"
+    $.getJSON "http://tuukka.kapsi.fi/tmp/reittiopas.cgi?callback=?", params, (data) ->
         window.route_dbg = data
 
         if routeLayer != null
