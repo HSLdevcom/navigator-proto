@@ -54,7 +54,7 @@
 .route-graph .leg-bar {
     height: 20px;
     margin-right: 1px;
-    padding: 2px;
+    padding: 2px 0px;
     vertical-align: middle;
     background-color: white;
     color: black;
@@ -72,10 +72,11 @@
 }
 
 .route-graph .leg-bar .leg-indicator {
-    color: white;
     font-size: 18px;
-    maring-top: -1px;
+    margin-top: -1px;
     font-weight: lighter;
+    text-shadow: none;    
+    background: white;
 }
 
 ul {
