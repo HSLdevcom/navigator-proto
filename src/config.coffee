@@ -12,6 +12,16 @@ manchester = new Area(
     center: [53.479167, -2.244167]
     otp_base_url: "http://dev.hsl.fi:8081/opentripplanner-api-webapp/ws/"
     poi_muni_id: 44001
+    poi_providers:
+        "waag": [
+            {type: "bar"}
+            {type: "pub"}
+        ],
+        "geocoder": [
+            {type: "park"}
+            {type: "library"}
+            {type: "recycling"}
+        ]
 )
 
 helsinki = new Area(
