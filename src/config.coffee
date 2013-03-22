@@ -4,6 +4,7 @@ class Area
 
 manchester = new Area(
     name: "Greater Manchester"
+    id: "manchester"
     country: "gb"
     cities: ["Bolton", "Bury", "Oldham", "Rochdale", "Stockport", "Tameside", "Trafford", "Wigan", "Manchester", "Salford"]
     google_autocomplete_append: "Manchester"
@@ -26,6 +27,7 @@ manchester = new Area(
 
 helsinki = new Area(
     name: "Helsinki Metropolitan"
+    id: "helsinki"
     country: "fi"
     bbox_ne: [60.653728, 25.576590]
     bbox_sw: [59.903339, 23.692820]
