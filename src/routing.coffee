@@ -219,6 +219,8 @@ find_route = (source, target, callback) ->
 
         window.route_dbg = data
 
+        itinerary = data.plan.itineraries[0]
+
         if routeLayer != null
             map.removeLayer(routeLayer)
             routeLayer = null
@@ -226,20 +228,26 @@ find_route = (source, target, callback) ->
             map.removeLayer(osm)
             map.addLayer(cloudmade)
 
-        route = L.featureGroup().addTo(map)
-        routeLayer = route
+        routeLayer = L.featureGroup().addTo(map)
 
-        render_route_buttons(data.plan.itineraries[0])
+        polylines = render_route_layer(itinerary, routeLayer)
+        render_route_buttons(itinerary, polylines)
 
-        legs = data.plan.itineraries[0].legs
+        if callback
+            callback(routeLayer)
+        console.log "opentripplanner callback done"
+    console.log "find_route done"
 
-        for leg in legs
-          do () ->
+render_route_layer = (itinerary, route) ->
+    legs = itinerary.legs
+
+    for leg in legs
+        do () ->
             points = (new L.LatLng(point[0]*1e-5, point[1]*1e-5) for point in decode_polyline(leg.legGeometry.points, 2))
             color = googleColors[leg.routeType]
             polyline = new L.Polyline(points, {color: color})
                 .on 'click', (e) ->
-                    map.fitBounds(e.target.getBounds())
+                    map.fitBounds(polyline.getBounds())
                     if marker?
                         marker.openPopup()
             polyline.addTo(route)
@@ -252,26 +260,40 @@ find_route = (source, target, callback) ->
                     .bindPopup("At time #{moment(leg.startTime).format("HH:mm")}, from stop #{stop.name} to stop #{last_stop.name}")
                     .bindLabel("<span style='font-size: 24px'><img src='static/images/#{googleIcons[leg.routeType]}' style='vertical-align: sub; height: 24px '/> #{leg.route}", {noHide: true})
                     .showLabel()
-        if callback
-            callback(route)
-        console.log "opentripplanner callback done"
-    console.log "find_route done"
+            polyline
 
-render_route_buttons = (itinerary) ->
+render_route_buttons = (itinerary, polylines) ->
     $list = $('#route-buttons')
     $list.empty()
     trip_duration = itinerary.duration
     trip_start = itinerary.startTime
 
+    length = itinerary.legs.length
+
     for leg, index in itinerary.legs
-        leg_start = (leg.startTime-trip_start)/trip_duration
-        leg_duration = leg.duration/trip_duration
+      do (index) ->
+
+# GoodEnoughJourneyPlanner style:
+#        leg_start = (leg.startTime-trip_start)/trip_duration
+#        leg_duration = leg.duration/trip_duration
+#        leg_label = "<img src='static/images/#{googleIcons[leg.routeType]}' height='100%' />"
+#        leg_subscript = "#{leg.route}"
+
+# YetAnotherJourneyPlanner style:
+        leg_start = index/length
+        leg_duration = 1/length
+        leg_label = "<img src='static/images/#{googleIcons[leg.routeType]}' height='100%' /> #{leg.route}"
+        leg_subscript = "#{Math.ceil(leg.duration/1000/60)}min"
+
         console.log leg_duration, "/", trip_duration
 
-        $leg = $("<li class='leg'><div class='leg-bar'><i><img src='static/images/#{googleIcons[leg.routeType]}' height='100%' /></i><span class='leg-indicator'>#{leg.route}</span></div></li>")
+        $leg = $("<li class='leg'><div class='leg-bar'><i>#{leg_label}</i><div class='leg-indicator'>#{leg_subscript}</div></div></li>")
 
         $leg.css("left", "#{leg_start*100}%")
         $leg.css("width", "#{leg_duration*100}%")
+
+        $leg.click (e) ->
+             polylines[index].fire("click")
 
         $list.append($leg)
 
