@@ -175,10 +175,11 @@ route_to_destination = (target_location) ->
         source = sourceMarker.getLatLng()
         find_route sourceMarker.getLatLng(), target, (route) ->
             map.fitBounds(route.getBounds())
+    
+    for marker in poi_markers
+        map.removeLayer marker
+    poi_markers = []
     if citynavi.poi_list
-        for marker in poi_markers
-            map.removeLayer marker
-        poi_markers = []
         for poi in citynavi.poi_list
             icon = L.AwesomeMarkers.icon
                 svg: poi.category.get_icon_path()

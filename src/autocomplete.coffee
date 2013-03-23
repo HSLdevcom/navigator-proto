@@ -206,6 +206,7 @@ test_completer = ->
 navigate_to_location = (loc) ->
     idx = location_history.add loc
     page = "#map-page?destination=#{ idx }"
+    citynavi.poi_list = []
     $.mobile.changePage page
 
 navigate_to_poi = (poi_list) ->
