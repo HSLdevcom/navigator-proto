@@ -270,7 +270,7 @@ render_route_layer = (itinerary, route) ->
                 console.log "subscribing to #{leg.routeId}"
                 citynavi.realtime.subscribe_route leg.routeId, (msg) ->
                     id = msg.vehicle.id
-                    pos = [msg.position.latitude, msg.position.longtitude]
+                    pos = [msg.position.latitude, msg.position.longitude]
                     if not (id of vehicles)
                         icon = L.divIcon({className: "navigator-div-icon", html: "<img src='static/images/#{googleIcons[leg.routeType]}' height='20px' />"})
                         vehicles[id] = L.marker(pos, {icon: icon})
