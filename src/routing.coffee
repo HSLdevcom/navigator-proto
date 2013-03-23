@@ -210,6 +210,10 @@ find_route = (source, target, callback) ->
         minTransferTime: 180
         walkSpeed: 1.17
         maxWalkDistance: -1
+    if $('#walk-only').attr('checked')
+        params.mode = "WALK"
+    if $('#wheelchair').attr('checked')
+        params.wheelchair = "true"
     $.getJSON citynavi.config.area.otp_base_url + "plan?callback=?", params, (data) ->
         console.log "opentripplanner callback got data"
         if data.error?.msg
