@@ -289,10 +289,26 @@ render_route_layer = (itinerary, route) ->
                 last_stop = leg.to
                 point = {y: stop.lat, x: stop.lon}
                 icon = L.divIcon({className: "navigator-div-icon"})
+                label = "<span style='font-size: 24px; padding-right: 6px'><img src='static/images/#{googleIcons[leg.routeType]}' style='vertical-align: sub; height: 24px '/> #{leg.route}</span>"
+
+                secondsCounter = () ->
+                    if leg.startTime >= moment()
+                        duration = moment.duration(leg.startTime-moment())
+                        sign = ""
+                    else
+                        duration = moment.duration(moment()-leg.startTime)
+                        sign = "-"
+                    seconds = (duration.seconds()+100).toString().substring(1)
+                    marker.updateLabelContent(label + "<span style='display: inline-block; font-size: 24px; padding-left: 6px; border-left: thin grey solid'>#{sign}#{duration.minutes()}:#{seconds}</span>")
+                    setTimeout secondsCounter, 1000
+
                 marker = L.marker(new L.LatLng(point.y, point.x), {icon: icon}).addTo(route)
                     .bindPopup("At time #{moment(leg.startTime).format("HH:mm")}, from stop #{stop.name} to stop #{last_stop.name}")
-                    .bindLabel("<span style='font-size: 24px'><img src='static/images/#{googleIcons[leg.routeType]}' style='vertical-align: sub; height: 24px '/> #{leg.route}", {noHide: true})
+                    .bindLabel(label, {noHide: true})
                     .showLabel()
+
+                secondsCounter()
+
                 console.log "subscribing to #{leg.routeId}"
                 citynavi.realtime.subscribe_route leg.routeId, (msg) ->
                     id = msg.vehicle.id
