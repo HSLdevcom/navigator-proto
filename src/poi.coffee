@@ -27,6 +27,26 @@ class GeocoderPOIProvider extends POIProvider
                 poi_list.push poi
             opts.callback poi_list, opts.callback_args
 
+get_polygon_center = (polygon) ->
+  pts = polygon._latlngs
+  off_ = pts[0]
+  twicearea = x = y = 0
+  nPts = pts.length
+  p1 = p2 = f = null
+  i = 0
+  j = nPts - 1
+
+  while i < nPts
+    p1 = pts[i]
+    p2 = pts[j]
+    f = (p1.lat - off_.lat) * (p2.lng - off_.lng) - (p2.lat - off_.lat) * (p1.lng - off_.lng)
+    twicearea += f
+    x += (p1.lat + p2.lat - 2 * off_.lat) * f
+    y += (p1.lng + p2.lng - 2 * off_.lng) * f
+    j = i++
+  f = twicearea * 3
+  return [x / f + off_.lat, y / f + off_.lng]
+
 WAAG_URL = "http://test-api.citysdk.waag.org/admr.uk.gr.manchester/nodes"
 class WaagPOIProvider extends POIProvider
     fetch_pois: (category, opts) ->
@@ -41,10 +61,18 @@ class WaagPOIProvider extends POIProvider
         $.getJSON WAAG_URL, params, (data) =>
             poi_list = []
             for res in data.results
-                coords = res.geom.coordinates
+                type = res.geom.type
+                if type == "Polygon"
+                    points = res.geom.coordinates[0]
+                    latlngs = (new L.LatLng(p[1], p[0]) for p in points)
+                    poly = new L.Polygon(latlngs)
+                    coords = get_polygon_center poly
+                else
+                    coords = res.geom.coordinates
+                    coords = [coords[1], coords[0]]
                 poi = new POI
                     name: res.name
-                    coords: [coords[1], coords[0]]
+                    coords: coords
                     category: category
                 poi_list.push poi
             opts.callback poi_list, opts.callback_args
@@ -61,8 +89,10 @@ class POICategory
     set_provider: (provider, provider_args) ->
         @provider = provider
         @provider_args = provider_args
+    get_icon_path: ->
+        return STATIC_PREFIX + @.icon
     get_icon_html: ->
-        return '<img src="' + STATIC_PREFIX + @.icon + '">'
+        return '<img src="' + @.get_icon_path() + '">'
     fetch_pois: (opts) ->
         @provider.fetch_pois @, opts
 

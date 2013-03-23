@@ -157,6 +157,8 @@ onSourceDragEnd = (event) ->
 
 ## Routing
 
+poi_markers = []
+
 route_to_destination = (target_location) ->
     console.log "route_to_destination", target_location.name
     [lat, lng] = target_location.coords
@@ -173,6 +175,24 @@ route_to_destination = (target_location) ->
         source = sourceMarker.getLatLng()
         find_route sourceMarker.getLatLng(), target, (route) ->
             map.fitBounds(route.getBounds())
+    if citynavi.poi_list
+        for marker in poi_markers
+            map.removeLayer marker
+        poi_markers = []
+        for poi in citynavi.poi_list
+            icon = L.AwesomeMarkers.icon
+                svg: poi.category.get_icon_path()
+                color: 'green'
+            latlng = new L.LatLng(poi.coords[0], poi.coords[1])
+            marker = L.marker(latlng, {icon: icon})
+            marker.bindPopup "#{poi.name}"
+            marker.poi = poi
+            marker.on 'click', (e) ->
+                targetMarker = e.target
+                find_route sourceMarker.getLatLng(), targetMarker.getLatLng(), (route) ->
+                    map.fitBounds route.getBounds()
+            marker.addTo map
+            poi_markers.push marker
     console.log "route_to_destination done"
 
 route_to_service = (srv_id) ->

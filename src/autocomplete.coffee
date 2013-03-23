@@ -211,9 +211,9 @@ navigate_to_location = (loc) ->
 navigate_to_poi = (poi_list) ->
     poi = poi_list[0]
     loc = new Location poi.name, poi.coords
-    console.log loc
     idx = location_history.add loc
     page = "#map-page?destination=#{ idx }"
+    citynavi.poi_list = poi_list
     $.mobile.changePage page
 
 get_all_predictions = (input, callback, callback_args) ->
