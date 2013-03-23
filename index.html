@@ -23,6 +23,7 @@
         <div id="front-page" data-role="page">
             <div data-role="header">
                 <h1>City Navigator</h1>
+                <a href="#settings" data-icon="gear" class="ui-btn-right">Settings</a>
             </div>
             <div data-role="content">
                 <ul id="navigate-to-input" data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Where do you want to go?"></ul>
@@ -40,10 +41,6 @@
                     <li>
                         <input type="checkbox" name="walk-only" id="walk-only" />
                         <label for="walk-only">Walk only</label>
-                    </li>
-                    <li>
-                        <input type="checkbox" name="wheelchair" id="wheelchair" />
-                        <label for="wheelchair">Require accessibility by wheelchair</label>
                     </li>
                 </ul>
             </div>
@@ -75,6 +72,20 @@
                 <h1>Find nearest services</h1>
             </div>
             <div data-role="content">
+            </div>
+        </div>
+        <div id="settings" data-role="page">
+            <div data-role="header">
+                <a href="" data-rel="back">Back</a>
+                <h1>Settings</h1>
+            </div>
+            <div data-role="content">
+                <ul data-role="listview" style="margin-bottom: 0">
+                    <li>
+                        <input type="checkbox" name="wheelchair" id="wheelchair" />
+                        <label for="wheelchair">Require accessibility by wheelchair</label>
+                    </li>
+                </ul>
             </div>
         </div>
         <script src="static/js/config.js"></script>
