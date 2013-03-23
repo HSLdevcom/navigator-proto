@@ -218,6 +218,8 @@ find_route = (source, target, callback) ->
         params.mode = "WALK"
     if $('#wheelchair').attr('checked')
         params.wheelchair = "true"
+    if $('#prefer-free').attr('checked') and citynavi.config.area.id == "manchester"
+        params.preferredRoutes = "GMN_1,GMN_2,GMN_3"
     $.getJSON citynavi.config.area.otp_base_url + "plan?callback=?", params, (data) ->
         console.log "opentripplanner callback got data"
         if data.error?.msg
