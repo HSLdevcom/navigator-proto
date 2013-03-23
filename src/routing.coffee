@@ -16,7 +16,10 @@ routeLayer = null
 # latest geolocation event info
 position_point = position_bounds = null
 
+# vehicle position interpolation data
 vehicles = []
+previous_positions = []
+interpolations = []
 
 ## Events before the page is shown
 
@@ -247,6 +250,7 @@ render_route_layer = (itinerary, route) ->
     legs = itinerary.legs
 
     vehicles = []
+    previous_positions = []
 
     for leg in legs
         do (leg) ->
@@ -277,7 +281,21 @@ render_route_layer = (itinerary, route) ->
                             .addTo(route)
                         console.log "new vehicle #{id} on route #{leg.routeId}"
                     else
-                        vehicles[id].setLatLng(pos)
+                        old_pos = previous_positions[id]
+                        steps = 30
+                        interpolation = (index, id, old_pos) ->
+                            lat = old_pos[0]+(pos[0]-old_pos[0])*(index/steps)
+                            lng = old_pos[1]+(pos[1]-old_pos[1])*(index/steps)
+                            vehicles[id].setLatLng([lat, lng])
+                            if index < steps
+                                interpolations[id] = setTimeout (-> interpolation index+1, id, old_pos), 1000
+                            else
+                                interpolations[id] = null
+                        if previous_positions[id][0] != pos[0] or previous_positions[id][1] != pos[1]
+                            if interpolations[id]
+                                clearTimeout(interpolations[id])
+                            interpolation 1, id, old_pos
+                    previous_positions[id] = pos
             polyline
 
 render_route_buttons = (itinerary, route_layer, polylines) ->
