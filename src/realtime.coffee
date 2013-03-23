@@ -5,7 +5,8 @@ class Realtime
     subscribe_route: (route_id, callback, callback_args) ->
         if @subs[route_id]
             @.unsubscribe_route route_id
-        path = "/location/#{citynavi.config.area.id}/#{route_id}/**"
+        route_path = route_id.replace(/\ /g, "_").replace(/:/g, "-")
+        path = "/location/#{citynavi.config.area.id}/#{route_path}/**"
         sub = @client.subscribe path, (message) ->
             callback message, callback_args
         @subs[route_id] = sub
