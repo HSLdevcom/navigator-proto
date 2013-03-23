@@ -41,9 +41,10 @@
 }
 
 .route-graph {
-    height: 40px;
+    height: 46px;
     position: relative;
     margin-left: 1px;
+    padding-top: 4px;
 }
 .route-graph li {
     font-size: 25px;
@@ -54,7 +55,7 @@
 .route-graph .leg-bar {
     height: 20px;
     margin-right: 1px;
-    padding: 2px 0px;
+    padding: 8px 0px;
     vertical-align: middle;
     background-color: white;
     color: black;
