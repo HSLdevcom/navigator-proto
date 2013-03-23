@@ -213,7 +213,7 @@ find_route = (source, target, callback) ->
         fromPlace: "#{source.lat},#{source.lng}"
         minTransferTime: 180
         walkSpeed: 1.17
-        maxWalkDistance: -1
+        maxWalkDistance: 100000
     if $('#walk-only').attr('checked')
         params.mode = "WALK"
     if $('#wheelchair').attr('checked')
