@@ -4,7 +4,7 @@ class Realtime
         @subs = {}
     subscribe_route: (route_id, callback, callback_args) ->
         if @subs[route_id]
-            @.unsubscribe route_id
+            @.unsubscribe_route route_id
         path = "/location/#{citynavi.config.area.id}/#{route_id}/**"
         sub = @client.subscribe path, (message) ->
             callback message, callback_args
