@@ -16,6 +16,7 @@ routeLayer = null
 # latest geolocation event info
 position_point = position_bounds = null
 
+vehicles = []
 
 ## Events before the page is shown
 
@@ -245,8 +246,10 @@ find_route = (source, target, callback) ->
 render_route_layer = (itinerary, route) ->
     legs = itinerary.legs
 
+    vehicles = []
+
     for leg in legs
-        do () ->
+        do (leg) ->
             points = (new L.LatLng(point[0]*1e-5, point[1]*1e-5) for point in decode_polyline(leg.legGeometry.points, 2))
             color = googleColors[leg.routeType]
             polyline = new L.Polyline(points, {color: color})
@@ -264,6 +267,17 @@ render_route_layer = (itinerary, route) ->
                     .bindPopup("At time #{moment(leg.startTime).format("HH:mm")}, from stop #{stop.name} to stop #{last_stop.name}")
                     .bindLabel("<span style='font-size: 24px'><img src='static/images/#{googleIcons[leg.routeType]}' style='vertical-align: sub; height: 24px '/> #{leg.route}", {noHide: true})
                     .showLabel()
+                console.log "subscribing to #{leg.routeId}"
+                citynavi.realtime.subscribe_route leg.routeId, (msg) ->
+                    id = msg.vehicle.id
+                    pos = [msg.position.latitude, msg.position.longtitude]
+                    if not (id of vehicles)
+                        icon = L.divIcon({className: "navigator-div-icon", html: "<img src='static/images/#{googleIcons[leg.routeType]}' height='20px' />"})
+                        vehicles[id] = L.marker(pos, {icon: icon})
+                            .addTo(route)
+                        console.log "new vehicle #{id} on route #{leg.routeId}"
+                    else
+                        vehicles[id].setLatLng(pos)
             polyline
 
 render_route_buttons = (itinerary, route_layer, polylines) ->
