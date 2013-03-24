@@ -307,7 +307,7 @@ render_route_layer = (itinerary, route) ->
                     setTimeout secondsCounter, 1000
 
                 marker = L.marker(new L.LatLng(point.y, point.x), {icon: icon}).addTo(route)
-                    .bindPopup("At time #{moment(leg.startTime).format("HH:mm")}, from stop #{stop.name} to stop #{last_stop.name}")
+                    .bindPopup("<b>Time: #{moment(leg.startTime).format("HH:mm")}</b><br /><b>From:</b> #{stop.name}<br /><b>To:</b> #{last_stop.name}")
                     .bindLabel(label, {noHide: true})
                     .showLabel()
 
@@ -432,7 +432,7 @@ find_route_reittiopas = (source, target, callback) ->
                 last_stop = leg.locs[leg.locs.length-1]
                 point = leg.shape[0]
                 marker = L.marker(new L.LatLng(point.y, point.x)).addTo(route)
-                    .bindPopup("At time #{format_time(stop.depTime)}, take the line #{format_code(leg.code)} from stop #{stop.name} to stop #{last_stop.name}")
+                    .bindPopup("<b><Time: #{format_time(stop.depTime)}</b><br /><b>From:</b> {stop.name}<br /><b>To:</b> #{last_stop.name}")
 
         if not map.getBounds().contains(route.getBounds())
             map.fitBounds(route.getBounds())
