@@ -134,12 +134,18 @@ console.log citynavi.poi_categories
 #setTimeout test_it, 500
 
 
-$(document).bind "pagebeforechange", (e, data) ->
-    if typeof data.toPage != "string"
-        return
-    u = $.mobile.path.parseUrl(data.toPage)
+$('#service-directory').bind 'pageinit', (e, data) ->
+        $list = $('#service-directory ul')
+        $list.empty()
+        $list.listview()
 
-    if u.hash.indexOf('#service-directory?') == 0
+$('#service-list').bind 'pageinit', (e, data) ->
+        $list = $('#service-list ul')
+        $list.empty()
+        $list.listview()
+
+$('#service-directory').bind 'pageshow', (e, data) ->
+#    if u.hash.indexOf('#service-directory?') == 0
 
         $list = $('#service-directory ul')
         $list.empty()
@@ -147,7 +153,13 @@ $(document).bind "pagebeforechange", (e, data) ->
         for category, index in citynavi.poi_categories 
             $list.append("<li><a href=\"#service-list?category=#{index}\"><img src=\"#{category.get_icon_path()}\" class='ui-li-icon' style='height: 20px;'/>#{category.name}</a></li>")
 
-        setTimeout (() -> $list.listview()), 0
+#        setTimeout (() -> $list.listview()), 0
+        $list.listview("refresh")
+
+$(document).bind "pagebeforechange", (e, data) ->
+    if typeof data.toPage != "string"
+        return
+    u = $.mobile.path.parseUrl(data.toPage)
 
     if u.hash.indexOf('#service-list?category=') == 0
         category_index = u.hash.replace(/.*\?category=/, "")
@@ -166,7 +178,7 @@ $(document).bind "pagebeforechange", (e, data) ->
                         citynavi.poi_list = pois
                         navigate_to_poi(poi)
                     $list.append($item)
-                $list.listview()
+                $list.listview("refresh")
 
 navigate_to_poi = (poi) ->
     loc = new Location poi.name, poi.coords
