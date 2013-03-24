@@ -367,16 +367,21 @@ render_route_buttons = (itinerary, route_layer, polylines) ->
     for leg, index in itinerary.legs
       do (index) ->
 
+        if leg.routeType == null and $('#wheelchair').attr('checked')
+            icon_name = "wheelchair.svg"
+        else
+            icon_name = googleIcons[leg.routeType]
+
 # GoodEnoughJourneyPlanner style:
 #        leg_start = (leg.startTime-trip_start)/trip_duration
 #        leg_duration = leg.duration/trip_duration
-#        leg_label = "<img src='static/images/#{googleIcons[leg.routeType]}' height='100%' />"
+#        leg_label = "<img src='static/images/#{icon_name}' height='100%' />"
 #        leg_subscript = "#{leg.route}"
 
 # YetAnotherJourneyPlanner style:
         leg_start = (index+1)/length
         leg_duration = 1/length
-        leg_label = "<img src='static/images/#{googleIcons[leg.routeType]}' height='100%' /> #{leg.route}"
+        leg_label = "<img src='static/images/#{icon_name}' height='100%' /> #{leg.route}"
         leg_subscript = "#{Math.ceil(leg.duration/1000/60)}min"
 
         console.log leg_duration, "/", trip_duration
