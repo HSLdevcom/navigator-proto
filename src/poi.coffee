@@ -104,7 +104,7 @@ class POICategory
         @provider.fetch_pois @, opts
 
 supported_poi_categories = {
-    "library": new POICategory {type: "library", name: "Library", plural_name: "Libraries", icon: "library2.svg"}
+    "library": new POICategory {type: "library", name: "Library", plural_name: "Libraries", icon: "library.svg"}
     "recycling": new POICategory {type: "recycling", name: "Recycling point", icon: "recycling.svg"}
     "park": new POICategory {type: "park", name: "Park", icon: "coniferous_and_deciduous.svg"}
     "bar": new POICategory {type: "bar", name: "Bar", icon: "bar.svg"}
