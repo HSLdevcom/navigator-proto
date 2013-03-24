@@ -55,6 +55,8 @@ class WaagPOIProvider extends POIProvider
             layer: "osm"
             geom: 1
             "osm::amenity": category.type
+        if $('#wheelchair').attr('checked')
+            params["osm::wheelchair"] = "yes"
         if opts.location
             params.lat = opts.location[0]
             params.lon = opts.location[1]
