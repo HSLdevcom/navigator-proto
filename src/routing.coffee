@@ -276,7 +276,13 @@ render_route_layer = (itinerary, route) ->
         do (leg) ->
             points = (new L.LatLng(point[0]*1e-5, point[1]*1e-5) for point in decode_polyline(leg.legGeometry.points, 2))
             color = googleColors[leg.routeType]
-            polyline = new L.Polyline(points, {color: color})
+            if leg.routeType != null
+                dashArray = null
+            else
+                dashArray = "5,10"
+            polyline = new L.Polyline(points, {color: color, weight: 8, opacity: 0.2, clickable: false, dashArray: dashArray})
+            polyline.addTo(route)
+            polyline = new L.Polyline(points, {color: color, opacity: 0.4, dashArray: dashArray})
                 .on 'click', (e) ->
                     map.fitBounds(polyline.getBounds())
                     if marker?
