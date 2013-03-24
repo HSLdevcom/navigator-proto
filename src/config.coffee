@@ -23,6 +23,7 @@ manchester = new Area(
             {type: "park"}
             {type: "library"}
             {type: "recycling"}
+            {type: "toilet"}
         ]
 )
 

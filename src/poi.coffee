@@ -108,6 +108,7 @@ supported_poi_categories = {
     "recycling": new POICategory {type: "recycling", name: "Recycling point", icon: "recycling.svg"}
     "park": new POICategory {type: "park", name: "Park", icon: "coniferous_and_deciduous.svg"}
     "bar": new POICategory {type: "bar", name: "Bar", icon: "bar.svg"}
+    "toilet": new POICategory {type: "toilet", name: "Toilet (public)", icon: "toilets_men.svg"}
     "pub": new POICategory {type: "pub", name: "Pub", icon: "pub.svg"}
     "supermarket": new POICategory {type: "supermarket", name: "Supermarket", icon: "supermarket.svg", waag_filter: {"osm::shop": "supermarket"}}
 }
