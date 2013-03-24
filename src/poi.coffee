@@ -174,12 +174,15 @@ $(document).bind "pagebeforechange", (e, data) ->
         category.fetch_pois
             location: current_location
             callback: (pois) ->
+                pois = _.sortBy pois, (poi) ->
+                    poi_loc = new L.LatLng poi.coords[0], poi.coords[1]
+                    poi.distance = poi_loc.distanceTo current_latlng
+                    return poi.distance
                 for poi in pois
                   do (poi) ->
                     if not poi.name
                         return
-                    poi_loc = new L.LatLng poi.coords[0], poi.coords[1]
-                    dist = poi_loc.distanceTo current_latlng
+                    dist = poi.distance
                     if dist >= 1000
                         dist = Math.round((dist + 100) / 100)
                         dist *= 100
