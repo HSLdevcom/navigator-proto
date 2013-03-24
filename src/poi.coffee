@@ -132,3 +132,44 @@ console.log citynavi.poi_categories
 #test_it = ->
 #    prov = supported_poi_providers['waag'].fetch_pois supported_poi_categories["pub"]
 #setTimeout test_it, 500
+
+
+$(document).bind "pagebeforechange", (e, data) ->
+    if typeof data.toPage != "string"
+        return
+    u = $.mobile.path.parseUrl(data.toPage)
+
+    if u.hash.indexOf('#service-directory?') == 0
+
+        $list = $('#service-directory ul')
+        $list.empty()
+
+        for category, index in citynavi.poi_categories 
+            $list.append("<li><a href=\"#service-list?category=#{index}\"><img src=\"#{category.get_icon_path()}\" class='ui-li-icon' style='height: 20px;'/>#{category.name}</a></li>")
+
+        setTimeout (() -> $list.listview()), 0
+
+    if u.hash.indexOf('#service-list?category=') == 0
+        category_index = u.hash.replace(/.*\?category=/, "")
+
+        category = citynavi.poi_categories[category_index]
+
+        $list = $('#service-list ul')
+        $list.empty()
+        
+        category.fetch_pois 
+            callback: (pois) ->
+                for poi in pois
+                  do (poi) ->
+                    $item = $("<li><a href=\"#map-page\"><img src=\"#{category.get_icon_path()}\" class='ui-li-icon' style=\"height: 20px;\"/>#{poi.name}</a></li>")
+                    $item.click () ->
+                        citynavi.poi_list = pois
+                        navigate_to_poi(poi)
+                    $list.append($item)
+                $list.listview()
+
+navigate_to_poi = (poi) ->
+    loc = new Location poi.name, poi.coords
+    idx = location_history.add loc
+    page = "#map-page?destination=#{ idx }"
+    $.mobile.changePage page

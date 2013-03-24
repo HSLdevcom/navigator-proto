@@ -10,6 +10,8 @@ class Location
     @from_json: (d) ->
         return new Location d.name, d.coords
 
+window.Location = Location
+
 class LocationHistory
     constructor: (@ls_id) ->
         s = localStorage[@ls_id]
