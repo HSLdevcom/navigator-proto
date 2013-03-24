@@ -310,6 +310,11 @@ render_route_layer = (itinerary, route) ->
 
                 secondsCounter()
 
+                $.getJSON "http://tuukka.kapsi.fi/tmp/geojson.cgi?line="+leg.routeId+"&callback=?", (data) ->
+                    color = "#892890"
+                    line_layer = L.geoJson([data], {style: {color: color, opacity: 0.2}})
+                    line_layer.addTo(route)
+
                 console.log "subscribing to #{leg.routeId}"
                 citynavi.realtime.subscribe_route leg.routeId, (msg) ->
                     id = msg.vehicle.id
