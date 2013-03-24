@@ -17,6 +17,7 @@ manchester = new Area(
         "waag": [
             {type: "bar"}
             {type: "pub"}
+            {type: "supermarket"}
         ],
         "geocoder": [
             {type: "park"}

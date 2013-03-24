@@ -54,7 +54,12 @@ class WaagPOIProvider extends POIProvider
         params =
             layer: "osm"
             geom: 1
-            "osm::amenity": category.type
+        if category.waag_filter
+            _.extend params, category.waag_filter
+        else
+            params["osm::amenity"] = category.type
+        console.log params
+
         if $('#wheelchair').attr('checked')
             params["osm::wheelchair"] = "yes"
         if opts.location
@@ -99,11 +104,12 @@ class POICategory
         @provider.fetch_pois @, opts
 
 supported_poi_categories = {
-    "library": new POICategory {type: "library", name: "Library", icon: "library2.svg"}
+    "library": new POICategory {type: "library", name: "Library", plural_name: "Libraries", icon: "library2.svg"}
     "recycling": new POICategory {type: "recycling", name: "Recycling point", icon: "recycling.svg"}
     "park": new POICategory {type: "park", name: "Park", icon: "coniferous_and_deciduous.svg"}
     "bar": new POICategory {type: "bar", name: "Bar", icon: "bar.svg"}
     "pub": new POICategory {type: "pub", name: "Pub", icon: "pub.svg"}
+    "supermarket": new POICategory {type: "supermarket", name: "Supermarket", icon: "supermarket.svg", waag_filter: {"osm::shop": "supermarket"}}
 }
 
 generate_area_poi_categories = (area) ->
