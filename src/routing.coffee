@@ -491,6 +491,20 @@ new BackControl().addTo(map)
 
 L.control.zoom().addTo(map)
 
+TRANSFORM_MAP = [
+    {source: {lat: 53.477342, lng: -2.2584626}, dest: {lat: 53.477958, lng: -2.23342}}
+]
+
+transform_location = (point) ->
+    # If the point is close to known bad locations, transform them to right ones.
+    for t in TRANSFORM_MAP
+        src_pnt = new L.LatLng t.source.lat, t.source.lng
+        current = new L.LatLng point.lat, point.lng
+        radius = 100
+        if src_pnt.distanceTo(current) < radius
+            point.lat = t.dest.lat
+            point.lng = t.dest.lng
+            return
 
 map.on 'locationerror', (e) ->
     alert(e.message)
@@ -500,6 +514,7 @@ map.on 'locationfound', (e) ->
     radius = e.accuracy
     measure = if e.accuracy < 2000 then "#{Math.round(e.accuracy)} meters" else "#{Math.round(e.accuracy/1000)} km"
     point = e.latlng
+    transform_location point
 
     # save latest position info for later page change
     position_point = point
