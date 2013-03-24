@@ -168,12 +168,26 @@ $(document).bind "pagebeforechange", (e, data) ->
 
         $list = $('#service-list ul')
         $list.empty()
-        
-        category.fetch_pois 
+
+        current_location = citynavi.get_source_location()
+        current_latlng = new L.LatLng current_location[0], current_location[1]
+        category.fetch_pois
+            location: current_location
             callback: (pois) ->
                 for poi in pois
                   do (poi) ->
-                    $item = $("<li><a href=\"#map-page\"><img src=\"#{category.get_icon_path()}\" class='ui-li-icon' style=\"height: 20px;\"/>#{poi.name}</a></li>")
+                    if not poi.name
+                        return
+                    poi_loc = new L.LatLng poi.coords[0], poi.coords[1]
+                    dist = poi_loc.distanceTo current_latlng
+                    if dist >= 1000
+                        dist = Math.round((dist + 100) / 100)
+                        dist *= 100
+                    else
+                        dist = Math.round((dist + 10) / 10)
+                        dist *= 10
+                    $item = $("<li><a href=\"#map-page\"><img src=\"#{category.get_icon_path()}\" class='ui-li-icon' style=\"height: 20px;\"/>#{poi.name}<span class='ui-li-count'>#{dist} m</span></a></li>")
+                    
                     $item.click () ->
                         citynavi.poi_list = pois
                         navigate_to_poi(poi)
