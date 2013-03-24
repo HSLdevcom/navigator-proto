@@ -255,9 +255,6 @@ find_route = (source, target, callback) ->
         if routeLayer != null
             map.removeLayer(routeLayer)
             routeLayer = null
-        else
-            map.removeLayer(osm)
-            map.addLayer(cloudmade)
 
         routeLayer = L.featureGroup().addTo(map)
 
@@ -312,7 +309,7 @@ render_route_layer = (itinerary, route) ->
 
                 $.getJSON "http://tuukka.kapsi.fi/tmp/geojson.cgi?line="+leg.routeId+"&callback=?", (data) ->
                     color = "#892890"
-                    line_layer = L.geoJson([data], {style: {color: color, opacity: 0.2}})
+                    line_layer = L.geoJson([data], {style: {color: color, opacity: 0.3}})
                     line_layer.addTo(route)
 
                 console.log "subscribing to #{leg.routeId}"
@@ -460,18 +457,20 @@ map.locate
 cloudmade = L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{style}/256/{z}/{x}/{y}.png', 
     attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2012 CloudMade',
     key: 'BC9A493B41014CAABB98F0471D759707'
-    style: 22677
-)
+    style: 998
+).addTo(map)
+
 osm = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
     attribution: 'Map data &copy; 2011 OpenStreetMap contributors',
-).addTo(map)
+)
+
 mapquest = L.tileLayer("http://otile{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg",
     subdomains: "1234"
     attribution: 'Map data &copy; 2013 OpenStreetMap contributors, Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">'
 )
 L.control.layers({
-    "OpenStreetMap": osm
     "CloudMade": cloudmade
+    "OpenStreetMap": osm
     "MapQuest": mapquest
 },
 ).addTo(map)
