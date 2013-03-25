@@ -25,17 +25,32 @@ manchester = new Area(
             {type: "recycling"}
             {type: "toilet"}
         ]
+    autocompletion_providers: ["poi_categories", "google"]
 )
 
 helsinki = new Area(
-    name: "Helsinki Metropolitan"
+    name: "Helsinki Region"
     id: "helsinki"
     country: "fi"
-    cities: ["Helsinki", "Vantaa", "Espoo", "Kauniainen"]
+    cities: ["Helsinki", "Vantaa", "Espoo", "Kauniainen", "Kerava", "Sipoo"] # XXX more?
     bbox_ne: [60.653728, 25.576590]
     bbox_sw: [59.903339, 23.692820]
     center: [60.170833, 24.9375]
     otp_base_url: "http://dev.hsl.fi/opentripplanner-api-webapp/ws/"
+    poi_muni_id: null # XXX is this ok?
+    poi_providers:
+        "waag": [
+            {type: "bar"}
+            {type: "pub"}
+            {type: "supermarket"}
+        ],
+        "geocoder": [
+            {type: "park"}
+            {type: "library"}
+            {type: "recycling"}
+            {type: "toilet"} # XXX is this what's available here?
+        ]
+    autocompletion_providers: ["poi_categories", "geocoder"]
 )
 
 class CityNavigator

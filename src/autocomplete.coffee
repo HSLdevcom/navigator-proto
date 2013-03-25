@@ -196,7 +196,16 @@ class POICategoryCompleter extends Autocompleter
             pred_list.push new CategoryPrediction(cat)
         callback args, pred_list
 
-completers = [new POICategoryCompleter, new GoogleCompleter]
+supported_completers =
+    poi_categories: new POICategoryCompleter
+    geocoder: new GeocoderCompleter
+    google: new GoogleCompleter
+    osm: new OSMCompleter
+
+generate_area_completers = (area) ->
+    (supported_completers[id] for id in area.autocompletion_providers)
+
+completers = generate_area_completers citynavi.config.area
 
 test_completer = ->
     callback = (args, data) ->
