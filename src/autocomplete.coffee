@@ -47,6 +47,9 @@ class Prediction
             @location.fetch_details navigate_to_location, @location
         else
             args = {callback: navigate_to_poi, location: citynavi.get_source_location()}
+            if not args.location?
+                alert "The device hasn't provided its current location. Using region center instead."
+                args.location = citynavi.config.area.center
             @category.fetch_pois args
     render: ->
         icon_html = ''
@@ -139,7 +142,7 @@ class GoogleCompleter extends RemoteAutocompleter
     fetch_results: ->
         url = GOOGLE_URL_BASE + "autocomplete/?callback=?"
         area = citynavi.config.area
-        location = area.center
+        location = citynavi.get_source_location_or_area_center()
         # FIXME
         radius = 12000
         data = {query: @query, location: location.join(','), radius: radius}

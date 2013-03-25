@@ -171,6 +171,9 @@ $(document).bind "pagebeforechange", (e, data) ->
         $list.empty()
 
         current_location = citynavi.get_source_location()
+        if not current_location?
+            alert "The device hasn't provided its current location. Using region center instead."
+            current_location = citynavi.config.area.center
         current_latlng = new L.LatLng current_location[0], current_location[1]
         category.fetch_pois
             location: current_location

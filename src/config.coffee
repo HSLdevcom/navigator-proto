@@ -59,6 +59,8 @@ class CityNavigator
         _.extend @, opts
     get_source_location: ->
         return @source_location
+    get_source_location_or_area_center: ->
+        return @source_location or @config.area.center
     set_source_location: (loc) ->
         @source_location = loc
 
