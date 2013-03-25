@@ -47,7 +47,7 @@ get_polygon_center = (polygon) ->
   f = twicearea * 3
   return [x / f + off_.lat, y / f + off_.lng]
 
-WAAG_URL = "http://test-api.citysdk.waag.org/admr.uk.gr.manchester/nodes"
+WAAG_URL = "http://test-api.citysdk.waag.org"
 class WaagPOIProvider extends POIProvider
     fetch_pois: (category, opts) ->
         opts = _.extend {}, opts
@@ -65,7 +65,7 @@ class WaagPOIProvider extends POIProvider
         if opts.location
             params.lat = opts.location[0]
             params.lon = opts.location[1]
-        $.getJSON WAAG_URL, params, (data) =>
+        $.getJSON "#{WAAG_URL}/#{citynavi.config.area.waag_id}/nodes", params, (data) =>
             poi_list = []
             for res in data.results
                 type = res.geom.type

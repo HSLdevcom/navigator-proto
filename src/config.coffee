@@ -13,6 +13,7 @@ manchester = new Area(
     center: [53.479167, -2.244167]
     otp_base_url: "http://dev.hsl.fi:8081/opentripplanner-api-webapp/ws/"
     poi_muni_id: 44001
+    waag_id: "admr.uk.gr.manchester"
     poi_providers:
         "waag": [
             {type: "bar"}
@@ -38,6 +39,7 @@ helsinki = new Area(
     center: [60.170833, 24.9375]
     otp_base_url: "http://dev.hsl.fi/opentripplanner-api-webapp/ws/"
     poi_muni_id: null # XXX is this ok?
+    waag_id: "admr.fi.uusimaa" # XXX should be HSL area
     poi_providers:
         "waag": [
             {type: "bar"}
