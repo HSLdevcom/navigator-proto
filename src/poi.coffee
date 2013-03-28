@@ -164,6 +164,8 @@ $('#service-directory').bind 'pageshow', (e, data) ->
 #        setTimeout (() -> $list.listview()), 0
         $list.listview("refresh")
 
+position_missing_alert_shown = false
+
 $(document).bind "pagebeforechange", (e, data) ->
     if typeof data.toPage != "string"
         return
@@ -179,7 +181,9 @@ $(document).bind "pagebeforechange", (e, data) ->
 
         current_location = citynavi.get_source_location()
         if not current_location?
-            alert "The device hasn't provided its current location. Using region center instead."
+            if not position_missing_alert_shown
+                alert "The device hasn't provided its current location. Using region center instead."
+                position_missing_alert_shown = true
             current_location = citynavi.config.area.center
         category.fetch_pois
             location: current_location
