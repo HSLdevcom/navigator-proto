@@ -50,6 +50,7 @@ helsinki = new Area(
             {type: "park"}
             {type: "library"}
             {type: "recycling"}
+            {type: "swimming_pool"}
             {type: "toilet"} # XXX is this what's available here?
         ]
     autocompletion_providers: ["poi_categories", "geocoder"]

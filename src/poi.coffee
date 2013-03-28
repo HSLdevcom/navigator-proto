@@ -107,6 +107,7 @@ supported_poi_categories = {
     "library": new POICategory {type: "library", name: "Library", plural_name: "Libraries", icon: "library.svg"}
     "recycling": new POICategory {type: "recycling", name: "Recycling point", icon: "recycling.svg"}
     "park": new POICategory {type: "park", name: "Park", icon: "coniferous_and_deciduous.svg"}
+    "swimming_pool": new POICategory {type: "swimming_pool", name: "Swimming pool", icon: "swimming_indoor.svg"}
     "bar": new POICategory {type: "bar", name: "Bar", icon: "bar.svg"}
     "toilet": new POICategory {type: "toilet", name: "Toilet (public)", icon: "toilets_men.svg"}
     "pub": new POICategory {type: "pub", name: "Pub", icon: "pub.svg"}
