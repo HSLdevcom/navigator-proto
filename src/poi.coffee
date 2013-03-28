@@ -50,10 +50,12 @@ get_polygon_center = (polygon) ->
 WAAG_URL = "http://test-api.citysdk.waag.org"
 class WaagPOIProvider extends POIProvider
     fetch_pois: (category, opts) ->
+        count = 10
         opts = _.extend {}, opts
         params =
             layer: "osm"
             geom: 1
+            per_page: count*2 # account for inaccuracy in result ordering
         if category.waag_filter
             _.extend params, category.waag_filter
         else
@@ -82,7 +84,11 @@ class WaagPOIProvider extends POIProvider
                     coords: coords
                     category: category
                 poi_list.push poi
-            opts.callback poi_list, opts.callback_args
+            poi_list = _.sortBy poi_list, (poi) ->
+                poi_loc = new L.LatLng poi.coords[0], poi.coords[1]
+                poi.distance = poi_loc.distanceTo opts.location
+                return poi.distance
+            opts.callback poi_list[0...count], opts.callback_args
 
 supported_poi_providers = {
     "geocoder": new GeocoderPOIProvider
@@ -175,14 +181,9 @@ $(document).bind "pagebeforechange", (e, data) ->
         if not current_location?
             alert "The device hasn't provided its current location. Using region center instead."
             current_location = citynavi.config.area.center
-        current_latlng = new L.LatLng current_location[0], current_location[1]
         category.fetch_pois
             location: current_location
             callback: (pois) ->
-                pois = _.sortBy pois, (poi) ->
-                    poi_loc = new L.LatLng poi.coords[0], poi.coords[1]
-                    poi.distance = poi_loc.distanceTo current_latlng
-                    return poi.distance
                 for poi in pois
                   do (poi) ->
                     if not poi.name
