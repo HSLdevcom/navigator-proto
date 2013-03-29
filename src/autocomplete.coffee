@@ -1,4 +1,4 @@
-URL_BASE = "http://dev.hel.fi:8000/api/v1/address/?format=jsonp"
+URL_BASE = "http://dev.hel.fi/geocoder/v1/address/?format=jsonp"
 
 class Location
     constructor: (@name, @coords) ->
