@@ -123,7 +123,7 @@ class GeocoderCompleter extends RemoteAutocompleter
                 loc_list.push loc
             @.submit_location_predictions loc_list
 
-GOOGLE_URL_BASE = "http://dev.hel.fi:8000/google/"
+GOOGLE_URL_BASE = "http://dev.hel.fi/geocoder/google/"
 
 class GoogleLocation extends Location
     constructor: (pred) ->
