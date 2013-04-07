@@ -2,6 +2,27 @@ class Area
     constructor: (opts) ->
         _.extend @, opts
 
+tampere = new Area
+    name: "Tampere"
+    id: "tampere"
+    country: "fi"
+    cities: ["Tampere"]
+    google_autocomplete_append: "Tampere"
+    bbox_ne: [61.8237444, 24.1064742]
+    bbox_sw: [61.42863, 23.5611791]
+    center: [61.4976348, 23.7688124]
+    otp_base_url: "http://dev.hsl.fi:8083/opentripplanner-api-webapp/ws/"
+    poi_muni_id: null
+    waag_id: "admr.fi.tampere"
+    poi_providers:
+        "waag": [
+            {type: "restaurant"}
+            {type: "bar"}
+            {type: "pub"}
+            {type: "supermarket"}
+        ]
+    autocompletion_providers: ["poi_categories", "google"]
+
 manchester = new Area(
     name: "Greater Manchester"
     id: "manchester"
