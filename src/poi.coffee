@@ -24,6 +24,7 @@ class GeocoderPOIProvider extends POIProvider
                     name: obj.name
                     coords: [obj.location.coordinates[1], obj.location.coordinates[0]]
                     category: category
+                    distance: obj.distance
                 poi_list.push poi
             opts.callback poi_list, opts.callback_args
 
