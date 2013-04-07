@@ -118,6 +118,7 @@ supported_poi_categories = {
     "toilet": new POICategory {type: "toilet", name: "Toilet (public)", icon: "toilets_men.svg"}
     "pub": new POICategory {type: "pub", name: "Pub", icon: "pub.svg"}
     "supermarket": new POICategory {type: "supermarket", name: "Supermarket", icon: "supermarket.svg", waag_filter: {"osm::shop": "supermarket"}}
+    "restaurant": new POICategory {type: "restaurant", name: "Restaurant", icon: "restaurant.svg"}
 }
 
 generate_area_poi_categories = (area) ->
