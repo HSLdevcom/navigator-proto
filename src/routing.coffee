@@ -313,12 +313,9 @@ render_route_layer = (itinerary, route) ->
 
                 secondsCounter()
 
-                $.getJSON "http://tuukka.kapsi.fi/tmp/geojson.cgi?line="+leg.routeId+"&callback=?", (data) ->
-                    line_layer = L.geoJson([data], {style: {color: color, opacity: 0.2}})
-                    line_layer.addTo(route)
-
-                $.getJSON "http://api.citysdk.waag.org/gtfs.line.helsinginseudunliikenne.#{leg.route}-0?geom", (data) ->
-                    points = ([y,x] for [x,y] in data.results[0].geom.coordinates)
+                $.getJSON citynavi.config.area.otp_base_url + "transit/variantForTrip?callback=?", {tripId: leg.tripId, tripAgency: leg.agencyId}, (data) ->
+                    geometry = data.geometry
+                    points = (new L.LatLng(point[0]*1e-5, point[1]*1e-5) for point in decode_polyline(geometry.points, 2))
                     line_layer = new L.Polyline(points, {color: color, opacity: 0.2})
                     line_layer.addTo(route)
 
