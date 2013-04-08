@@ -16,10 +16,16 @@ tampere = new Area
     waag_id: "admr.fi.tampere"
     poi_providers:
         "waag": [
+            {type: "library"}
+            {type: "park"}
+            {type: "swimming_pool"}
             {type: "restaurant"}
+            {type: "cafe"}
             {type: "bar"}
             {type: "pub"}
             {type: "supermarket"}
+            {type: "toilet"}
+            {type: "recycling"}
         ]
     autocompletion_providers: ["poi_categories", "google"]
 
@@ -37,9 +43,12 @@ manchester = new Area(
     waag_id: "admr.uk.gr.manchester"
     poi_providers:
         "waag": [
+            {type: "restaurant"}
+            {type: "cafe"}
             {type: "bar"}
             {type: "pub"}
             {type: "supermarket"}
+            {type: "swimming_pool"}
         ],
         "geocoder": [
             {type: "park"}
@@ -63,6 +72,8 @@ helsinki = new Area(
     waag_id: "admr.fi.uusimaa" # XXX should be HSL area
     poi_providers:
         "waag": [
+            {type: "restaurant"}
+            {type: "cafe"}
             {type: "bar"}
             {type: "pub"}
             {type: "supermarket"}

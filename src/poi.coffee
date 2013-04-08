@@ -113,10 +113,11 @@ class POICategory
 supported_poi_categories = {
     "library": new POICategory {type: "library", name: "Library", plural_name: "Libraries", icon: "library.svg"}
     "recycling": new POICategory {type: "recycling", name: "Recycling point", icon: "recycling.svg"}
-    "park": new POICategory {type: "park", name: "Park", icon: "coniferous_and_deciduous.svg"}
+    "park": new POICategory {type: "park", name: "Park", icon: "coniferous_and_deciduous.svg", waag_filter: {"osm::leisure": "park"}}
     "swimming_pool": new POICategory {type: "swimming_pool", name: "Swimming pool", icon: "swimming_indoor.svg"}
+    "cafe": new POICategory {type: "cafe", name: "Cafe", icon: "cafe.svg"}
     "bar": new POICategory {type: "bar", name: "Bar", icon: "bar.svg"}
-    "toilet": new POICategory {type: "toilet", name: "Toilet (public)", icon: "toilets_men.svg"}
+    "toilet": new POICategory {type: "toilet", name: "Toilet (public)", icon: "toilets_men.svg", waag_filter: {"osm::amenity": "toilets"}}
     "pub": new POICategory {type: "pub", name: "Pub", icon: "pub.svg"}
     "supermarket": new POICategory {type: "supermarket", name: "Supermarket", icon: "supermarket.svg", waag_filter: {"osm::shop": "supermarket"}}
     "restaurant": new POICategory {type: "restaurant", name: "Restaurant", icon: "restaurant.svg"}
