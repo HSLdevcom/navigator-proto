@@ -194,7 +194,7 @@ $(document).bind "pagebeforechange", (e, data) ->
                 for poi in pois
                   do (poi) ->
                     if not poi.name
-                        return
+                        poi.name = "Unnamed #{category.name.toLowerCase()}"
                     dist = poi.distance
                     if dist >= 1000
                         dist = Math.round((dist + 100) / 100)
