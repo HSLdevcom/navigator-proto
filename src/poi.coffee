@@ -84,6 +84,7 @@ class WaagPOIProvider extends POIProvider
                     name: res.name
                     coords: coords
                     category: category
+                    private: res.layers?.osm?.data?.access == "private"
                 poi_list.push poi
             poi_list = _.sortBy poi_list, (poi) ->
                 poi_loc = new L.LatLng poi.coords[0], poi.coords[1]
@@ -195,6 +196,8 @@ $(document).bind "pagebeforechange", (e, data) ->
                   do (poi) ->
                     if not poi.name
                         poi.name = "Unnamed #{category.name.toLowerCase()}"
+                    if poi.private
+                        poi.name = "#{poi.name} (private)"
                     dist = poi.distance
                     if dist >= 1000
                         dist = Math.round((dist + 100) / 100)
