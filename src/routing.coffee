@@ -190,8 +190,8 @@ route_to_destination = (target_location) ->
             marker.poi = poi
             marker.on 'click', (e) ->
                 targetMarker = e.target
-                find_route sourceMarker.getLatLng(), targetMarker.getLatLng(), (route) ->
-                    map.fitBounds route.getBounds()
+                if sourceMarker?
+                    find_route sourceMarker.getLatLng(), targetMarker.getLatLng()
             marker.addTo map
             poi_markers.push marker
     console.log "route_to_destination done"
