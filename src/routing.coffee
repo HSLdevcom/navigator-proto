@@ -476,6 +476,10 @@ osm = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     attribution: 'Map data &copy; 2011 OpenStreetMap contributors',
 )
 
+opencyclemap = L.tileLayer('http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png', 
+    attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery by <a href="http://www.opencyclemap.org/" target="_blank">OpenCycleMap</a>',
+)
+
 mapquest = L.tileLayer("http://otile{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg",
     subdomains: "1234"
     attribution: 'Map data &copy; 2013 OpenStreetMap contributors, Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">'
@@ -483,6 +487,7 @@ mapquest = L.tileLayer("http://otile{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jp
 L.control.layers({
     "CloudMade": cloudmade
     "OpenStreetMap": osm
+    "OpenCycleMap": opencyclemap
     "MapQuest": mapquest
 },
 ).addTo(map)
