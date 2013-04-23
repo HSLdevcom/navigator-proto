@@ -23,12 +23,6 @@ interpolations = []
 
 ## Events before the page is shown
 
-$(document).bind "mobileinit", ->
-    console.log "mobileinit"
-    $.mobile.defaultPageTransition = "slide"
-    $.mobile.defaultHomeScroll = 0
-    $.mobile.page.prototype.options.keepNative = "form input"
-
 $(document).bind "pagebeforechange", (e, data) ->
     if typeof data.toPage != "string"
         console.log "pagebeforechange without toPage"
