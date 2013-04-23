@@ -297,7 +297,12 @@ render_route_layer = (itinerary, route) ->
                         duration = moment.duration(moment()-leg.startTime)
                         sign = "-"
                     seconds = (duration.seconds()+100).toString().substring(1)
-                    marker.updateLabelContent(label + "<span style='display: inline-block; font-size: 24px; padding-left: 6px; border-left: thin grey solid'>#{sign}#{duration.minutes()}:#{seconds}</span>")
+                    minutes = duration.minutes()
+                    hours = duration.hours()+24*duration.days()
+                    if (hours > 0) 
+                        minutes = (minutes+100).toString().substring(1)
+                        minutes = "#{hours}:#{minutes}"
+                    marker.updateLabelContent(label + "<span style='display: inline-block; font-size: 24px; padding-left: 6px; border-left: thin grey solid'>#{sign}#{minutes}:#{seconds}</span>")
                     setTimeout secondsCounter, 1000
 
                 marker = L.marker(new L.LatLng(point.y, point.x), {icon: icon}).addTo(route)
