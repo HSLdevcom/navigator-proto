@@ -314,7 +314,7 @@ render_route_layer = (itinerary, route) ->
                     line_layer.addTo(route)
 
                 console.log "subscribing to #{leg.routeId}"
-                citynavi.realtime.subscribe_route leg.routeId, (msg) ->
+                citynavi.realtime?.subscribe_route leg.routeId, (msg) ->
                     id = msg.vehicle.id
                     pos = [msg.position.latitude, msg.position.longitude]
                     if not (id of vehicles)
