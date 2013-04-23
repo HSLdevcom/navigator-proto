@@ -2,7 +2,7 @@ class POI
     constructor: (opts) ->
         _.extend @, opts
 
-URL_BASE = "http://dev.hel.fi/geocoder/v1/poi/?format=jsonp&callback=?"
+URL_BASE = "http://dev.hel.fi/geocoder/v1/poi/"
 STATIC_PREFIX = "static/images/" 
 
 class POIProvider

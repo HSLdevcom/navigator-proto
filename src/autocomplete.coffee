@@ -1,4 +1,4 @@
-URL_BASE = "http://dev.hel.fi/geocoder/v1/address/?format=jsonp"
+URL_BASE = "http://dev.hel.fi/geocoder/v1/address/"
 
 class Location
     constructor: (@name, @coords) ->
@@ -110,7 +110,7 @@ class RemoteAutocompleter extends Autocompleter
 
 class GeocoderCompleter extends RemoteAutocompleter
     fetch_results: ->
-        @xhr = $.getJSON URL_BASE + "&callback=?",
+        @xhr = $.getJSON URL_BASE,
             name: @.query
             limit: 10
         , (data) =>
@@ -130,7 +130,7 @@ class GoogleLocation extends Location
         @name = pred.description
         @info = pred
     fetch_details: (callback, args) ->
-        url = GOOGLE_URL_BASE + "details/?callback=?"
+        url = GOOGLE_URL_BASE + "details/"
         params = {reference: @info.reference}
         $.getJSON url, params, (data) =>
             res = data.result
@@ -140,7 +140,7 @@ class GoogleLocation extends Location
 
 class GoogleCompleter extends RemoteAutocompleter
     fetch_results: ->
-        url = GOOGLE_URL_BASE + "autocomplete/?callback=?"
+        url = GOOGLE_URL_BASE + "autocomplete/"
         area = citynavi.config.area
         location = citynavi.get_source_location_or_area_center()
         # FIXME

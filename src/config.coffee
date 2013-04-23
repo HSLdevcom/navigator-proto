@@ -11,7 +11,7 @@ tampere = new Area
     bbox_ne: [61.8237444, 24.1064742]
     bbox_sw: [61.42863, 23.5611791]
     center: [61.4976348, 23.7688124]
-    otp_base_url: "http://dev.hsl.fi:8083/opentripplanner-api-webapp/ws/"
+    otp_base_url: "http://dev.hsl.fi/tampere/opentripplanner-api-webapp/ws/"
     poi_muni_id: null
     waag_id: "admr.fi.tampere"
     poi_providers:
@@ -38,7 +38,7 @@ manchester = new Area(
     bbox_ne: [53.685760, -1.909630]
     bbox_sw: [53.327332, -2.730550]
     center: [53.479167, -2.244167]
-    otp_base_url: "http://dev.hsl.fi:8081/opentripplanner-api-webapp/ws/"
+    otp_base_url: "http://dev.hsl.fi/manchester/opentripplanner-api-webapp/ws/"
     poi_muni_id: 44001
     waag_id: "admr.uk.gr.manchester"
     poi_providers:
