@@ -527,9 +527,28 @@ map.on 'locationerror', (e) ->
 map.on 'locationfound', (e) ->
 #    radius = e.accuracy / 2
     radius = e.accuracy
-    measure = if e.accuracy < 2000 then "#{Math.round(e.accuracy)} meters" else "#{Math.round(e.accuracy/1000)} km"
+    measure = if e.accuracy < 2000 then "within #{Math.round(e.accuracy)} meters" else "within #{Math.round(e.accuracy/1000)} km"
     point = e.latlng
     transform_location point
+
+    bbox_sw = citynavi.config.area.bbox_sw
+    bbox_ne = citynavi.config.area.bbox_ne
+
+    if not (bbox_sw[0] < point.lat < bbox_ne[0]) or not (bbox_sw[1] < point.lng < bbox_ne[1])
+        if sourceMarker != null
+            if positionMarker != null
+               map.removeLayer(positionMarker) # red circle was stale
+               positionMarker = null
+            return # no interest in updating to new location outside area
+        console.log(bbox_sw[0], point.lat, bbox_ne[0])
+        console.log(bbox_sw[1], point.lng, bbox_ne[1])
+        console.log("using area center instead of geolocation outside area")
+        point.lat = citynavi.config.area.center[0]
+        point.lng = citynavi.config.area.center[1]
+        e.accuracy = 2001 # don't draw red circle
+        radius = 50 # draw small grey circle
+        measure = "nowhere near"
+        e.bounds = L.latLngBounds(bbox_sw, bbox_ne)
 
     # save latest position info for later page change
     position_point = point
@@ -545,13 +564,13 @@ map.on 'locationfound', (e) ->
 
         sourceMarker = L.marker(point, {draggable: true}).addTo(map)
             .on('dragend', onSourceDragEnd)
-            .bindPopup("The starting point for journey planner<br>(tap the red marker to update)<br>You are within #{measure} from this point").openPopup()
+            .bindPopup("The starting point for journey planner<br>(tap the red marker to update)<br>You are #{measure} from this point").openPopup()
         sourceCircle = L.circle(point, radius, {color: 'gray'}).addTo(map)
 
         if targetMarker != null
             find_route(sourceMarker.getLatLng(), targetMarker.getLatLng())
 
-    if radius > 2000
+    if e.accuracy > 2000
         return
     positionMarker = L.circle(point, radius, {color: 'red'}).addTo(map)
         .on 'click', (e) ->
