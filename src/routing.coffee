@@ -144,9 +144,61 @@ decode_polyline = (encoded, dims) ->
 
 ## Markers
 
+set_source_marker = (latlng, options) ->
+    if sourceMarker?
+        map.removeLayer(sourceMarker)
+        sourceMarker = null
+    sourceMarker = L.marker(latlng, {draggable: true}).addTo(map)
+        .on('dragend', onSourceDragEnd)
+    if options?.accuracy
+        accuracy = options.accuracy
+        measure = options.measure
+        if not measure?
+            measure = if accuracy < 2000 then "#{Math.round(accuracy)} meters" else "#{Math.round(accuracy/1000)} km"
+        
+        sourceMarker.bindPopup("The starting point for journey planner<br>(tap the red marker to update)<br>You are within #{measure} from this point").openPopup()
+        if sourceCircle != null
+            map.removeLayer(sourceCircle)
+            sourceCircle = null
+        sourceCircle = L.circle(latlng, accuracy, {color: 'gray'}).addTo(map)
+    else
+        sourceMarker.bindPopup("The starting point for journey<br>(drag the marker to change)").openPopup()
+
+    marker_changed(options)
+
+set_target_marker = (latlng, options) ->
+    if targetMarker?
+        map.removeLayer(targetMarker)
+        targetMarker = null
+    targetMarker = L.marker(latlng, {draggable: true}).addTo(map)
+        .on('dragend', onTargetDragEnd)
+    description = options?.description
+    if not description?
+        description = "The end point for journey<br>(drag the marker to change)"
+    targetMarker.bindPopup(description).openPopup()
+
+    marker_changed(options)
+
 onSourceDragEnd = (event) ->
-    if sourceMarker != null and targetMarker != null
-        find_route(sourceMarker.getLatLng(), targetMarker.getLatLng())
+    sourceMarker.unbindPopup()
+    sourceMarker.bindPopup("The starting point for journey<br>(drag the marker to change)")
+    marker_changed()
+
+onTargetDragEnd = (event) ->
+    targetMarker.unbindPopup()
+    targetMarker.bindPopup("The end point for journey<br>(drag the marker to change)")
+    marker_changed()
+
+marker_changed = (options) ->
+    # when both markers have been placed, find the route between them
+    # and zoom out if necessary to fit the route on the screen
+    if sourceMarker? and targetMarker?
+        find_route sourceMarker.getLatLng(), targetMarker.getLatLng(), (route) ->
+            if options?.zoomToFit
+                map.fitBounds(route.getBounds())
+            else if options?.zoomToShow
+                if not map.getBounds().contains(route.getBounds())
+                    map.fitBounds(route.getBounds())
 
 
 ## Routing
@@ -157,24 +209,17 @@ route_to_destination = (target_location) ->
     console.log "route_to_destination", target_location.name
     [lat, lng] = target_location.coords
     target = new L.LatLng(lat, lng)
-    if targetMarker?
-        map.removeLayer(targetMarker)
-    targetMarker = L.marker(target, {draggable: true}).addTo(map)
-        .on('dragend', onSourceDragEnd)
-        .bindPopup("#{target_location.name}")
+    set_target_marker(target, {description: target_location.name, zoomToFit: true})
 # crashes on Mobile Safari:
 #    targetMarker.openPopup()
     $.mobile.changePage("#map-page")
-    if sourceMarker?
-        source = sourceMarker.getLatLng()
-        find_route sourceMarker.getLatLng(), target, (route) ->
-            map.fitBounds(route.getBounds())
     
     for marker in poi_markers
         map.removeLayer marker
     poi_markers = []
     if citynavi.poi_list
         for poi in citynavi.poi_list
+          do (poi) ->
             icon = L.AwesomeMarkers.icon
                 svg: poi.category.get_icon_path()
                 color: 'green'
@@ -183,9 +228,7 @@ route_to_destination = (target_location) ->
             marker.bindPopup "#{poi.name}"
             marker.poi = poi
             marker.on 'click', (e) ->
-                targetMarker = e.target
-                if sourceMarker?
-                    find_route sourceMarker.getLatLng(), targetMarker.getLatLng()
+                set_target_marker(e.target.getLatLng(), {description: poi.name})
             marker.addTo map
             poi_markers.push marker
     console.log "route_to_destination done"
@@ -208,16 +251,10 @@ route_to_service = (srv_id) ->
             alert("No service near the current position.")
             return
         target = new L.LatLng(data[0].latitude, data[0].longitude)
-        if targetMarker?
-            map.removeLayer(targetMarker)
-        targetMarker = L.marker(target, {draggable: true}).addTo(map)
-            .on('dragend', onSourceDragEnd)
-            .bindPopup("#{data[0].name_en}<br>(closest #{srv_id})")
+        set_target_marker(target, {description: "#{data[0].name_en}<br>(closest #{srv_id})"})
 # crashes on Mobile Safari:
 #        targetMarker.openPopup()
         $.mobile.changePage("#map-page")
-        find_route sourceMarker.getLatLng(), target, (route) ->
-            map.fitBounds(route.getBounds())
         console.log "palvelukartta callback done"
     console.log "route_to_service done"
 
@@ -561,28 +598,13 @@ map.on 'locationfound', (e) ->
     else if sourceMarker == null
         zoom = Math.min(map.getBoundsZoom(e.bounds), 15)
         map.setView(point, zoom)
-
-        sourceMarker = L.marker(point, {draggable: true}).addTo(map)
-            .on('dragend', onSourceDragEnd)
-            .bindPopup("The starting point for journey planner<br>(tap the red marker to update)<br>You are #{measure} from this point").openPopup()
-        sourceCircle = L.circle(point, radius, {color: 'gray'}).addTo(map)
-
-        if targetMarker != null
-            find_route(sourceMarker.getLatLng(), targetMarker.getLatLng())
+        set_source_marker(point, {accuracy: radius, measure: measure})
 
     if e.accuracy > 2000
         return
     positionMarker = L.circle(point, radius, {color: 'red'}).addTo(map)
         .on 'click', (e) ->
-            point = positionMarker.getLatLng()
-            radius = positionMarker.getRadius()
-            sourceMarker.setLatLng(point)
-            if sourceCircle != null
-                map.removeLayer(sourceCircle)
-                sourceCircle = null
-            sourceCircle = L.circle(point, radius, {color: 'gray'}).addTo(map)
-            if targetMarker != null
-                find_route(sourceMarker.getLatLng(), targetMarker.getLatLng())
+            set_source_marker(point, {accuracy: radius, measure: measure})
 
 map.on 'click', (e) ->
     # don't react to map clicks after both markers have been set
@@ -591,19 +613,6 @@ map.on 'click', (e) ->
 
     # place the marker that's missing, giving priority to the source marker
     if sourceMarker == null
-        source = e.latlng
-        sourceMarker = L.marker(source, {draggable: true}).addTo(map)
-            .on('dragend', onSourceDragEnd)
-            .bindPopup("The starting point for journey<br>(drag the marker to change)").openPopup()
+        set_source_marker(e.latlng)
     else if targetMarker == null
-        target = e.latlng
-        targetMarker = L.marker(target, {draggable: true}).addTo(map)
-            .on('dragend', onSourceDragEnd)
-            .bindPopup("The end point for journey<br>(drag the marker to change)").openPopup()
-
-    # when the second marker has been placed, find the route between them
-    # and zoom out if necessary to fit the route on the screen
-    if sourceMarker? and targetMarker?
-        find_route sourceMarker.getLatLng(), targetMarker.getLatLng(), (route) ->
-            if not map.getBounds().contains(route.getBounds())
-                map.fitBounds(route.getBounds())
+        set_target_marker(e.latlng)
