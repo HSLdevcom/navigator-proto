@@ -616,3 +616,19 @@ map.on 'click', (e) ->
         set_source_marker(e.latlng)
     else if targetMarker == null
         set_target_marker(e.latlng)
+
+contextmenu = L.popup().setContent('<a href="#" onclick="return setMapSource()">Set source</a> | <a href="#" onclick="return setMapTarget()">Set target</a>')
+
+map.on 'contextmenu', (e) ->
+    contextmenu.setLatLng(e.latlng)
+    contextmenu.openOn(map)
+
+    window.setMapSource = () ->
+        set_source_marker(e.latlng)
+        map.removeLayer(contextmenu)
+        return false
+
+    window.setMapTarget = () ->
+        set_target_marker(e.latlng)
+        map.removeLayer(contextmenu)
+        return false
