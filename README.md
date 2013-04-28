@@ -39,3 +39,20 @@ Install build tool with `sudo npm install -g grunt-cli` and run with
 
 Or, install build tool with `npm install grunt-cli` and run dev server with
 `node_modules/.bin/grunt server`.
+
+## Running tests ##
+
+Run tests with `grunt test'.
+
+## Writing tests ##
+
+Install testem cli with `sudo npm install -g testem`.
+
+Run 'grunt test' at least once before (to generate `testem.json`).
+
+Start watching test environment with `testem`.
+
+Follow instructions on screen to register browser with testem.
+
+Edit test below `./tests`. Tests are run when changes in test suites are
+detected.
