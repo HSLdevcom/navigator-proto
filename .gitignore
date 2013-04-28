@@ -1,3 +1,6 @@
 static/js/
 *~
 node_modules
+sauce_connect.log
+test_functional.tap
+testem.json
