@@ -18,16 +18,38 @@ module.exports = (grunt) ->
       tasks: 'default'
 
     testem:
-      options:
-        launch_in_ci: ['chrome', 'firefox']
-        before_tests: 'coffee -c tests/*.coffee'
-        after_tests: 'rm tests/*.js'
-        serve_files: 'tests/*.js'
-        src_files: 'tests/*.coffee'
-      main:
+      desktop:
+        options:
+          launch_in_ci: ['firefox']
+          before_tests: 'coffee -c tests/*.coffee'
+          after_tests: 'rm tests/*.js'
+          serve_files: 'tests/*.js'
+          src_files: 'tests/*.coffee'
         files:
           'test_functional.tap': ['index.html']
-
+      mobile:
+        options:
+          launch_in_ci: ['android', 'iphone', 'ipad']
+          launchers:
+            android:
+              command: 'saucelauncher launch android <url> --os=Linux'
+              protocol: 'browser'
+            iphone:
+              command: 'saucelauncher launch iphone <url> --os="OS X 10.8"'
+              protocol: 'browser'
+            ipad:
+              command: 'saucelauncher launch ipad <url> --os="OS X 10.8"'
+              protocol: 'browser'
+          on_start:
+            command: 'saucelauncher tunnel'
+            wait_for_text: 'Connected! You may start your tests.'
+          host: '0.0.0.0',  # for accessing the server from SauceLabs
+          before_tests: 'coffee -c tests/*.coffee'
+          after_tests: 'rm tests/*.js'
+          serve_files: 'tests/*.js'
+          src_files: 'tests/*.coffee'
+        files:
+          'test_functional.tap': ['index.html']
     connect:
       server:
         options:
@@ -41,4 +63,5 @@ module.exports = (grunt) ->
 
   grunt.registerTask 'default', ['coffee']
   grunt.registerTask 'server', ['coffee', 'connect', 'watch']
-  grunt.registerTask 'test', ['coffee', 'connect', 'testem']
+  grunt.registerTask 'test', ['coffee', 'testem:desktop']
+  grunt.registerTask 'test-mobile', ['coffee', 'testem:mobile']
