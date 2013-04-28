@@ -30,7 +30,7 @@ Libraries used: jQuery Mobile, Leaflet, Backbone.js, Moment.js
 
 Node.js with NPM 1.2 or newer is required to build the project. For
 Ubuntu 12.04 LTS, this can be acquired with `sudo add-apt-repository
-ppa:chris-lea/node.js` followed by `sudo apt-get install npm`.
+ppa:chris-lea/node.js` followed by `sudo apt-get install nodejs`.
 
 Install dependencies with `npm install`.
 
@@ -42,11 +42,18 @@ Or, install build tool with `npm install grunt-cli` and run dev server with
 
 ## Running tests (on a desktop browser) ##
 
-Run tests with `grunt test'.
+Install testem with `sudo npm install -g testem`.
+
+Run tests with `grunt test`. (This may finish early if you have Firefox 
+running already.)
+
+To use Phantomjs instead of Firefox, you can install it with 
+`sudo apt-get install phantomjs` and replace `firefox` with `phantomjs` 
+in `Gruntfile.coffee`.
 
 ## Running tests (on a mobile browser) ##
 
-Mobile browsers tests are run at SauceLabs. (Unfortunately, the current
+Tests can be run on mobile browsers at SauceLabs. (Unfortunately, the current
 SauceLabs integration for testem is mostly just a hack and that's why
 the current experience is quite poor.)
 
@@ -64,13 +71,11 @@ Add `~/.saucelabs.json` in a format:
 }
 ```
 
-Run tests with `grunt test-mobile'.
+Run tests with `grunt test-mobile`.
 
 ## Writing tests ##
 
-Install testem cli with `sudo npm install -g testem`.
-
-Run 'grunt test' at least once before (to generate working `testem.json`).
+Run `grunt test` at least once before (to generate working `testem.json`).
 
 Start watching test environment with `testem`.
 
