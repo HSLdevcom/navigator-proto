@@ -19,6 +19,29 @@
         <script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.10/backbone-min.js"></script>
         <script src="static/js/moment.min.js"></script>
         <script src="http://dev.hsl.fi:9002/faye/client.js"></script>
+        <script>
+        // Functional testing with TestEm using mocha+chai-framework.
+        if (window.location.hash === '#testem') {
+            jQuery(document).ready(function($) {
+                $('#front-page').bind('pageshow', function() {
+                    var loadDependencies, suite = '/tests/test_functional.js';
+                    loadDependencies = function(urls, callback) {
+                        if (urls.length > 0) {
+                           $.getScript(urls.shift(0), function() {
+                               loadDependencies(urls, callback);
+                           });
+                        } else { callback(); }
+                    }
+                    loadDependencies([
+                        '/testem/mocha.js', '/testem/chai.js', '/testem.js'
+                    ], function() {
+                        mocha.setup('bdd');
+                        $.getScript(suite, function() { mocha.run(); });
+                    });
+                });
+            });
+        }
+        </script>
     </head>
     <body>
         <div id="front-page" data-role="page">

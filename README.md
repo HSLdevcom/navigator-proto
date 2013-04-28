@@ -39,3 +39,42 @@ Install build tool with `sudo npm install -g grunt-cli` and run with
 
 Or, install build tool with `npm install grunt-cli` and run dev server with
 `node_modules/.bin/grunt server`.
+
+## Running tests (on a desktop browser) ##
+
+Run tests with `grunt test'.
+
+## Running tests (on a mobile browser) ##
+
+Mobile browsers tests are run at SauceLabs. (Unfortunately, the current
+SauceLabs integration for testem is mostly just a hack and that's why
+the current experience is quite poor.)
+
+Install saucelauncher from source with `sudo npm install -g
+git://github.com/datakurre/saucelauncher.git`.
+(Once https://github.com/airportyh/saucelauncher/pull/3 has been merged and
+released, you may switch back to a released version of saucelauncher.)
+
+Add `~/.saucelabs.json` in a format:
+
+```json
+{
+    "username": "mysaucelabsuserid",
+    "api_key": "mysecretsaucelabsapikey"
+}
+```
+
+Run tests with `grunt test-mobile'.
+
+## Writing tests ##
+
+Install testem cli with `sudo npm install -g testem`.
+
+Run 'grunt test' at least once before (to generate working `testem.json`).
+
+Start watching test environment with `testem`.
+
+Follow instructions on screen to register browser with testem.
+
+Edit test below `./tests`. Tests are run when changes in test suites are
+detected.
