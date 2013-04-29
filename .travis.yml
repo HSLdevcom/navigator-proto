@@ -7,13 +7,13 @@ before_install:
 - echo \{\"username\":\"$SAUCE_USERNAME\",\"api_key\":\"$SAUCE_ACCESS_KEY\"\} > ~/.saucelabs.json
 install:
 - npm install -g grunt-cli testem coffee-script
-- npm install -g git://github.com/datakurre/saucelauncher.git
+#- npm install -g git://github.com/datakurre/saucelauncher.git
 - npm install
 script: grunt test$TARGET
 env:
   matrix:
   - TARGET=
-  - TARGET=-mobile
+#  - TARGET=-mobile
   global:
   - SAUCE_USERNAME=navigator-proto
   - secure: |-
