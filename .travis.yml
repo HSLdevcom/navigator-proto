@@ -4,7 +4,7 @@ node_js: "0.10"
 before_install:
 - export DISPLAY=:99.0
 - sh -e /etc/init.d/xvfb start
-- echo '{"username": "$SAUCE_USERNAME", "api_key": "$SAUCE_ACCESSKEY"}'>~/.saucelabs.json
+- echo '{\"username\":\"$SAUCE_USERNAME\",\"api_key\":\"$SAUCE_ACCESS_KEY\"}' > ~/.saucelabs.json
 install:
 - npm install -g grunt-cli testem coffee-script
 - npm install -g git://github.com/datakurre/saucelauncher.git
