@@ -26,6 +26,8 @@ Technologies used: HTML5, Geolocation, Local storage
 
 Libraries used: jQuery Mobile, Leaflet, Backbone.js, Moment.js
 
+[![Build Status](https://secure.travis-ci.org/datakurre/navigator-proto.png)](http://travis-ci.org/datakurre/navigator-proto)
+
 ## Getting started ##
 
 Node.js with NPM 1.2 or newer is required to build the project. For
