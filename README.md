@@ -42,7 +42,7 @@ Or, install build tool with `npm install grunt-cli` and run dev server with
 
 ## Running tests (on a desktop browser) ##
 
-Install testem with `sudo npm install -g testem`.
+Install testem with `sudo npm install -g testem coffee-script`.
 
 Run tests with `grunt test`. (This may finish early if you have Firefox 
 running already.)
