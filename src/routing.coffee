@@ -208,11 +208,9 @@ poi_markers = []
 route_to_destination = (target_location) ->
     console.log "route_to_destination", target_location.name
     [lat, lng] = target_location.coords
+    $.mobile.changePage("#map-page")
     target = new L.LatLng(lat, lng)
     set_target_marker(target, {description: target_location.name, zoomToFit: true})
-# crashes on Mobile Safari:
-#    targetMarker.openPopup()
-    $.mobile.changePage("#map-page")
     
     for marker in poi_markers
         map.removeLayer marker
@@ -250,11 +248,9 @@ route_to_service = (srv_id) ->
         if data.length == 0
             alert("No service near the current position.")
             return
+        $.mobile.changePage("#map-page")
         target = new L.LatLng(data[0].latitude, data[0].longitude)
         set_target_marker(target, {description: "#{data[0].name_en}<br>(closest #{srv_id})"})
-# crashes on Mobile Safari:
-#        targetMarker.openPopup()
-        $.mobile.changePage("#map-page")
         console.log "palvelukartta callback done"
     console.log "route_to_service done"
 
