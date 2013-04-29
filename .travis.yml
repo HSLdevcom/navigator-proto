@@ -1,10 +1,22 @@
 ---
 language: node_Js
-node_js: '0.10'
+node_js: "0.10"
 before_install:
-- "export DISPLAY=:99.0"
-- "sh -e /etc/init.d/xvfb start"
+- export DISPLAY=:99.0
+- sh -e /etc/init.d/xvfb start
+- echo '{"username": "$SAUCE_USERNAME", "api_key": "$SAUCE_ACCESSKEY"}'>~/.saucelabs.json
 install:
 - npm install -g grunt-cli testem coffee-script
+- npm install -g git://github.com/datakurre/saucelauncher.git
 - npm install
-script: grunt test
+script: grunt test$TARGET
+env:
+  matrix:
+  - TARGET=
+  - TARGET=-mobile
+  global:
+  - SAUCE_USERNAME=navigator-proto
+  - secure: |-
+      NSa08sEGEb2aaiv4kUGdB/gi4h2QJWghc9Syzy7vIelHPSkKJl1aG7OPbVXX
+      XVAlbGRSkP++3ShW/mFJ/ntZpWxcSt8K/p4mRE1f3r9aGv/PkkNlJKODC143
+      s8GTjslJgi9Ll/ao1Ys9aeCkRdYKfqMWM4fJMWkeucuh3lZ+HAw=
