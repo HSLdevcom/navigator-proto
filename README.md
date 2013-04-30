@@ -26,7 +26,7 @@ Technologies used: HTML5, Geolocation, Local storage
 
 Libraries used: jQuery Mobile, Leaflet, Backbone.js, Moment.js
 
-[![Build Status](https://secure.travis-ci.org/datakurre/navigator-proto.png)](http://travis-ci.org/datakurre/navigator-proto)
+[![Build Status](https://secure.travis-ci.org/codeforeurope/navigator-proto.png)](http://travis-ci.org/codeforeurope/navigator-proto)
 
 ## Getting started ##
 
