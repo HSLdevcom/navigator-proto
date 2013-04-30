@@ -3,6 +3,16 @@
 
 do chai.should
 
+afterEach (done)-> 
+  if $.mobile.activePage.attr("id") == "front-page"
+    done()
+    return
+  jQuery.mobile.changePage '#front-page'
+  jQuery('#front-page').bind 'pageshow', (event)->
+    jQuery(this).unbind(event)
+    done()
+# FIXME try to reset all state
+
 
 describe 'jQuery is loaded', ->
   it 'should be Function', ->
@@ -23,13 +33,18 @@ describe 'Find nearest services', ->
   it 'should have title "Find nearest services"', ->
     jQuery('h1.ui-title').filter(":visible").text().should.equal('Find nearest services')
 
-afterEach (done)-> 
-  if $.mobile.activePage.attr("id") == "front-page"
-    done()
-    return
-  jQuery.mobile.changePage '#front-page'
-  jQuery('#front-page').bind 'pageshow', (event)->
-    jQuery(this).unbind(event)
-    done()
-# FIXME try to reset all state
-
+describe 'Settings', ->
+  beforeEach (done)->
+    jQuery('a[href="#settings"]').click()
+    jQuery('#settings').bind 'pageshow', (event)->
+      $(this).unbind(event)
+      done()
+  it 'should have title "Settings"', ->
+    jQuery('h1.ui-title').filter(":visible").text().should.equal('Settings')
+  it 'should have back button', ->
+    jQuery('a[data-rel="back"]').filter(":visible").length.should.equal(1)
+  it 'back button should return to Front Page', (done)->
+    jQuery('a[data-rel="back"]').filter(":visible").click()
+    jQuery('#front-page').bind 'pageshow', (event)->
+      jQuery(this).unbind(event)
+      done()
