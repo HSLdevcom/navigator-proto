@@ -9,6 +9,8 @@ install:
 - npm install -g grunt-cli testem coffee-script
 #- npm install -g git://github.com/datakurre/saucelauncher.git
 - npm install
+- virtualenv pybot
+- source pybot/bin/activate
 - pip install -r requirements.txt
 script: grunt test$TARGET
 env:
