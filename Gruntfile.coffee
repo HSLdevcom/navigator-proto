@@ -52,7 +52,7 @@ module.exports = (grunt) ->
           'test_functional.tap': ['index.html']
     exec:
       robot:
-        command: 'pybot tests'
+        command: 'bin/pybot tests'
     connect:
       server:
         options:
