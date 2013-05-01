@@ -9,9 +9,8 @@ install:
 - npm install -g grunt-cli testem coffee-script
 #- npm install -g git://github.com/datakurre/saucelauncher.git
 - npm install
-- virtualenv robotenv
-- source robotenv/bin/activate
-- pip install -r requirements.txt
+- python bootstrap.py
+- bin/buildout
 script: grunt test$TARGET
 env:
   matrix:
