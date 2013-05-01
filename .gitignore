@@ -4,3 +4,12 @@ node_modules
 sauce_connect.log
 test_functional.tap
 testem.json
+.installed.cfg
+bin
+eggs
+develop-eggs
+parts
+log.html
+report.html
+output.xml
+selenium-screenshot-*.png
