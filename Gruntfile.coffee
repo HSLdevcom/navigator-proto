@@ -50,6 +50,9 @@ module.exports = (grunt) ->
           src_files: 'tests/*.coffee'
         files:
           'test_functional.tap': ['index.html']
+    exec:
+      robot:
+        command: 'pybot tests'
     connect:
       server:
         options:
@@ -59,9 +62,11 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-coffee'
   grunt.loadNpmTasks 'grunt-contrib-watch'
   grunt.loadNpmTasks 'grunt-contrib-connect'
+  grunt.loadNpmTasks 'grunt-exec'
   grunt.loadNpmTasks 'grunt-testem'
 
   grunt.registerTask 'default', ['coffee']
   grunt.registerTask 'server', ['coffee', 'connect', 'watch']
   grunt.registerTask 'test', ['coffee', 'testem:desktop']
   grunt.registerTask 'test-mobile', ['coffee', 'testem:mobile']
+  grunt.registerTask 'test-robot', ['coffee', 'connect', 'exec:robot']
