@@ -4,7 +4,7 @@ $(document).bind "mobileinit", ->
       console =
         log: ->
       window.console = console
-      $.ajaxSetup({cache: true});
+      $.ajaxSetup({cache: true})
       $.getScript("http://jsconsole.com/remote.js?citynavi")
      else
        window.console.log "mobileinit"
