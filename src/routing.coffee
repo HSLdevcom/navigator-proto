@@ -301,6 +301,7 @@ render_route_layer = (itinerary, route) ->
 
     for leg in legs
         do (leg) ->
+            uid = Math.floor(Math.random()*1000000)
             points = (new L.LatLng(point[0]*1e-5, point[1]*1e-5) for point in decode_polyline(leg.legGeometry.points, 2))
             color = googleColors[leg.routeType]
             if leg.routeType != null
@@ -335,12 +336,12 @@ render_route_layer = (itinerary, route) ->
                     if (hours > 0) 
                         minutes = (minutes+100).toString().substring(1)
                         minutes = "#{hours}:#{minutes}"
-                    marker.updateLabelContent(label + "<span style='display: inline-block; font-size: 24px; padding-left: 6px; border-left: thin grey solid'>#{sign}#{minutes}:#{seconds}</span>")
+                    $("#counter#{uid}").text "#{sign}#{minutes}:#{seconds}"
                     setTimeout secondsCounter, 1000
 
                 marker = L.marker(new L.LatLng(point.y, point.x), {icon: icon}).addTo(route)
                     .bindPopup("<b>Time: #{moment(leg.startTime).format("HH:mm")}</b><br /><b>From:</b> #{stop.name}<br /><b>To:</b> #{last_stop.name}")
-                    .bindLabel(label, {noHide: true})
+                    .bindLabel(label + "<span id='counter#{uid}' style='display: inline-block; font-size: 24px; padding-left: 6px; border-left: thin grey solid'></span>", {noHide: true})
                     .showLabel()
 
                 secondsCounter()
