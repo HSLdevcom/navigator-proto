@@ -516,12 +516,18 @@ mapquest = L.tileLayer("http://otile{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jp
     subdomains: "1234"
     attribution: 'Map data &copy; 2013 OpenStreetMap contributors, Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">'
 )
+
+osmnotes = new leafletOsmNotes()
+
 L.control.layers({
     "CloudMade": cloudmade
     "OpenStreetMap": osm
     "OpenCycleMap": opencyclemap
     "MapQuest": mapquest
 },
+{
+    "View map errors": osmnotes
+}
 ).addTo(map)
 L.control.scale().addTo(map)
 
