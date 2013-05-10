@@ -387,7 +387,7 @@ render_route_buttons = (itinerary, route_layer, polylines) ->
 
     length = itinerary.legs.length + 1
 
-    $full_trip = $("<li class='leg'><div class='leg-bar' style='margin-right: 3px'><i style='font-weight: lighter'><img src='' />Total</i><div class='leg-indicator'>#{Math.ceil(trip_duration/1000/60)}min</div></div></li>")
+    $full_trip = $("<li class='leg'><div class='leg-bar' style='margin-right: 3px'><i style='font-weight: lighter'><img />Total</i><div class='leg-indicator'>#{Math.ceil(trip_duration/1000/60)}min</div></div></li>")
 
     $full_trip.css("left", "{0}%")
     $full_trip.css("width", "#{1/length*100}%")
