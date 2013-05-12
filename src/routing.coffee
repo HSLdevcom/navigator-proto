@@ -4,8 +4,8 @@
 # map
 map = null
 
-# map markers for current position, routing source, routing target
-positionMarker = sourceMarker = targetMarker = null
+# map markers for current position, routing source, routing target, comment
+positionMarker = sourceMarker = targetMarker = commentMarker = null
 
 # map feature for accuracy of geolocated routing source
 sourceCircle = null
@@ -620,7 +620,19 @@ map.on 'click', (e) ->
     else if targetMarker == null
         set_target_marker(e.latlng)
 
-contextmenu = L.popup().setContent('<a href="#" onclick="return setMapSource()">Set source</a> | <a href="#" onclick="return setMapTarget()">Set target</a>')
+contextmenu = L.popup().setContent('<a href="#" onclick="return setMapSource()">Set source</a> | <a href="#" onclick="return setMapTarget()">Set target</a> | <a href="#" onclick="return setNoteLocation()">Report map error</a>')
+
+set_comment_marker = (latlng) ->
+    if commentMarker?
+        map.removeLayer(commentMarker)
+        commentMarker = null
+    if not latlng?
+        return
+    commentMarker = L.marker(latlng, {draggable: true}).addTo(map)
+    description = options?.description
+    if not description?
+        description = "Location for map error report"
+    commentMarker.bindPopup(description).openPopup()
 
 map.on 'contextmenu', (e) ->
     contextmenu.setLatLng(e.latlng)
@@ -633,5 +645,26 @@ map.on 'contextmenu', (e) ->
 
     window.setMapTarget = () ->
         set_target_marker(e.latlng)
+        map.removeLayer(contextmenu)
+        return false
+
+    window.setNoteLocation = () ->
+        set_comment_marker(e.latlng)
+        osmnotes.addTo(map)
+        $('#comment-box').show()
+        $('#comment-box').unbind 'submit'
+        $('#comment-box').bind 'submit', ->
+            text = $('#comment-box textarea').val()
+            lat = commentMarker.getLatLng().lat
+            lon = commentMarker.getLatLng().lng
+            uri = "http://api.openstreetmap.org/api/0.6/notes.json"
+            # enable for testing: 
+            # uri = "http://api06.dev.openstreetmap.org/api/0.6/notes.json"
+            $.post uri, {lat: lat, lon: lon, text: text}, ()->
+                $('#comment-box').hide()
+                resize_map() # causes map redraw & notes update
+                set_comment_marker()
+            return false # don't submit form
+        resize_map()
         map.removeLayer(contextmenu)
         return false
