@@ -50,13 +50,10 @@ module.exports = window.L.LayerGroup.extend({
             }, this)
         });
         this.addLayer(this.notesLayer);
-        map
-            .on('viewreset', this._load, this)
-            .on('moveend', this._load, this);
+        map.on('moveend', this._load, this);
         this._load();
     },
     onRemove: function(map) {
-        map.off('viewreset', this._load, this);
         map.off('moveend', this._load, this);
         this.removeLayer(this.notesLayer);
         this.notesLayer = null;
