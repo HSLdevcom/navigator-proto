@@ -28,7 +28,7 @@ module.exports = window.L.LayerGroup.extend({
         });
     },
     onAdd: function(map) {
-        this._map = map;
+        L.LayerGroup.prototype.onAdd.call(this, map);
 
         this.notesLayer = L.geoJson({
             type: 'FeatureCollection',
@@ -54,6 +54,14 @@ module.exports = window.L.LayerGroup.extend({
             .on('viewreset', this._load, this)
             .on('moveend', this._load, this);
         this._load();
+    },
+    onRemove: function(map) {
+        map.off('viewreset', this._load, this);
+        map.off('moveend', this._load, this);
+        this.removeLayer(this.notesLayer);
+        this.notesLayer = null;
+
+        L.LayerGroup.prototype.onRemove.call(this, map);
     },
     boundsString: function(map) {
         var b = map.getBounds();
