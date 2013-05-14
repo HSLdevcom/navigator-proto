@@ -4,8 +4,8 @@
 # map
 map = null
 
-# map markers for current position, routing source, routing target
-positionMarker = sourceMarker = targetMarker = null
+# map markers for current position, routing source, routing target, comment
+positionMarker = sourceMarker = targetMarker = commentMarker = null
 
 # map feature for accuracy of geolocated routing source
 sourceCircle = null
@@ -301,6 +301,7 @@ render_route_layer = (itinerary, route) ->
 
     for leg in legs
         do (leg) ->
+            uid = Math.floor(Math.random()*1000000)
             points = (new L.LatLng(point[0]*1e-5, point[1]*1e-5) for point in decode_polyline(leg.legGeometry.points, 2))
             color = googleColors[leg.routeType]
             if leg.routeType != null
@@ -335,12 +336,12 @@ render_route_layer = (itinerary, route) ->
                     if (hours > 0) 
                         minutes = (minutes+100).toString().substring(1)
                         minutes = "#{hours}:#{minutes}"
-                    marker.updateLabelContent(label + "<span style='display: inline-block; font-size: 24px; padding-left: 6px; border-left: thin grey solid'>#{sign}#{minutes}:#{seconds}</span>")
+                    $("#counter#{uid}").text "#{sign}#{minutes}:#{seconds}"
                     setTimeout secondsCounter, 1000
 
                 marker = L.marker(new L.LatLng(point.y, point.x), {icon: icon}).addTo(route)
                     .bindPopup("<b>Time: #{moment(leg.startTime).format("HH:mm")}</b><br /><b>From:</b> #{stop.name}<br /><b>To:</b> #{last_stop.name}")
-                    .bindLabel(label, {noHide: true})
+                    .bindLabel(label + "<span id='counter#{uid}' style='display: inline-block; font-size: 24px; padding-left: 6px; border-left: thin grey solid'></span>", {noHide: true})
                     .showLabel()
 
                 secondsCounter()
@@ -386,7 +387,7 @@ render_route_buttons = (itinerary, route_layer, polylines) ->
 
     length = itinerary.legs.length + 1
 
-    $full_trip = $("<li class='leg'><div class='leg-bar' style='margin-right: 3px'><i style='font-weight: lighter'><img src='' />Total</i><div class='leg-indicator'>#{Math.ceil(trip_duration/1000/60)}min</div></div></li>")
+    $full_trip = $("<li class='leg'><div class='leg-bar' style='margin-right: 3px'><i style='font-weight: lighter'><img />Total</i><div class='leg-indicator'>#{Math.ceil(trip_duration/1000/60)}min</div></div></li>")
 
     $full_trip.css("left", "{0}%")
     $full_trip.css("width", "#{1/length*100}%")
@@ -516,12 +517,18 @@ mapquest = L.tileLayer("http://otile{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jp
     subdomains: "1234"
     attribution: 'Map data &copy; 2013 OpenStreetMap contributors, Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">'
 )
+
+osmnotes = new leafletOsmNotes()
+
 L.control.layers({
     "CloudMade": cloudmade
     "OpenStreetMap": osm
     "OpenCycleMap": opencyclemap
     "MapQuest": mapquest
 },
+{
+    "View map errors": osmnotes
+}
 ).addTo(map)
 L.control.scale().addTo(map)
 
@@ -613,7 +620,19 @@ map.on 'click', (e) ->
     else if targetMarker == null
         set_target_marker(e.latlng)
 
-contextmenu = L.popup().setContent('<a href="#" onclick="return setMapSource()">Set source</a> | <a href="#" onclick="return setMapTarget()">Set target</a>')
+contextmenu = L.popup().setContent('<a href="#" onclick="return setMapSource()">Set source</a> | <a href="#" onclick="return setMapTarget()">Set target</a> | <a href="#" onclick="return setNoteLocation()">Report map error</a>')
+
+set_comment_marker = (latlng) ->
+    if commentMarker?
+        map.removeLayer(commentMarker)
+        commentMarker = null
+    if not latlng?
+        return
+    commentMarker = L.marker(latlng, {draggable: true}).addTo(map)
+    description = options?.description
+    if not description?
+        description = "Location for map error report"
+    commentMarker.bindPopup(description).openPopup()
 
 map.on 'contextmenu', (e) ->
     contextmenu.setLatLng(e.latlng)
@@ -626,5 +645,26 @@ map.on 'contextmenu', (e) ->
 
     window.setMapTarget = () ->
         set_target_marker(e.latlng)
+        map.removeLayer(contextmenu)
+        return false
+
+    window.setNoteLocation = () ->
+        set_comment_marker(e.latlng)
+        osmnotes.addTo(map)
+        $('#comment-box').show()
+        $('#comment-box').unbind 'submit'
+        $('#comment-box').bind 'submit', ->
+            text = $('#comment-box textarea').val()
+            lat = commentMarker.getLatLng().lat
+            lon = commentMarker.getLatLng().lng
+            uri = "http://api.openstreetmap.org/api/0.6/notes.json"
+            # enable for testing: 
+            # uri = "http://api06.dev.openstreetmap.org/api/0.6/notes.json"
+            $.post uri, {lat: lat, lon: lon, text: text}, ()->
+                $('#comment-box').hide()
+                resize_map() # causes map redraw & notes update
+                set_comment_marker()
+            return false # don't submit form
+        resize_map()
         map.removeLayer(contextmenu)
         return false

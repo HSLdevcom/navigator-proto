@@ -18,6 +18,7 @@
         <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js"></script>
         <script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.10/backbone-min.js"></script>
         <script src="static/js/moment.min.js"></script>
+        <script src="static/js/leaflet-osm-notes.js"></script>
         <script src="http://dev.hsl.fi:9002/faye/client.js"></script>
         <script>
         // Functional testing with TestEm using mocha+chai-framework.
@@ -79,6 +80,10 @@
             <div data-role="footer" style="padding: 0; margin: 0; overflow: hidden">
                 <ul id="route-buttons" class="route-graph" style="display: none">
                 </ul>
+                <form id="comment-box" style="display: none; width: 100%; height: 100%; border: 0;">
+                    <textarea style="width: 100%; height: 100%;"></textarea>
+                    <button>Submit</button>
+                </form>
             </div>
             <div id="error-popup" data-role="popup" data-rel="dialog" data-transition="pop" data-overlay-theme="a">
                 <div data-role="header">
