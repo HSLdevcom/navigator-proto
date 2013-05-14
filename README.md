@@ -31,16 +31,25 @@ Libraries used: jQuery Mobile, Leaflet, Backbone.js, Moment.js
 ## Getting started ##
 
 Node.js with NPM 1.2 or newer is required to build the project. For
-Ubuntu 12.04 LTS, this can be acquired with `sudo add-apt-repository
-ppa:chris-lea/node.js` followed by `sudo apt-get install nodejs`.
+Ubuntu 12.04 LTS, this can be acquired with
+`sudo add-apt-repository ppa:chris-lea/node.js` followed by `sudo apt-get install nodejs`.
+If for some reason you want to build and install Node.js from sources see:
+https://github.com/HSLdevcom/hsl-navigator/wiki/Building-node-from-sources
 
-Install dependencies with `npm install`.
+After installing Node.js go to the directory where you want to install the City Navigator.
+There, run `git clone https://github.com/codeforeurope/navigator-proto.git`. 
 
-Install build tool with `sudo npm install -g grunt-cli` and run with
-`grunt server`.
+In the navigator-proto directory install dependencies with `npm install`.
+
+Install build tool with `sudo npm install -g grunt-cli`. Run
+`grunt server` and if everything goes well open
+http://localhost:9001/ with your web browser.
 
 Or, install build tool with `npm install grunt-cli` and run dev server with
 `node_modules/.bin/grunt server`.
+
+If you encounter errors, you may want to run commands `sudo apt-get dist-upgrade` and
+`sudo apt-get update` to make sure everything is up-to-date.
 
 ## Running tests (on a desktop browser) ##
 
