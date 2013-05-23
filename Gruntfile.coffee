@@ -20,7 +20,7 @@ module.exports = (grunt) ->
     testem:
       desktop:
         options:
-          launch_in_ci: ['firefox']
+          launch_in_ci: ['phantomjs']
           before_tests: 'coffee -c tests/*.coffee'
           after_tests: 'rm tests/*.js'
           serve_files: 'tests/*.js'
