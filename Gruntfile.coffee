@@ -52,7 +52,7 @@ module.exports = (grunt) ->
           'test_functional.tap': ['index.html']
     exec:
       robot:
-        command: 'bin/pybot tests'
+        command: 'bin/pybot -v REMOTE_URL:http://$SAUCE_USERNAME:$SAUCE_ACCESS_KEY@ondemand.saucelabs.com:80/wd/hub -v DESIRED_CAPABILITIES:tunnel-identifier:$TRAVIS_JOB_ID -v BUILD_NUMBER:travis-$TRAVIS_BUILD_NUMBER tests'
     connect:
       server:
         options:

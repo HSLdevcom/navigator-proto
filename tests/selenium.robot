@@ -16,13 +16,16 @@ ${BROWSER}  Firefox
 ${REMOTE_URL}
 ${FF_PROFILE_DIR}
 ${DESIRED_CAPABILITIES}
+${BUILD_NUMBER}  manual
 
 *** Keywords ***
 
 Open test browser
+    ${BUILD_INFO} =  Set variable
+    ...           build:${BUILD_NUMBER},name:${SUITE_NAME} | ${TEST_NAME}
     Open browser  ${START_URL}  ${BROWSER}
     ...           remote_url=${REMOTE_URL}
-    ...           desired_capabilities=${DESIRED_CAPABILITIES}
+    ...           desired_capabilities=${DESIRED_CAPABILITIES},${BUILD_INFO}
     ...           ff_profile_dir=${FF_PROFILE_DIR}
 
 Wait until location is
