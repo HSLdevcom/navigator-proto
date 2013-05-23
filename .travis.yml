@@ -9,10 +9,13 @@ install:
 - npm install -g grunt-cli testem coffee-script
 #- npm install -g git://github.com/datakurre/saucelauncher.git
 - npm install
+- python bootstrap.py
+- bin/buildout
 script: grunt test$TARGET
 env:
   matrix:
   - TARGET=
+  - TARGET=-robot
 #  - TARGET=-mobile
   global:
   - SAUCE_USERNAME=navigator-proto
