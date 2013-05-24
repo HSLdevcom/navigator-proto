@@ -1,3 +1,6 @@
+
+# This file is not used anymore.
+
 pk_base_url = 'http://www.hel.fi/palvelukarttaws/rest/v2/'
 
 #get_pk_object = (url, callback) ->
