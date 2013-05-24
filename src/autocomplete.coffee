@@ -12,9 +12,14 @@ class Location
 
 window.Location = Location
 
+# Locations are added to the history when user selects a location or POI as a
+# navigation target. Last entry in the history is currently used for routing.
+# History is also stored to the local storage (local storage is a HTML5 feature)
 class LocationHistory
     constructor: (@ls_id) ->
-        s = localStorage[@ls_id]
+        # Try to get history from the local storage. If there is no history,
+        # just create empty arrays where locations will be added to.
+        s = localStorage[@ls_id] 
         if s
             @array = JSON.parse s
         else
@@ -38,16 +43,23 @@ class LocationHistory
         @history = []
         localStorage.removeItem @ls_id
 
+# This is used in pagebeforechange event handler in the routing.coffee.
+# Locations are added to the history when user selects a location or POI
+# as a navigation target.
 window.location_history = new LocationHistory "city-navigator-history"
 
 class Prediction
     select: ->
         $.mobile.showPageLoadingMsg()
         if @type == "location"
+            # Call fetch_details that by default does nothing but for GoogleLocation gets
+            # the location coordinates. The fetch_details function will call navigate_to_location
+            # function defined later in this file with the @location as a parameter. 
             @location.fetch_details navigate_to_location, @location
         else # Fetch POIs corresponding the category (that has been set in sub class constructor) by
              # calling fetch_pois function defined for POICategory class in poi.coffee that will
-             # eventually show map page where the POIs and the route to the closest POI is shown.
+             # eventually call navigate_to_poi function that will show map page where the POIs and
+             # the route to the closest POI is shown.
             args = {callback: navigate_to_poi, location: citynavi.get_source_location()}
             if not args.location?
                 alert "The device hasn't provided its current location. Using region center instead."
@@ -86,6 +98,9 @@ class RemoteAutocompleter extends Autocompleter
         @.timeout = null
         @.remote = true
 
+    # Get predictions but use timeout of 200 milliseconds before making remote
+    # fetch and also if previous timeout has been set but it has not yet completed,
+    # then abort it before setting the new one.
     get_predictions: (query, callback, args) ->
         @.abort()
         timeout_handler = =>
@@ -96,12 +111,16 @@ class RemoteAutocompleter extends Autocompleter
         @.query = query
         @timeout = window.setTimeout timeout_handler, 200
 
+    # Called when there are results from the remote autocompleter service.
+    # Callback is the render_autocomplete_results function and the callback_args
+    # is the list that will be shown to the user.
     submit_location_predictions: (loc_list) ->
         pred_list = []
         for loc in loc_list
             pred_list.push new LocationPrediction(loc)
         @.callback @.callback_args, pred_list
 
+    # Abort the timeout that would have caused fetch_results call.
     abort: ->
         if @timeout
             window.clearTimeout @timeout
@@ -110,8 +129,11 @@ class RemoteAutocompleter extends Autocompleter
             @xhr.abort()
             @xhr = null
 
+# GeocoderCompleter uses the geocoder at the dev.hel.fi server.
 class GeocoderCompleter extends RemoteAutocompleter
     fetch_results: ->
+        # Get maximum 10 predictions for the user input (@.query) from the
+        # dev.hel.fi geocoder.
         @xhr = $.getJSON URL_BASE,
             name: @.query
             limit: 10
@@ -119,10 +141,13 @@ class GeocoderCompleter extends RemoteAutocompleter
             @xhr = null
             objs = data.objects
             loc_list = []
+            # Create Location object of the each received data object,
+            # add it to the the list, and finally call submit_location_predictions
             for adr in objs
                 coords = adr.location.coordinates
                 loc = new Location adr.name, [coords[1], coords[0]]
                 loc_list.push loc
+            # submit_location_predictions function is defined in RemoteAutocompleter
             @.submit_location_predictions loc_list
 
 GOOGLE_URL_BASE = "http://dev.hel.fi/geocoder/google/"
@@ -140,6 +165,8 @@ class GoogleLocation extends Location
             @coords = [loc.lat, loc.lng]
             callback args, @
 
+# GoogleCompleter is currently undocumented geocoder in the dev.hel.fi
+# server that is used by tampere and manchester areas.
 class GoogleCompleter extends RemoteAutocompleter
     fetch_results: ->
         url = GOOGLE_URL_BASE + "autocomplete/"
@@ -147,10 +174,12 @@ class GoogleCompleter extends RemoteAutocompleter
         location = citynavi.get_source_location_or_area_center()
         # FIXME
         radius = 12000
+        # Query is the user input.
         data = {query: @query, location: location.join(','), radius: radius}
         data['country'] = area.country
         @xhr = $.getJSON url, data, (data) =>
             @xhr = null
+            #console.log "GoogleCompleter data: ", data
             preds = data.predictions
             loc_list = []
             for pred in preds
@@ -159,7 +188,8 @@ class GoogleCompleter extends RemoteAutocompleter
                     continue
                 loc = new GoogleLocation pred
                 loc_list.push loc
-            @.submit_location_predictions loc_list
+            # submit_location_predictions is defined in RemoteAutocompleter
+            @.submit_location_predictions loc_list 
 
 NOMINATIM_URL = "http://nominatim.openstreetmap.org/search/"
 
@@ -213,6 +243,7 @@ supported_completers =
 generate_area_completers = (area) ->
     (supported_completers[id] for id in area.autocompletion_providers)
 
+# completers is a subset of the supported_completers.
 completers = generate_area_completers citynavi.config.area
 
 test_completer = ->
@@ -222,12 +253,18 @@ test_completer = ->
 
 #test_completer()
 
+# Will show a map page where the location and the route to it from the current location is shown.
+# Also stores the location to the location history
 navigate_to_location = (loc) ->
     idx = location_history.add loc
     page = "#map-page?destination=#{ idx }"
     citynavi.poi_list = []
     $.mobile.changePage page
 
+# Will show a map page where the POIs and the route to the closest POI
+# from the current location is shown. Also creates Location object of the
+# closest POI and stores the location to the location history.
+#FIXME? this is redefined in the poi.coffee
 navigate_to_poi = (poi_list) ->
     poi = poi_list[0]
     loc = new Location poi.name, poi.coords
@@ -236,10 +273,10 @@ navigate_to_poi = (poi_list) ->
     citynavi.poi_list = poi_list
     $.mobile.changePage page
 
+# Use all completers that have been defined in config.coffee (autocompletion_providers)
+# for the area to collect the predictions.
 get_all_predictions = (input, callback, callback_args) ->
     input = $.trim input
-    # Use all completers that have been defined in config.coffee (autocompletion_providers)
-    # for the area to collect the predictions.
     for c in completers
         if c.remote
             # Do not do remote autocompletion if less than 3 characters
