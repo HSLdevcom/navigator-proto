@@ -45,19 +45,21 @@ class Prediction
         $.mobile.showPageLoadingMsg()
         if @type == "location"
             @location.fetch_details navigate_to_location, @location
-        else
+        else # Fetch POIs corresponding the category (that has been set in sub class constructor) by
+             # calling fetch_pois function defined for POICategory class in poi.coffee that will
+             # eventually show map page where the POIs and the route to the closest POI is shown.
             args = {callback: navigate_to_poi, location: citynavi.get_source_location()}
             if not args.location?
                 alert "The device hasn't provided its current location. Using region center instead."
                 args.location = citynavi.config.area.center
             @category.fetch_pois args
-    render: ->
+    render: -> # create the list element
         icon_html = ''
         name = @name
-        if @type == "category"
+        if @type == "category" # Prediction is for a category
             dest_page = "select-nearest"
             icon_html = @category.get_icon_html()
-            name = "Closest " + name.toLowerCase()
+            name = "Closest " + name.toLowerCase() # For example, "Closest library"
         else
             dest_page = "map-page"
         $el = $("<li><a href='##{dest_page}'>#{icon_html}#{name}</a></li>")
@@ -186,6 +188,9 @@ class OSMCompleter extends RemoteAutocompleter
                 loc_list.push loc
             @.submit_location_predictions loc_list
 
+# POICategoryCompleter checks if there are any categories that would match the user input
+# and if there are then it will create CategoryPrediction object, add it to the list of
+# predictions and call the callback function (render_autocomplete_results).
 class POICategoryCompleter extends Autocompleter
     get_predictions: (query, callback, args) ->
         if not query.length
@@ -203,7 +208,7 @@ supported_completers =
     poi_categories: new POICategoryCompleter
     geocoder: new GeocoderCompleter
     google: new GoogleCompleter
-    osm: new OSMCompleter
+    osm: new OSMCompleter # This is not currently used.
 
 generate_area_completers = (area) ->
     (supported_completers[id] for id in area.autocompletion_providers)
@@ -233,6 +238,8 @@ navigate_to_poi = (poi_list) ->
 
 get_all_predictions = (input, callback, callback_args) ->
     input = $.trim input
+    # Use all completers that have been defined in config.coffee (autocompletion_providers)
+    # for the area to collect the predictions.
     for c in completers
         if c.remote
             # Do not do remote autocompletion if less than 3 characters
@@ -243,27 +250,32 @@ get_all_predictions = (input, callback, callback_args) ->
 
 pred_list = []
 
+# FIXME seems that if there are POICategoryCompleter predictions then no other predictions are shown.
 render_autocomplete_results = (args, new_preds) ->
-    $ul = args.$ul
+    $ul = args.$ul # The list where the predictions are to be included in. 
     pred_list = pred_list.concat new_preds
     for pred in pred_list
         if pred.rendered
             continue
-        $el = pred.render()
-        $el.data 'index', pred_list.indexOf(pred)
+        $el = pred.render() # render function of the Prediction object defined in this file
+        $el.data 'index', pred_list.indexOf(pred) # Store the index of the prediction to the element
         pred.rendered = true
-        $el.click (e) ->
+        $el.click (e) -> # Bind event handler to the list item
             e.preventDefault()
             idx = $(this).data 'index'
             pred = pred_list[idx]
-            pred.select()
+            pred.select() # select function of the Prediction object  defined in this file
         $ul.append $el
     $ul.listview "refresh"
     $ul.trigger "updatelayout"
         
+# Event handler for the listview defined in the index.html with id "navigate-to-input"
+# The listview is the search box that shows the list of location suggestions when user types
+# where he wants to go.
 $(document).on "listviewbeforefilter", "#navigate-to-input", (e, data) ->
-    val = $(data.input).val()
-    $ul = $(this)
+    val = $(data.input).val() # Get the value user has inputted in the search box.
+    $ul = $(this) # The list that sent the event.
     $ul.html('')
     pred_list = []
+    # Get all predictions (= location suggestions), and render the results to the list.
     get_all_predictions val, render_autocomplete_results, {$ul: $ul}

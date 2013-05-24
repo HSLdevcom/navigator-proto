@@ -45,12 +45,18 @@
         </script>
     </head>
     <body>
+        <!-- data-role="page" and other data-roles are jQuery mobile specific widget attributes -->
+        <!-- The jQuery mobile will link to pages with data-role="page" based on the id attribute.
+             There are several pages in this index.html document. -->
         <div id="front-page" data-role="page">
             <div data-role="header">
                 <h1>City Navigator</h1>
+                <!-- Settings button.
+                     data-icon="gear" and class="ui-btn-right" are jQuery mobile specific -->
                 <a href="#settings" data-icon="gear" class="ui-btn-right">Settings</a>
             </div>
             <div data-role="content">
+                <!-- Search box with the list of results for the location that the user wants to go to. -->
                 <ul id="navigate-to-input" data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Where do you want to go?"></ul>
             </div>
             <div data-role="content" style="padding-bottom: 0">
@@ -95,16 +101,19 @@
                 </div>
             </div>
         </div>
-        <div id="find-nearest" data-role="page">
+        <!-- This page is for palvelukartta.coffee but neither is not used anymore as
+              the geocoder API is used nowadays. -->
+        <!--<div id="find-nearest" data-role="page">
             <div data-role="header">
                 <a href="" data-rel="back">Back</a>
                 <h1>Find nearest services</h1>
             </div>
             <div data-role="content">
             </div>
-        </div>
+        </div>-->
         <div id="service-directory" data-role="page">
             <div data-role="header">
+                <!-- jQuery mobile back button to go one page back in history -->
                 <a href="" data-rel="back">Back</a>
                 <h1>Find nearest services</h1>
             </div>
@@ -149,14 +158,19 @@
                 </ul>
             </div>
         </div>
+        <!-- Initialization related code -->
         <script src="static/js/init.js"></script>
+        <!-- Configure the geographical area where the app is to be used in -->
         <script src="static/js/config.js"></script>
+        <!-- "Colorful iconic & retina-proof markers for Leaflet,
+             based on the Font Awesome/Twitter Bootstrap icons" -->
         <script src="static/js/leaflet-awesome-markers.js"></script>
         <script src="static/js/palvelukartta.js"></script>
         <script src="static/js/routing.js"></script>
         <script src="static/js/autocomplete.js"></script>
         <script src="static/js/poi.js"></script>
         <script src="static/js/realtime.js"></script>
+        <!-- Load jQuery Mobile as last because init.js handles the jQuery Mobile mobileinit message. -->
         <script src="http://code.jquery.com/mobile/1.3.0/jquery.mobile-1.3.0.min.js"></script>
     </body>
 </html>

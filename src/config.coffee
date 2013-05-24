@@ -91,7 +91,7 @@ helsinki = new Area(
 class CityNavigator
     constructor: (opts) ->
         @source_location = null
-        _.extend @, opts
+        _.extend @, opts # Use underscore.js to exten the CityNavigator with the opts
     get_source_location: ->
         return @source_location
     get_source_location_or_area_center: ->
