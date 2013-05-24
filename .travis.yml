@@ -1,18 +1,23 @@
 ---
 language: node_Js
 node_js: "0.10"
-before_install:
-- export DISPLAY=:99.0
-- sh -e /etc/init.d/xvfb start
-- echo \{\"username\":\"$SAUCE_USERNAME\",\"api_key\":\"$SAUCE_ACCESS_KEY\"\} > ~/.saucelabs.json
 install:
+- curl -O http://saucelabs.com/downloads/Sauce-Connect-latest.zip
+- unzip Sauce-Connect-latest.zip
+- java -jar Sauce-Connect.jar $SAUCE_USERNAME $SAUCE_ACCESS_KEY -i $TRAVIS_JOB_ID
+  -f CONNECTED 1>/dev/null &
+- JAVA_PID=$!
 - npm install -g grunt-cli testem coffee-script
-#- npm install -g git://github.com/datakurre/saucelauncher.git
 - npm install
+- python bootstrap.py
+- bin/buildout
+before_script:
+- bash -c "while [ ! -f CONNECTED ]; do sleep 2; done"
 script: grunt test$TARGET
 env:
   matrix:
   - TARGET=
+  - TARGET=-robot
 #  - TARGET=-mobile
   global:
   - SAUCE_USERNAME=navigator-proto
