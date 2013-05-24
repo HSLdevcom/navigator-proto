@@ -94,3 +94,9 @@ Follow instructions on screen to register browser with testem.
 
 Edit test below `./tests`. Tests are run when changes in test suites are
 detected.
+
+## Running Robot Framework tests ##
+
+Run ``python bootstrap.py`` and ``bin/buildout``.
+
+Run ``grunt test-robot``.
