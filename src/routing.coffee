@@ -30,23 +30,33 @@ $(document).bind "pagebeforechange", (e, data) ->
     console.log "pagebeforechange", data.toPage
     u = $.mobile.path.parseUrl(data.toPage)
 
+    # The "#map-page?service" is used with the palvelukartta.coffee.
     if u.hash.indexOf('#map-page?service=') == 0
         srv_id = u.hash.replace(/.*\?service=/, "")
         e.preventDefault()
         route_to_service(srv_id)
 
+    # If user has selected an address or service where to go to, then get the 
+    # place from the location_history (defined in autocomplete.coffee),
+    # find a route to that place and show it on the map.
     if u.hash.indexOf('#map-page?destination=') == 0
         destination = u.hash.replace(/.*\?destination=/, "")
         e.preventDefault()
+        # Destination in this case is the last index in the history. 
         location = location_history.get(destination)
         route_to_destination(location)
 
+# This event is triggered whenever the map page is shown and it
+# resizes map view, opens proper source and target marker popups,
+# fits map to route layer if any, and if there is no route layer then
+# if we have the position where the user is then pans and zooms the map.
+# This event happens after the pagebeforechange event.
 $('#map-page').bind 'pageshow', (e, data) ->
     console.log "#map-page pageshow"
 
     resize_map()
 
-    if targetMarker?
+    if targetMarker? # Check that typeof targetMarker !== "undefined" && targetMarker !== null
         if sourceMarker?
             sourceMarker.closePopup()
         targetMarker.closePopup()
@@ -117,6 +127,7 @@ format_code = (code) ->
 format_time = (time) ->
     return time.replace(/(....)(..)(..)(..)(..)/,"$1-$2-$3 $4:$5")
 
+# Route received from OTP is encoded so it needs to be decoded.
 # translated from https://github.com/ahocevar/openlayers/blob/master/lib/OpenLayers/Format/EncodedPolyline.js
 decode_polyline = (encoded, dims) -> 
     # Start from origo
@@ -144,6 +155,9 @@ decode_polyline = (encoded, dims) ->
 
 ## Markers
 
+# Called when source marker should be added or it's position should be changed.
+# (currently this happens if user clicks on the map to set it or
+#  when user location changes and there is no source marker)
 set_source_marker = (latlng, options) ->
     if sourceMarker?
         map.removeLayer(sourceMarker)
@@ -166,6 +180,9 @@ set_source_marker = (latlng, options) ->
 
     marker_changed(options)
 
+# Called when target marker should be added or it's position should be changed.
+# (currently this happens if user clicks on the map to set it or
+#  user has selected an address or service where to go to on some other than map page)
 set_target_marker = (latlng, options) ->
     if targetMarker?
         map.removeLayer(targetMarker)
@@ -189,9 +206,9 @@ onTargetDragEnd = (event) ->
     targetMarker.bindPopup("The end point for journey<br>(drag the marker to change)")
     marker_changed()
 
+# When both markers have been placed, find the route between them
+# and zoom out if necessary to fit the route on the screen.
 marker_changed = (options) ->
-    # when both markers have been placed, find the route between them
-    # and zoom out if necessary to fit the route on the screen
     if sourceMarker? and targetMarker?
         find_route sourceMarker.getLatLng(), targetMarker.getLatLng(), (route) ->
             if options?.zoomToFit
@@ -205,6 +222,8 @@ marker_changed = (options) ->
 
 poi_markers = []
 
+# route_to_destination function is called when pagebeforechange event happens for
+# the map page if user has selected an address or service where to go to
 route_to_destination = (target_location) ->
     console.log "route_to_destination", target_location.name
     [lat, lng] = target_location.coords
@@ -215,6 +234,8 @@ route_to_destination = (target_location) ->
     for marker in poi_markers
         map.removeLayer marker
     poi_markers = []
+    # There is citynavi.poi_list if user has selected a service from the service list or
+    # from the autocompletion list on the front page. Add their markers to the map.
     if citynavi.poi_list
         for poi in citynavi.poi_list
           do (poi) ->
@@ -231,6 +252,7 @@ route_to_destination = (target_location) ->
             poi_markers.push marker
     console.log "route_to_destination done"
 
+# Used with the palvelukartta.coffee
 route_to_service = (srv_id) ->
     console.log "route_to_service", srv_id
     if not sourceMarker?
@@ -254,8 +276,13 @@ route_to_service = (srv_id) ->
         console.log "palvelukartta callback done"
     console.log "route_to_service done"
 
+
+# Called from marker_changed function when there are both source marker and target marker
+# on the map and either of them has been set to a new place. 
 find_route = (source, target, callback) ->
     console.log "find_route", source.toString(), target.toString(), callback?
+    # See explanation of the parameters from
+    # http://opentripplanner.org/apidoc/0.9.2/resource_Planner.html
     params = 
         toPlace: "#{target.lat},#{target.lng}"
         fromPlace: "#{source.lat},#{source.lng}"
@@ -268,6 +295,8 @@ find_route = (source, target, callback) ->
         params.wheelchair = "true"
     if $('#prefer-free').attr('checked') and citynavi.config.area.id == "manchester"
         params.preferredRoutes = "GMN_1,GMN_2,GMN_3"
+    # Call plan in the OpenTripPlanner RESTful API. See:
+    # # http://opentripplanner.org/apidoc/0.9.2/resource_Planner.html
     $.getJSON citynavi.config.area.otp_base_url + "plan", params, (data) ->
         console.log "opentripplanner callback got data"
         if data.error?.msg
@@ -277,14 +306,17 @@ find_route = (source, target, callback) ->
 
         window.route_dbg = data
 
-        itinerary = data.plan.itineraries[0]
+        # OTP may return more than one route option but the first one is used.
+        itinerary = data.plan.itineraries[0] 
 
         if routeLayer != null
             map.removeLayer(routeLayer)
             routeLayer = null
 
+        # Create empty layer group and add it to the map.
         routeLayer = L.featureGroup().addTo(map)
 
+        # Render the route both on the map and on the footer.
         polylines = render_route_layer(itinerary, routeLayer)
         render_route_buttons(itinerary, routeLayer, polylines)
 
@@ -293,7 +325,7 @@ find_route = (source, target, callback) ->
         console.log "opentripplanner callback done"
     console.log "find_route done"
 
-render_route_layer = (itinerary, route) ->
+render_route_layer = (itinerary, routeLayer) ->
     legs = itinerary.legs
 
     vehicles = []
@@ -302,20 +334,25 @@ render_route_layer = (itinerary, route) ->
     for leg in legs
         do (leg) ->
             uid = Math.floor(Math.random()*1000000)
+            # Route received from OTP is encoded so it needs to be decoded.
             points = (new L.LatLng(point[0]*1e-5, point[1]*1e-5) for point in decode_polyline(leg.legGeometry.points, 2))
             color = googleColors[leg.routeType]
+            # For walking a dashed line is used
             if leg.routeType != null
                 dashArray = null
             else
                 dashArray = "5,10"
             polyline = new L.Polyline(points, {color: color, weight: 8, opacity: 0.2, clickable: false, dashArray: dashArray})
-            polyline.addTo(route)
+            polyline.addTo(routeLayer) # The route leg line is added to the routeLayer
+            # Make zooming to the leg via click possible.
             polyline = new L.Polyline(points, {color: color, opacity: 0.4, dashArray: dashArray})
                 .on 'click', (e) ->
                     map.fitBounds(polyline.getBounds())
                     if marker?
                         marker.openPopup()
-            polyline.addTo(route)
+            polyline.addTo(routeLayer)
+            # For other than walking legs draw info including line number, icon (bus, tram, etc.), and arrival
+            # time of the transit to the leg start position
             if leg.routeType != null
                 stop = leg.from
                 last_stop = leg.to
@@ -323,6 +360,9 @@ render_route_layer = (itinerary, route) ->
                 icon = L.divIcon({className: "navigator-div-icon"})
                 label = "<span style='font-size: 24px; padding-right: 6px'><img src='static/images/#{googleIcons[leg.routeType]}' style='vertical-align: sub; height: 24px '/> #{leg.route}</span>"
 
+                # Define function to calculate the transit arrival time and update the element
+                # that has uid specific to this leg once per second by calling this function
+                # again. Uid has been calculated randomly above in the beginning of the for loop.
                 secondsCounter = () ->
                     if leg.startTime >= moment()
                         duration = moment.duration(leg.startTime-moment())
@@ -339,29 +379,42 @@ render_route_layer = (itinerary, route) ->
                     $("#counter#{uid}").text "#{sign}#{minutes}:#{seconds}"
                     setTimeout secondsCounter, 1000
 
-                marker = L.marker(new L.LatLng(point.y, point.x), {icon: icon}).addTo(route)
+                marker = L.marker(new L.LatLng(point.y, point.x), {icon: icon}).addTo(routeLayer)
                     .bindPopup("<b>Time: #{moment(leg.startTime).format("HH:mm")}</b><br /><b>From:</b> #{stop.name}<br /><b>To:</b> #{last_stop.name}")
                     .bindLabel(label + "<span id='counter#{uid}' style='display: inline-block; font-size: 24px; padding-left: 6px; border-left: thin grey solid'></span>", {noHide: true})
                     .showLabel()
 
-                secondsCounter()
+                secondsCounter() # Start updating the time in the marker.
 
+                # By calling OTP transit/variantForTrip get the whole route for the vehicle, 
+                # including also those parts that are not part of the itienary leg.
+                # This is done because we draw all parts of the route that, for example,
+                # a bus drives.
+                # FIXME This should be drawn before the leg part is drawn because otherwise
+                # this is drawn on top of it and click events for the line  below are not triggered. 
                 $.getJSON citynavi.config.area.otp_base_url + "transit/variantForTrip", {tripId: leg.tripId, tripAgency: leg.agencyId}, (data) ->
                     geometry = data.geometry
                     points = (new L.LatLng(point[0]*1e-5, point[1]*1e-5) for point in decode_polyline(geometry.points, 2))
                     line_layer = new L.Polyline(points, {color: color, opacity: 0.2})
-                    line_layer.addTo(route)
+                    line_layer.addTo(routeLayer)
 
+                # Subscribe the real-time updates for the leg transit mode vehicles from the navigator-server
+                # The leg.routeId is passed for the citynavi.realtime.subscribe_route function 
+                # that has been defined in the realtime.coffee file. The routeId can be, for example,
+                # 23 for a bus at Tampere, Finland.
                 console.log "subscribing to #{leg.routeId}"
                 citynavi.realtime?.subscribe_route leg.routeId, (msg) ->
                     id = msg.vehicle.id
                     pos = [msg.position.latitude, msg.position.longitude]
-                    if not (id of vehicles)
+                    if not (id of vehicles) # Data for a new vehicle was given from the server
+                        # Draw icon for the vehicle
                         icon = L.divIcon({className: "navigator-div-icon", html: "<img src='static/images/#{googleIcons[leg.routeType]}' height='20px' />"})
                         vehicles[id] = L.marker(pos, {icon: icon})
-                            .addTo(route)
+                            .addTo(routeLayer)
                         console.log "new vehicle #{id} on route #{leg.routeId}"
                     else
+                        # Update the vehicle icon's place on the map.
+                        # Use interpolation to make updates smoother.
                         old_pos = previous_positions[id]
                         steps = 30
                         interpolation = (index, id, old_pos) ->
@@ -377,20 +430,29 @@ render_route_layer = (itinerary, route) ->
                                 clearTimeout(interpolations[id])
                             interpolation 1, id, old_pos
                     previous_positions[id] = pos
-            polyline
-
+            # The row causes all legs polylines to be returned as array from the render_route_layer function.
+            # polyline is graphical representation of the leg.
+            polyline 
+            
+# Renders the route buttons in the map page footer.
+# Itienary is the  itienary suggested for the user to get from source to target.
+# Route_layer is needed to resize the map when info is added to the footer here.
+# polylines contains graphical representation of the itienary legs.
 render_route_buttons = (itinerary, route_layer, polylines) ->
     $list = $('#route-buttons')
     $list.empty()
     trip_duration = itinerary.duration
     trip_start = itinerary.startTime
 
-    length = itinerary.legs.length + 1
+    length = itinerary.legs.length + 1 # Include space for the "Total" button.
 
+    # The "Total" button.
     $full_trip = $("<li class='leg'><div class='leg-bar' style='margin-right: 3px'><i style='font-weight: lighter'><img />Total</i><div class='leg-indicator'>#{Math.ceil(trip_duration/1000/60)}min</div></div></li>")
 
     $full_trip.css("left", "{0}%")
     $full_trip.css("width", "#{1/length*100}%")
+    # Add event handler to zoom to show whole itienary on map if
+    # there is no other click event defined for a button. The "Total" button is such.
     $full_trip.click (e) ->
         map.fitBounds(route_layer.getBounds())
         sourceMarker.closePopup()
@@ -398,6 +460,7 @@ render_route_buttons = (itinerary, route_layer, polylines) ->
         sourceMarker.openPopup()
     $list.append($full_trip)
 
+    # Draw a button for each leg.
     for leg, index in itinerary.legs
       do (index) ->
 
@@ -413,7 +476,7 @@ render_route_buttons = (itinerary, route_layer, polylines) ->
 #        leg_subscript = "#{leg.route}"
 
 # YetAnotherJourneyPlanner style:
-        leg_start = (index+1)/length
+        leg_start = (index+1)/length # leg_start and leg_duration are used for positioning the buttons.
         leg_duration = 1/length
         leg_label = "<img src='static/images/#{icon_name}' height='100%' /> #{leg.route}"
         leg_subscript = "#{Math.ceil(leg.duration/1000/60)}min"
@@ -425,15 +488,18 @@ render_route_buttons = (itinerary, route_layer, polylines) ->
         $leg.css("left", "#{leg_start*100}%")
         $leg.css("width", "#{leg_duration*100}%")
 
+        # Add event handler to zoom to leg in the map when user clicks the leg button in the footer.
+        # The click event for the polylines have been defined in the render_route_layer function.
         $leg.click (e) ->
              polylines[index].fire("click")
 
-        $list.append($leg)
+        $list.append($leg) # Add button to the list that is shown to the user in the footer.
 
     $list.show()
 
     resize_map()
 
+# Not currently used.
 find_route_reittiopas = (source, target, callback) ->
     params = 
         request: "route"
@@ -483,15 +549,18 @@ resize_map = () ->
     console.log "resize_map"
     height = window.innerHeight - 
                                   # $('#map-page [data-role=header]').height() -
-                                  $('#map-page [data-role=footer]').height() -
+                                  $('#map-page [data-role=footer]').height() - # Footer contains buttons/textual info of the route
                                   # $('#route-buttons').height()
                                   2
     console.log "#map height", height
     $('#map').height(height)
-    map.invalidateSize()
+    map.invalidateSize() # Leaflet.js function that updates the map.
 
 window.map_dbg = map = L.map('map', {minZoom: 10, zoomControl: false})
     .setView(citynavi.config.area.center, 10)
+    
+# Starts continuos watching of the user location using Leaflet.js locate function:
+# http://leafletjs.com/reference.html#map-locate
 map.locate
     setView: false
     maxZoom: 15
@@ -564,6 +633,7 @@ transform_location = (point) ->
 map.on 'locationerror', (e) ->
     alert(e.message)
 
+# Triggered whenever user location has changed.
 map.on 'locationfound', (e) ->
 #    radius = e.accuracy / 2
     radius = e.accuracy
@@ -634,6 +704,8 @@ set_comment_marker = (latlng) ->
         description = "Location for map error report"
     commentMarker.bindPopup(description).openPopup()
 
+
+# This event happens on map page, when the user keeps finger long time on the touchscreen.
 map.on 'contextmenu', (e) ->
     contextmenu.setLatLng(e.latlng)
     contextmenu.openOn(map)
