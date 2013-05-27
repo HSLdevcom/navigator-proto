@@ -556,6 +556,8 @@ resize_map = () ->
     $('#map').height(height)
     map.invalidateSize() # Leaflet.js function that updates the map.
 
+# Create a new Leaflet map and set it's center point to the
+# location defined in the config.coffee
 window.map_dbg = map = L.map('map', {minZoom: 10, zoomControl: false})
     .setView(citynavi.config.area.center, 10)
     
@@ -568,6 +570,7 @@ map.locate
     timeout: Infinity
     enableHighAccuracy: true
 
+# Base map layers are created.
 cloudmade = L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{style}/256/{z}/{x}/{y}.png', 
     attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2012 CloudMade',
     key: 'BC9A493B41014CAABB98F0471D759707'
@@ -587,8 +590,12 @@ mapquest = L.tileLayer("http://otile{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jp
     attribution: 'Map data &copy; 2013 OpenStreetMap contributors, Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">'
 )
 
+# Use the leafletOsmNotes() function in file file "static/js/leaflet-osm-notes.js"
+# to create layer for showing error notes from OSM in the map.
 osmnotes = new leafletOsmNotes()
 
+# Add the base maps and "error notes" layer to the layers control and add it to the map.
+# See http://leafletjs.com/examples/layers-control.html for more info.
 L.control.layers({
     "CloudMade": cloudmade
     "OpenStreetMap": osm
@@ -599,8 +606,12 @@ L.control.layers({
     "View map errors": osmnotes
 }
 ).addTo(map)
+
+# Add scale control to the map that shows current scale in
+# metric (m/km) and imperial (mi/ft) systems
 L.control.scale().addTo(map)
 
+# Add button that allows user to navigate back in the page history
 BackControl = L.Control.extend
     options: {
         position: 'topleft'
@@ -613,6 +624,7 @@ BackControl = L.Control.extend
 
 new BackControl().addTo(map)
 
+# Add zoom control to the map
 L.control.zoom().addTo(map)
 
 TRANSFORM_MAP = [
@@ -644,12 +656,14 @@ map.on 'locationfound', (e) ->
     bbox_sw = citynavi.config.area.bbox_sw
     bbox_ne = citynavi.config.area.bbox_ne
 
+    # Check if the location is sensible
     if not (bbox_sw[0] < point.lat < bbox_ne[0]) or not (bbox_sw[1] < point.lng < bbox_ne[1])
         if sourceMarker != null
             if positionMarker != null
                map.removeLayer(positionMarker) # red circle was stale
                positionMarker = null
             return # no interest in updating to new location outside area
+        # If there is no source marker then edit location to be on the center of the area
         console.log(bbox_sw[0], point.lat, bbox_ne[0])
         console.log(bbox_sw[1], point.lng, bbox_ne[1])
         console.log("using area center instead of geolocation outside area")
@@ -665,6 +679,8 @@ map.on 'locationfound', (e) ->
     position_bounds = e.bounds
     citynavi.set_source_location [point.lat, point.lng]
 
+    # If there is already a position marker on map then remove it, and otherwise
+    # if there is no source marker (indicating navigation start point) add it to map.
     if positionMarker != null
         map.removeLayer(positionMarker)
         positionMarker = null
@@ -675,6 +691,8 @@ map.on 'locationfound', (e) ->
 
     if e.accuracy > 2000
         return
+    # Add the position marker to the map and set click event handler for it
+    # to set source marker (indicating navigation start point).
     positionMarker = L.circle(point, radius, {color: 'red'}).addTo(map)
         .on 'click', (e) ->
             set_source_marker(point, {accuracy: radius, measure: measure})
@@ -690,8 +708,12 @@ map.on 'click', (e) ->
     else if targetMarker == null
         set_target_marker(e.latlng)
 
+# Create context menu that allows user to set source and target location as well as add error notes.
+# The menu is shown when the user keeps finger long time on the touchscreen (see contextmenu event
+# handler below).
 contextmenu = L.popup().setContent('<a href="#" onclick="return setMapSource()">Set source</a> | <a href="#" onclick="return setMapTarget()">Set target</a> | <a href="#" onclick="return setNoteLocation()">Report map error</a>')
 
+# Called when user clicks "Report map error" link in the context menu and adds the note.
 set_comment_marker = (latlng) ->
     if commentMarker?
         map.removeLayer(commentMarker)
