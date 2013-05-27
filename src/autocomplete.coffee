@@ -193,6 +193,7 @@ class GoogleCompleter extends RemoteAutocompleter
 
 NOMINATIM_URL = "http://nominatim.openstreetmap.org/search/"
 
+# This is not currently used.
 class OSMCompleter extends RemoteAutocompleter
     fetch_results: ->
         url = NOMINATIM_URL + "?json_callback=?"

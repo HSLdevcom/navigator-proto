@@ -1,3 +1,5 @@
+
+# Area is a geographical area that City Navigator has been configured to work in. 
 class Area
     constructor: (opts) ->
         _.extend @, opts
@@ -99,6 +101,7 @@ class CityNavigator
     set_source_location: (loc) ->
         @source_location = loc
 
+# The area for which the city-navigator is configured to.
 window.citynavi = new CityNavigator
     config:
         area: manchester

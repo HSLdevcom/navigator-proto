@@ -161,10 +161,9 @@ console.log citynavi.poi_categories
 #    prov = supported_poi_providers['waag'].fetch_pois supported_poi_categories["pub"]
 #setTimeout test_it, 500
 
-# Here we are interested if the user has clicked the "Find nearest services"
+# This event happens if the user has clicked the "Find nearest services"
 # button on the front page which causes showing the content of the page that
 # has the id "service-directory" in the index.html.
-
 # pageinit event happens before the pageshow event
 $('#service-directory').bind 'pageinit', (e, data) ->
         # Get the ul element(s) (there is only one) inside the div with id "service-directory".
@@ -175,11 +174,13 @@ $('#service-directory').bind 'pageinit', (e, data) ->
         # initialization" error.
         $list.listview()
 
+# Event happens when the user has selected a service category to show.
 $('#service-list').bind 'pageinit', (e, data) ->
         $list = $('#service-list ul')
         $list.empty()
         $list.listview()
 
+# Event happens when the user has selected the "Find nearest services" link from the front page.
 # pageinit event happens before the pageshow event
 $('#service-directory').bind 'pageshow', (e, data) ->
 #    if u.hash.indexOf('#service-directory?') == 0
@@ -198,7 +199,7 @@ $('#service-directory').bind 'pageshow', (e, data) ->
 
 position_missing_alert_shown = false
 
-# Event handler for showing nearby services of the service category that a user selects.
+# Event handler for showing nearby services of the service category that the user has selected to show.
 # TODO: switch to using '#pageId' instead of the document. See:
 # http://stackoverflow.com/questions/8761859/jquery-mobile-pagebeforechange-being-called-twice
 # This event is triggered before page transition.

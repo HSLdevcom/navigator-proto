@@ -21,8 +21,11 @@ vehicles = []
 previous_positions = []
 interpolations = []
 
-## Events before the page is shown
+## Events before a page is shown
 
+# This event is triggered when a page is about to be shown.
+# There are also other pagebeforechange event handlers in other files.
+# In this event handler map page related events are handled.
 $(document).bind "pagebeforechange", (e, data) ->
     if typeof data.toPage != "string"
         console.log "pagebeforechange without toPage"
@@ -325,6 +328,8 @@ find_route = (source, target, callback) ->
         console.log "opentripplanner callback done"
     console.log "find_route done"
 
+# Renders each leg of the route to the map and also draws icons of real-time vehicle
+# locations to the map if available.
 render_route_layer = (itinerary, routeLayer) ->
     legs = itinerary.legs
 
@@ -730,8 +735,9 @@ set_comment_marker = (latlng) ->
 # This event happens on map page, when the user keeps finger long time on the touchscreen.
 map.on 'contextmenu', (e) ->
     contextmenu.setLatLng(e.latlng)
-    contextmenu.openOn(map)
+    contextmenu.openOn(map) # Shows context menu defined above.
 
+    # Functions that are called from the context menu's click event handlers are defined here.
     window.setMapSource = () ->
         set_source_marker(e.latlng)
         map.removeLayer(contextmenu)
@@ -745,6 +751,7 @@ map.on 'contextmenu', (e) ->
     window.setNoteLocation = () ->
         set_comment_marker(e.latlng)
         osmnotes.addTo(map)
+        # Comment box with id "comment-box" has been defined in the index.html.
         $('#comment-box').show()
         $('#comment-box').unbind 'submit'
         $('#comment-box').bind 'submit', ->

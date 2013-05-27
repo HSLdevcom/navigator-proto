@@ -48,6 +48,7 @@
         <!-- data-role="page" and other data-roles are jQuery mobile specific widget attributes -->
         <!-- The jQuery mobile will link to pages with data-role="page" based on the id attribute.
              There are several pages in this index.html document. -->
+        <!-- Front page -->
         <div id="front-page" data-role="page">
             <div data-role="header">
                 <h1>City Navigator</h1>
@@ -56,7 +57,7 @@
                 <a href="#settings" data-icon="gear" class="ui-btn-right">Settings</a>
             </div>
             <div data-role="content">
-                <!-- Search box with the list of results for the location that the user wants to go to. -->
+                <!-- "Search box" with the list of results for the location that the user wants to go to. -->
                 <ul id="navigate-to-input" data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Where do you want to go?"></ul>
             </div>
             <div data-role="content" style="padding-bottom: 0">
@@ -80,6 +81,7 @@
                 <h4>Copyright &copy; 2013</h4>
             </div>
         </div>
+        <!-- Map page -->
         <div id="map-page" data-role="page">
             <div data-role="content" style="padding: 0; margin: 0">
                 <div id="map" style="width: 100%; height: 100%; border: 0;"></div>
@@ -104,14 +106,15 @@
         </div>
         <!-- This page is for palvelukartta.coffee but neither is not used anymore as
               the geocoder API is used nowadays. -->
-        <!--<div id="find-nearest" data-role="page">
+        <div id="find-nearest" data-role="page">
             <div data-role="header">
                 <a href="" data-rel="back">Back</a>
                 <h1>Find nearest services</h1>
             </div>
             <div data-role="content">
             </div>
-        </div>-->
+        </div>
+        <!-- "Find nearest services" page -->
         <div id="service-directory" data-role="page">
             <div data-role="header">
                 <!-- jQuery mobile back button to go one page back in history -->
@@ -123,6 +126,7 @@
                 </ul>
             </div>
         </div>
+        <!-- "Nearest services" page -->
         <div id="service-list" data-role="page">
             <div data-role="header">
                 <a href="" data-rel="back">Back</a>
@@ -133,6 +137,7 @@
                 </ul>
             </div>
         </div>
+        <!-- Settings page -->
         <div id="settings" data-role="page">
             <div data-role="header">
                 <a href="" data-rel="back">Back</a>

@@ -5,7 +5,7 @@ class Realtime
         @subs = {}
     # Called from routing.coffee render_route_layer function when a new route 
     # suggestion is given to the user that includes also legs other than walking
-    # FIXME seems that routes are new unsubscribed unless the subscribe_route
+    # FIXME seems that routes are never unsubscribed unless the subscribe_route
     # id is called again with the route_id that has been subscribed earlier.
     subscribe_route: (route_id, callback, callback_args) ->
         if @subs[route_id]
