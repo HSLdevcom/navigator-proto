@@ -154,9 +154,9 @@ set_source_marker = (latlng, options) ->
         accuracy = options.accuracy
         measure = options.measure
         if not measure?
-            measure = if accuracy < 2000 then "#{Math.round(accuracy)} meters" else "#{Math.round(accuracy/1000)} km"
+            measure = if accuracy < 2000 then "within #{Math.round(accuracy)} meters" else "within #{Math.round(accuracy/1000)} km"
         
-        sourceMarker.bindPopup("The starting point for journey planner<br>(tap the red marker to update)<br>You are within #{measure} from this point").openPopup()
+        sourceMarker.bindPopup("The starting point for journey planner<br>(tap the red marker to update)<br>You are #{measure} from this point").openPopup()
         if sourceCircle != null
             map.removeLayer(sourceCircle)
             sourceCircle = null
