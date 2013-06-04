@@ -293,9 +293,12 @@ find_route = (source, target, callback) ->
         walkSpeed: 1.17
         maxWalkDistance: 100000
     if $('#walk-only').attr('checked')
-        params.mode = "WALK"
+        params.mode = $("#vehiclesettings input:checked").val()
     else
-        params.mode = "FERRY,WALK" # always enable these with transit
+        # always enable the following modes with transit
+        # XXX we'd like to enable WALK, but TRANSIT,BICYCLE,WALK seems to mean
+        # TRANSIT,WALK to OTP
+        params.mode = "FERRY,"+$("#vehiclesettings input:checked").val()
         $modes = $("#modesettings input:checked")
         if $modes.length == 0
             $modes = $("#modesettings input") # all disabled means all enabled
@@ -476,7 +479,11 @@ render_route_buttons = (itinerary, route_layer, polylines) ->
     for leg, index in itinerary.legs
       do (index) ->
 
-        if leg.routeType == null and $('#wheelchair').attr('checked')
+        if leg.mode == "CAR"
+            icon_name = "car.svg"
+        else if leg.mode == "BICYCLE"
+            icon_name = "bicycle.svg"
+        else if leg.routeType == null and $('#wheelchair').attr('checked')
             icon_name = "wheelchair.svg"
         else
             icon_name = googleIcons[leg.routeType]
