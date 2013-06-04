@@ -294,6 +294,13 @@ find_route = (source, target, callback) ->
         maxWalkDistance: 100000
     if $('#walk-only').attr('checked')
         params.mode = "WALK"
+    else
+        params.mode = "FERRY,WALK" # always enable these with transit
+        $modes = $("#modesettings input:checked")
+        if $modes.length == 0
+            $modes = $("#modesettings input") # all disabled means all enabled
+        for mode in $modes
+            params.mode = $(mode).attr('name')+","+params.mode
     if $('#wheelchair').attr('checked')
         params.wheelchair = "true"
     if $('#prefer-free').attr('checked') and citynavi.config.area.id == "manchester"
