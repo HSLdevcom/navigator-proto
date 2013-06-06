@@ -575,6 +575,9 @@ resize_map = () ->
     $('#map').height(height)
     map.invalidateSize() # Leaflet.js function that updates the map.
 
+$(window).on 'resize', () ->
+    resize_map()
+
 # Create a new Leaflet map and set it's center point to the
 # location defined in the config.coffee
 window.map_dbg = map = L.map('map', {minZoom: 10, zoomControl: false})
