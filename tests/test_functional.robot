@@ -25,7 +25,7 @@ Start app
 Front page
     Element should become visible  css=#front-page
     Element should become visible  css=#front-page h1.ui-title
-    Element should contain  css=#front-page h1.ui-title  City Navigator
+    Element should contain  css=#front-page h1.ui-title  Navigator
 
 No front page
     Element should not remain visible  css=#front-page

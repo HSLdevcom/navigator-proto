@@ -21,8 +21,8 @@ describe 'jQuery is loaded', ->
 describe 'App is loaded', ->
   it 'should have title', ->
     jQuery('h1.ui-title').filter(":visible").length.should.equal(1)
-  it 'should have title "City Navigator"', ->
-    jQuery('h1.ui-title').filter(":visible").text().should.equal('City Navigator')
+  it 'should have title "Navigator"', ->
+    jQuery('h1.ui-title').filter(":visible").text().should.equal('Navigator')
 
 describe 'Find nearest services.', ->
   describe 'Choose "Find nearest services" from the front page.', ->
