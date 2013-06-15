@@ -641,7 +641,15 @@ BackControl = L.Control.extend
 
     onAdd: (map) ->
         $container = $("<div id='back-control'>")
-        $container.append($("<a href='' data-role='button' data-rel='back' data-icon='arrow-l' data-mini='true'>Back</a>"))
+        $button = $("<a href='' data-role='button' data-rel='back' data-icon='arrow-l' data-mini='true'>Back</a>")
+        $button.on 'click', (e) ->
+            e.preventDefault()
+            if history.length < 2
+                $.mobile.changePage("#front-page")
+            else
+                history.back()
+            return false
+        $container.append($button)
         return $container.get(0)
 
 new BackControl().addTo(map)
