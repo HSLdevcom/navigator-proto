@@ -35,8 +35,8 @@
       div
 
     _createInner: ->
-      if @options.svg?
-        return "<img src='#{@options.svg}' height='18' style='margin-top: 8px; -webkit-filter: invert(1);'>"
+      if @options.topIcon?
+        return "<img src='#{@options.topIcon}' height='18' style='margin-top: 8px; -webkit-filter: invert(1);'>"
       if @options.icon.slice(0, 5) is "icon-"
         iconClass = @options.icon
       else

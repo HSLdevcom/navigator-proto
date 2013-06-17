@@ -108,13 +108,13 @@ googleColors =
     109: transportColors[12]
 
 googleIcons =
-    null: 'walking.svg'
-    0: 'tram_stop.svg'
-    1: 'subway.svg'
-    2: 'train_station2.svg'
-    3: 'bus_stop.svg'
-    4: 'port.svg'
-    109: 'train_station2.svg'
+        null: 'walking'
+        0: 'tram_stop'
+        1: 'subway'
+        2: 'train_station2'
+        3: 'bus_stop'
+        4: 'port'
+        109: 'train_station2'
 
 format_code = (code) ->
     if code.substring(0,3) == "300" # local train
@@ -243,7 +243,7 @@ route_to_destination = (target_location) ->
         for poi in citynavi.poi_list
           do (poi) ->
             icon = L.AwesomeMarkers.icon
-                svg: poi.category.get_icon_path()
+                topIcon: citynavicon.get_icon_path(poi.category.get_icon_name())
                 color: 'green'
             latlng = new L.LatLng(poi.coords[0], poi.coords[1])
             marker = L.marker(latlng, {icon: icon})
@@ -373,7 +373,7 @@ render_route_layer = (itinerary, routeLayer) ->
                 last_stop = leg.to
                 point = {y: stop.lat, x: stop.lon}
                 icon = L.divIcon({className: "navigator-div-icon"})
-                label = "<span style='font-size: 24px; padding-right: 6px'><img src='static/images/#{googleIcons[leg.routeType]}' style='vertical-align: sub; height: 24px '/> #{leg.route}</span>"
+                label = "<span style='font-size: 24px; padding-right: 6px'><img src='#{citynavicon.get_icon_path(googleIcons[leg.routeType])}' style='vertical-align: sub; height: 24px '/> #{leg.route}</span>"
 
                 # Define function to calculate the transit arrival time and update the element
                 # that has uid specific to this leg once per second by calling this function
@@ -423,7 +423,7 @@ render_route_layer = (itinerary, routeLayer) ->
                     pos = [msg.position.latitude, msg.position.longitude]
                     if not (id of vehicles) # Data for a new vehicle was given from the server
                         # Draw icon for the vehicle
-                        icon = L.divIcon({className: "navigator-div-icon", html: "<img src='static/images/#{googleIcons[leg.routeType]}' height='20px' />"})
+                        icon = L.divIcon({className: "navigator-div-icon", html: "<img src='#{citynavicon.get_icon_path(googleIcons[leg.routeType])}' height='20px' />"})
                         vehicles[id] = L.marker(pos, {icon: icon})
                             .addTo(routeLayer)
                         console.log "new vehicle #{id} on route #{leg.routeId}"
@@ -480,13 +480,13 @@ render_route_buttons = (itinerary, route_layer, polylines) ->
       do (index) ->
 
         if leg.mode == "CAR"
-            icon_name = "car.svg"
+            icon_name = citynavicon.get_icon_path("car")
         else if leg.mode == "BICYCLE"
-            icon_name = "bicycle.svg"
+            icon_name = citynavicon.get_icon_path("bicycle")
         else if leg.routeType == null and $('#wheelchair').attr('checked')
-            icon_name = "wheelchair.svg"
+            icon_name = citynavicon.get_icon_path("wheelchair")
         else
-            icon_name = googleIcons[leg.routeType]
+            icon_name = citynavicon.get_icon_path(googleIcons[leg.routeType])
 
 # GoodEnoughJourneyPlanner style:
 #        leg_start = (leg.startTime-trip_start)/trip_duration
@@ -497,7 +497,7 @@ render_route_buttons = (itinerary, route_layer, polylines) ->
 # YetAnotherJourneyPlanner style:
         leg_start = (index+1)/length # leg_start and leg_duration are used for positioning the buttons.
         leg_duration = 1/length
-        leg_label = "<img src='static/images/#{icon_name}' height='100%' /> #{leg.route}"
+        leg_label = "<img src='#{icon_name}' height='100%' /> #{leg.route}"
         leg_subscript = "#{Math.ceil(leg.duration/1000/60)}min"
 
         console.log leg_duration, "/", trip_duration
