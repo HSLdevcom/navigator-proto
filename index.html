@@ -77,9 +77,9 @@
                     </li>
                     <li>
                         <fieldset id="vehiclesettings" data-role="controlgroup" data-type="horizontal">
-                            <label><input type="radio" name="vehiclesettings" value="WALK" checked="checked"><img src="static/images/walking.svg" style="height: 20px;"/></input></label>
-                            <label><input type="radio" name="vehiclesettings" value="BICYCLE"><img src="static/images/bicycle.svg" style="height: 20px;"/></input></label>
-                            <label><input type="radio" name="vehiclesettings" value="CAR"><img src="static/images/car.svg" style="height: 20px;"/></input></label>
+                            <label><input type="radio" name="vehiclesettings" value="WALK" checked="checked"><img id="citynavicon-walking" style="height: 20px;"></input></label>
+                            <label><input type="radio" name="vehiclesettings" value="BICYCLE"><img id="citynavicon-bicycle" style="height: 20px;"></input></label>
+                            <label><input type="radio" name="vehiclesettings" value="CAR"><img id="citynavicon-car" style="height: 20px;"></input></label>
                         </fieldset>
                     </li>
                 </ul>
@@ -151,15 +151,15 @@
                 <ul data-role="listview" style="margin-bottom: 0">
                     <li>
                         <fieldset id="modesettings" data-role="controlgroup" data-type="horizontal">
-                            <label><input type="checkbox" name="BUS"><img src="static/images/bus_stop.svg" style="height: 20px;"/></input></label>
-                            <label><input type="checkbox" name="TRAM"><img src="static/images/tram_stop.svg" style="height: 20px;"/></input></label>
-                            <label><input type="checkbox" name="RAIL"><img src="static/images/train_station2.svg" style="height: 20px;"/></input></label>
-                            <label><input type="checkbox" name="SUBWAY"><img src="static/images/subway.svg" style="height: 20px;"/></input></label>
+                            <label><input type="checkbox" name="BUS"><img id="citynavicon-bus_stop" style="height: 20px;"></input></label>
+                            <label><input type="checkbox" name="TRAM"><img id="citynavicon-tram_stop" style="height: 20px;"></input></label>
+                            <label><input type="checkbox" name="RAIL"><img id="citynavicon-train_station2" style="height: 20px;"></input></label>
+                            <label><input type="checkbox" name="SUBWAY"><img id="citynavicon-subway" style="height: 20px;"></input></label>
                         </fieldset>
                     </li>
                     <li>
                         <input type="checkbox" name="wheelchair" id="wheelchair" />
-                        <label for="wheelchair"><img src="static/images/wheelchair.svg" height=20 style="margin-right:16px; margin-left: 16px" />Wheelchair accessible</label>
+                        <label for="wheelchair"><img id="citynavicon-wheelchair" style="height: 20px;  margin-right: 16px; margin-left: 16px">Wheelchair accessible</label>
                     </li>
                     <li>
                         <input type="checkbox" name="prefer-free" id="prefer-free" />
@@ -172,6 +172,8 @@
         <script src="static/js/init.js"></script>
         <!-- Configure the geographical area where the app is to be used in -->
         <script src="static/js/config.js"></script>
+        <!-- Providing svg or png icons depending of the support by the web browser. -->
+        <script src="static/js/icon.js"></script>
         <!-- "Colorful iconic & retina-proof markers for Leaflet,
              based on the Font Awesome/Twitter Bootstrap icons" -->
         <script src="static/js/leaflet-awesome-markers.js"></script>
