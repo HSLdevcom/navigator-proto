@@ -36,7 +36,7 @@
 
     _createInner: ->
       if @options.topIcon?
-        return "<img src='#{@options.topIcon}' height='18' style='margin-top: 8px; -webkit-filter: invert(1);'>"
+        return "<img src='#{@options.topIcon}' style='height: 18px; margin-top: 8px; -webkit-filter: invert(1);'>"
       if @options.icon.slice(0, 5) is "icon-"
         iconClass = @options.icon
       else

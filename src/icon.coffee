@@ -8,14 +8,13 @@ class CityNavIcon
         
     get_icon_path: (name) ->
        if document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Image", "1.1") ||
-          document.implementation.hasFeature("org.w3c.dom.svg", "1.0") ||
-          document.createElementNS("http://www.w3.org/2000/svg","svg").createSVGRect
+          document.implementation.hasFeature("org.w3c.dom.svg", "1.0")
             return @staticSVGPath + name + '.svg'
         else
             return @staticPNGPath + name + '.png'
             
     get_icon_html: (name) ->
-        return '<img src="' + @.get_icon_path(name) + '" style="height: 20px" class="ui-li-icon"></div>'
+        return '<img src="' + @.get_icon_path(name) + '" style="height: 20px" class="ui-li-icon">'
 
 window.citynavicon = new CityNavIcon
 

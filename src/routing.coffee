@@ -497,7 +497,7 @@ render_route_buttons = (itinerary, route_layer, polylines) ->
 # YetAnotherJourneyPlanner style:
         leg_start = (index+1)/length # leg_start and leg_duration are used for positioning the buttons.
         leg_duration = 1/length
-        leg_label = "<img src='#{icon_name}' height='100%' /> #{leg.route}"
+        leg_label = "<img src='#{icon_name}' height='100%'> #{leg.route}"
         leg_subscript = "#{Math.ceil(leg.duration/1000/60)}min"
 
         console.log leg_duration, "/", trip_duration
@@ -575,6 +575,9 @@ resize_map = () ->
     $('#map').height(height)
     map.invalidateSize() # Leaflet.js function that updates the map.
 
+$(window).on 'resize', () ->
+    resize_map()
+
 # Create a new Leaflet map and set it's center point to the
 # location defined in the config.coffee
 window.map_dbg = map = L.map('map', {minZoom: 10, zoomControl: false})
@@ -638,7 +641,15 @@ BackControl = L.Control.extend
 
     onAdd: (map) ->
         $container = $("<div id='back-control'>")
-        $container.append($("<a href='' data-role='button' data-rel='back' data-icon='arrow-l' data-mini='true'>Back</a>"))
+        $button = $("<a href='' data-role='button' data-rel='back' data-icon='arrow-l' data-mini='true'>Back</a>")
+        $button.on 'click', (e) ->
+            e.preventDefault()
+            if history.length < 2
+                $.mobile.changePage("#front-page")
+            else
+                history.back()
+            return false
+        $container.append($button)
         return $container.get(0)
 
 new BackControl().addTo(map)
