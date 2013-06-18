@@ -100,3 +100,12 @@ detected.
 Run ``python bootstrap.py`` and ``bin/buildout``.
 
 Run ``grunt test-robot``.
+
+## Using icons
+
+Add svg file(s) under folder `./static/images`.  Run `grunt icon` to generate png files.
+
+In code, use `citynavicon.get_icon_path("myicon")` to get path to image that you can, for example use as src attribute in an img html element. Alternatively you can use `citynavicon.get_icon_html(name)` function to get an img element that has attributes style="height: 20px" and class="ui-li-icon". Finally, in the index.html you can include images via defining img element with id="citynavicon-myicon" where "citynavicon-" is mandatory part and "myicon" specifies name of the image.
+
+Note that svg files should define svg as default namespace for grunticon to work at the moment. Also note that svg files should define viewBox="0 0 w h" attribute where w and h correspond the defined width and height attribute values. The viewBox attribute ensures better browser compatability. For more information, see http://www.seowarp.com/blog/2011/06/svg-scaling-problems-in-ie9-and-other-browsers/.
+
