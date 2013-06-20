@@ -71,7 +71,7 @@ class Prediction
         if @type == "category" # Prediction is for a category
             dest_page = "select-nearest"
             name = "Closest " + name.toLowerCase() # For example, "Closest library"
-            icon_html = citynavicon.get_icon_html(@category.get_icon_name())
+            icon_html = citynavi.iconprovider.get_icon_html(@category.get_icon_name(), 'style="height: 20px" class="ui-li-icon"')
             $el = $("<li><a href='##{dest_page}'>#{icon_html}#{name}</a></li>")
         else
             dest_page = "map-page"

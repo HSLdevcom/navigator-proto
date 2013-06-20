@@ -189,7 +189,7 @@ $('#service-directory').bind 'pageshow', (e, data) ->
         # e.g. Tampere, in the config.coffee and have been stored to citynavi.poi_categories in
         # this file.
         for category, index in citynavi.poi_categories
-            $list.append("<li><a href=\"#service-list?category=#{index}\"><img src=\"#{citynavicon.get_icon_path(category.get_icon_name())}\" class='ui-li-icon' style='height: 20px;'/>#{category.name}</a></li>")
+            $list.append("<li><a href=\"#service-list?category=#{index}\">#{citynavi.iconprovider.get_icon_html(category.get_icon_name(), 'style="height: 20px" class="ui-li-icon"')}#{category.name}</a></li>")
 
 #        setTimeout (() -> $list.listview()), 0
         $list.listview("refresh")
@@ -244,7 +244,7 @@ $(document).bind "pagebeforechange", (e, data) ->
                     else
                         dist = Math.round((dist + 10) / 10)
                         dist *= 10
-                    $item = $("<li><a href=\"#map-page\"><img src=\"#{citynavicon.get_icon_path(category.get_icon_name())}\" class='ui-li-icon' style=\"height: 20px;\"/>#{poi.name}<span class='ui-li-count'>#{dist} m</span></a></li>")
+                    $item = $("<li><a href=\"#map-page\">#{citynavi.iconprovider.get_icon_html(category.get_icon_name(), 'style="height: 20px" class="ui-li-icon"')}#{poi.name}<span class='ui-li-count'>#{dist} m</span></a></li>")
                     
                     # Bind event handler to the list item
                     $item.click () ->

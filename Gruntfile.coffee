@@ -15,7 +15,7 @@ module.exports = (grunt) ->
         'Gruntfile.coffee'
         'src/*.coffee'
       ]
-      tasks: 'default'
+      tasks: ['default']
 
     testem:
       desktop:
@@ -60,7 +60,7 @@ module.exports = (grunt) ->
           base: "."
 
     grunticon:
-      cityNavIcons:
+      city_nav_icons:
         options:
           src: "static/images/"
           dest: "static/images/grunticon/"
