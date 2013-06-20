@@ -66,16 +66,16 @@ class Prediction
                 args.location = citynavi.config.area.center
             @category.fetch_pois args
     render: -> # create the list element
-        icon_html = ''
+        $el = ''
         name = @name
         if @type == "category" # Prediction is for a category
             dest_page = "select-nearest"
-            icon_html = @category.get_icon_html()
             name = "Closest " + name.toLowerCase() # For example, "Closest library"
+            icon_html = citynavi.iconprovider.get_icon_html(@category.get_icon_name(), 'style="height: 20px" class="ui-li-icon"')
+            $el = $("<li><a href='##{dest_page}'>#{icon_html}#{name}</a></li>")
         else
             dest_page = "map-page"
-        $el = $("<li><a href='##{dest_page}'>#{icon_html}#{name}</a></li>")
-        $el.find('img').height(20).addClass('ui-li-icon')
+            $el = $("<li><a href='##{dest_page}'>#{name}</a></li>")
         return $el
 
 class LocationPrediction extends Prediction

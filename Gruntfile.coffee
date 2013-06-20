@@ -15,7 +15,7 @@ module.exports = (grunt) ->
         'Gruntfile.coffee'
         'src/*.coffee'
       ]
-      tasks: 'default'
+      tasks: ['default']
 
     testem:
       desktop:
@@ -59,14 +59,22 @@ module.exports = (grunt) ->
           port: 9001
           base: "."
 
+    grunticon:
+      city_nav_icons:
+        options:
+          src: "static/images/"
+          dest: "static/images/grunticon/"
+
   grunt.loadNpmTasks 'grunt-contrib-coffee'
   grunt.loadNpmTasks 'grunt-contrib-watch'
   grunt.loadNpmTasks 'grunt-contrib-connect'
   grunt.loadNpmTasks 'grunt-exec'
   grunt.loadNpmTasks 'grunt-testem'
+  grunt.loadNpmTasks 'grunt-grunticon'
 
   grunt.registerTask 'default', ['coffee']
   grunt.registerTask 'server', ['coffee', 'connect', 'watch']
   grunt.registerTask 'test', ['coffee', 'testem:desktop']
   grunt.registerTask 'test-mobile', ['coffee', 'testem:mobile']
   grunt.registerTask 'test-robot', ['coffee', 'connect', 'exec:robot']
+  grunt.registerTask 'icon', ['grunticon']
