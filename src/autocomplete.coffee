@@ -49,17 +49,25 @@ class LocationHistory
 window.location_history = new LocationHistory "city-navigator-history"
 
 class Prediction
-    select: ->
-        $.mobile.showPageLoadingMsg()
+    select: ($input, $ul) ->
         if @type == "location"
-            # Call fetch_details that by default does nothing but for GoogleLocation gets
-            # the location coordinates. The fetch_details function will call navigate_to_location
-            # function defined later in this file with the @location as a parameter. 
-            @location.fetch_details navigate_to_location, @location
-        else # Fetch POIs corresponding the category (that has been set in sub class constructor) by
-             # calling fetch_pois function defined for POICategory class in poi.coffee that will
-             # eventually call navigate_to_poi function that will show map page where the POIs and
-             # the route to the closest POI is shown.
+            coords = @location.coords
+            if coords[0]? and coords[1]?
+                $.mobile.showPageLoadingMsg()
+                # Call fetch_details that by default does nothing but for GoogleLocation gets
+                # the location coordinates. The fetch_details function will call navigate_to_location
+                # function defined later in this file with the @location as a parameter.
+                @location.fetch_details navigate_to_location, @location
+            else
+                $input.val("#{@name} ")
+                $input.focus()
+                $ul.html("")
+        else
+            $.mobile.showPageLoadingMsg()
+            # Fetch POIs corresponding the category (that has been set in sub class constructor) by
+            # calling fetch_pois function defined for POICategory class in poi.coffee that will
+            # eventually call navigate_to_poi function that will show map page where the POIs and
+            # the route to the closest POI is shown.
             args = {callback: navigate_to_poi, location: citynavi.get_source_location()}
             if not args.location?
                 alert "The device hasn't provided its current location. Using region center instead."
@@ -132,6 +140,12 @@ class RemoteAutocompleter extends Autocompleter
 # GeocoderCompleter uses the geocoder at the dev.hel.fi server.
 class GeocoderCompleter extends RemoteAutocompleter
     fetch_results: ->
+        if /\d/.test @.query
+            @fetch_addresses()
+        else
+            @fetch_streets()
+
+    fetch_addresses: ->
         # Get maximum 10 predictions for the user input (@.query) from the
         # dev.hel.fi geocoder.
         @xhr = $.getJSON URL_BASE,
@@ -149,6 +163,27 @@ class GeocoderCompleter extends RemoteAutocompleter
                 loc_list.push loc
             # submit_location_predictions function is defined in RemoteAutocompleter
             @.submit_location_predictions loc_list
+
+    fetch_streets: ->
+        @xhr = $.getJSON URL_BASE,
+            name: @.query
+            limit: 10
+            distinct_streets: true
+        , (data) =>
+            @xhr = null
+            objs = data.objects
+            if objs.length == 1
+                # Make another request.
+                return @fetch_addresses()
+            loc_list = []
+            loc_dict = {}
+            for street in objs
+                strt = street.street
+                continue if strt of loc_dict
+                loc_dict[strt] = true
+                loc = new Location strt, [null, null]
+                loc_list.push loc
+            @submit_location_predictions loc_list
 
 GOOGLE_URL_BASE = "http://dev.hel.fi/geocoder/google/"
 
@@ -291,6 +326,7 @@ pred_list = []
 # FIXME seems that if there are POICategoryCompleter predictions then no other predictions are shown.
 render_autocomplete_results = (args, new_preds) ->
     $ul = args.$ul # The list where the predictions are to be included in. 
+    $input = args.$input # The input element.
     pred_list = pred_list.concat new_preds
     for pred in pred_list
         if pred.rendered
@@ -302,7 +338,7 @@ render_autocomplete_results = (args, new_preds) ->
             e.preventDefault()
             idx = $(this).data 'index'
             pred = pred_list[idx]
-            pred.select() # select function of the Prediction object  defined in this file
+            pred.select($input, $ul) # select function of the Prediction object  defined in this file
         $ul.append $el
     $ul.listview "refresh"
     $ul.trigger "updatelayout"
@@ -311,9 +347,11 @@ render_autocomplete_results = (args, new_preds) ->
 # The listview is the search box that shows the list of location suggestions when user types
 # where he wants to go.
 $(document).on "listviewbeforefilter", "#navigate-to-input", (e, data) ->
-    val = $(data.input).val() # Get the value user has inputted in the search box.
+    $input = $(data.input)
+    val = $input.val() # Get the value user has inputted in the search box.
     $ul = $(this) # The list that sent the event.
     $ul.html('')
     pred_list = []
     # Get all predictions (= location suggestions), and render the results to the list.
-    get_all_predictions val, render_autocomplete_results, {$ul: $ul}
+    get_all_predictions val, render_autocomplete_results,
+        {$input: $input, $ul: $ul}
