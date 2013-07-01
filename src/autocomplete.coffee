@@ -61,7 +61,7 @@ class Prediction
             else
                 $input.val("#{@name} ")
                 $input.focus()
-                $ul.html("")
+                $input.trigger("keyup")
         else
             $.mobile.showPageLoadingMsg()
             # Fetch POIs corresponding the category (that has been set in sub class constructor) by
