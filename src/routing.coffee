@@ -284,6 +284,15 @@ route_to_service = (srv_id) ->
         console.log "palvelukartta callback done"
     console.log "route_to_service done"
 
+find_route_offline = (source, target, callback) ->
+    $.mobile.loading('show');
+    window.citynavi.reach.find source, target, (itinerary) ->
+        $.mobile.loading('hide')
+
+        display_route_result plan: itineraries: [itinerary]
+
+        if (callback)
+            callback(routeLayer)
 
 # clean up oddities in routing result data from OTP
 otp_cleanup = (data) ->
@@ -349,6 +358,14 @@ otp_cleanup = (data) ->
 # on the map and either of them has been set to a new place.
 find_route = (source, target, callback) ->
     console.log "find_route", source.toString(), target.toString(), callback?
+    if window.citynavi.reach?
+        find_route_impl = find_route_offline
+    else
+        find_route_impl = find_route_otp
+    find_route_impl source, target, callback
+    console.log "find_route done"
+
+find_route_otp = (source, target, callback) ->
     # See explanation of the parameters from
     # http://opentripplanner.org/apidoc/0.9.2/resource_Planner.html
     params =
@@ -383,7 +400,6 @@ find_route = (source, target, callback) ->
         if callback
             callback(routeLayer)
         console.log "opentripplanner callback done"
-    console.log "find_route done"
 
 display_route_result = (data) ->
     if data.error?.msg

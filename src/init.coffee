@@ -17,6 +17,9 @@ $(document).bind "mobileinit", ->
     # Prevent automatic scrolling to the top of the page when navigating to a new page
     $.mobile.defaultHomeScroll = 0
 
+    # init offline routing module if available
+    window.citynavi.reach = reach?.Api.init()
+
     # non-native inputs don't work in leaflet
     $.mobile.page.prototype.options.keepNative = "form input"
 
