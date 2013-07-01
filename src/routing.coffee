@@ -292,13 +292,13 @@ find_route = (source, target, callback) ->
         minTransferTime: 180
         walkSpeed: 1.17
         maxWalkDistance: 100000
-    if $('#walk-only').attr('checked')
-        params.mode = $("#vehiclesettings input:checked").val()
+    if not $('[name=usetransit]').attr('checked')
+        params.mode = $("input:checked[name=vehiclesettings]").val()
     else
         # always enable the following modes with transit
         # XXX we'd like to enable WALK, but TRANSIT,BICYCLE,WALK seems to mean
         # TRANSIT,WALK to OTP
-        params.mode = "FERRY,"+$("#vehiclesettings input:checked").val()
+        params.mode = "FERRY,"+$("input:checked[name=vehiclesettings]").val()
         $modes = $("#modesettings input:checked")
         if $modes.length == 0
             $modes = $("#modesettings input") # all disabled means all enabled
