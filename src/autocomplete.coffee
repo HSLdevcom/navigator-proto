@@ -355,3 +355,11 @@ $(document).on "listviewbeforefilter", "#navigate-to-input", (e, data) ->
     # Get all predictions (= location suggestions), and render the results to the list.
     get_all_predictions val, render_autocomplete_results,
         {$input: $input, $ul: $ul}
+
+    # $input is available only here so install the event handler here
+    $input.off 'keypress.enter'
+    $input.on 'keypress.enter', (event) ->
+        # XXX should wait for all ongoing predictions to finish first
+        if event.keyCode == 13 # if enter is pressed
+            if pred_list.length == 1 # if there's a unique prediction
+                pred_list[0].select {$input: $input, $ul: $ul} # select it
