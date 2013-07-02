@@ -52,11 +52,25 @@
 	left: -8px;
 }
 
+.route-list {
+    background: white;
+}
+
+:first-child > .route-graph {
+    margin-top: 0px;
+}
+
+.active > .route-graph {
+    opacity: 1;
+}
+
 .route-graph {
+    opacity: 0.5;
     height: 20px;
     position: relative;
     margin-left: 0px;
     padding-top: 4px;
+    margin-top: 19px;
     background: lightgrey;
 }
 .route-graph li {

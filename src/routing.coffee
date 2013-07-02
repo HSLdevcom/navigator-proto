@@ -292,6 +292,7 @@ find_route = (source, target, callback) ->
         minTransferTime: 180
         walkSpeed: 1.17
         maxWalkDistance: 100000
+        numItineraries: 3
     if not $('[name=usetransit]').attr('checked')
         params.mode = $("input:checked[name=vehiclesettings]").val()
     else
@@ -319,9 +320,6 @@ find_route = (source, target, callback) ->
 
         window.route_dbg = data
 
-        # OTP may return more than one route option but the first one is used.
-        itinerary = data.plan.itineraries[0] 
-
         if routeLayer != null
             map.removeLayer(routeLayer)
             routeLayer = null
@@ -329,9 +327,20 @@ find_route = (source, target, callback) ->
         # Create empty layer group and add it to the map.
         routeLayer = L.featureGroup().addTo(map)
 
-        # Render the route both on the map and on the footer.
-        polylines = render_route_layer(itinerary, routeLayer)
-        render_route_buttons(itinerary, routeLayer, polylines)
+        for index in [0, 1, 2]
+            $list = $("#route-buttons-#{index}")
+            $list.empty()
+            $list.hide()
+            $list.parent().removeClass("active")
+            if index of data.plan.itineraries
+                itinerary = data.plan.itineraries[index]
+                # Render the route both on the map and on the footer.
+                if index == 0
+                    polylines = render_route_layer(itinerary, routeLayer)
+                    $list.parent().addClass("active")
+                else
+                    polylines = null
+                render_route_buttons($list, data.plan.itineraries[index], routeLayer, polylines)
 
         if callback
             callback(routeLayer)
@@ -455,9 +464,7 @@ render_route_layer = (itinerary, routeLayer) ->
 # Itienary is the  itienary suggested for the user to get from source to target.
 # Route_layer is needed to resize the map when info is added to the footer here.
 # polylines contains graphical representation of the itienary legs.
-render_route_buttons = (itinerary, route_layer, polylines) ->
-    $list = $('#route-buttons')
-    $list.empty()
+render_route_buttons = ($list, itinerary, route_layer, polylines) ->
     trip_duration = itinerary.duration
     trip_start = itinerary.startTime
 
@@ -520,7 +527,16 @@ render_route_buttons = (itinerary, route_layer, polylines) ->
         # Add event handler to zoom to leg in the map when user clicks the leg button in the footer.
         # The click event for the polylines have been defined in the render_route_layer function.
         $leg.click (e) ->
-             polylines[index].fire("click")
+            if $list.parent().filter('.active').length > 0
+                polylines[index].fire("click")
+            else
+                routeLayer.eachLayer (layer) ->
+                    routeLayer.removeLayer(layer)
+                $list.parent().siblings().removeClass('active')
+                polylines = render_route_layer(itinerary, routeLayer)
+                $list.parent().addClass('active')
+                map.fitBounds(routeLayer.getBounds())
+
         # if the i is a block, it needs a separate event handler
         $leg.find('i').click (e) ->
              polylines[index].fire("click")
