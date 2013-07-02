@@ -3,6 +3,18 @@
     height: 100%
 }
 
+.leaflet-bottom .leaflet-control-scale {
+    margin-bottom: 17px;
+}
+
+.leaflet-container .leaflet-control-attribution {
+    transform: rotate(-90deg);
+    background: none;
+    color: rgba(0,0,0,0.3);
+    box-shadow: none;
+    text-shadow: none;
+}
+
 .leaflet-label {
 //	background: #193695;
 	background: #ffffff;
@@ -41,21 +53,23 @@
 }
 
 .route-graph {
-    height: 46px;
+    height: 20px;
     position: relative;
-    margin-left: 1px;
+    margin-left: 0px;
     padding-top: 4px;
+    background: lightgrey;
 }
 .route-graph li {
     font-size: 18px;
-    height: 24px;
+    height: 20px;
     position: absolute;
     top: 0;
+    background: white;
 }
 .route-graph .leg-bar {
     height: 20px;
-    margin-right: 1px;
-    padding: 8px 0px;
+    border-right: solid 1px white;
+    padding: 2px 0px;
     vertical-align: middle;
     background-color: white;
     color: black;
@@ -63,7 +77,7 @@
 }
 
 .route-graph .leg-bar i {
-    display: block;
+//    display: block;
     height: 100%;
     width: 100%;
     text-align: center;
@@ -72,13 +86,15 @@
 //    top: -4px;
     font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
     font-weight: normal;
+    z-index: 1;
 }
 
 .route-graph .leg-bar .leg-indicator {
-    color: white;
+    color: black;
     font-size: 14px;
-    margin-top: 6px;
-    font-weight: lighter;
+//    margin-top: -38px;
+    margin-top: -45px;
+    font-weight: bold;
     text-shadow: none;    
 //    background: white;
 }
