@@ -481,7 +481,7 @@ render_route_buttons = (itinerary, route_layer, polylines) ->
         sourceMarker.closePopup()
         targetMarker.closePopup()
         sourceMarker.openPopup()
-    $list.append($full_trip)
+#    $list.append($full_trip)
 
     # Draw a button for each leg.
     for leg, index in itinerary.legs
@@ -499,8 +499,8 @@ render_route_buttons = (itinerary, route_layer, polylines) ->
         color = googleColors[leg.routeType]
 
 # GoodEnoughJourneyPlanner style:
-        leg_start = (leg.startTime-trip_start)/trip_duration*0.95 + 5/100
-        leg_duration = leg.duration/trip_duration*0.95
+        leg_start = (leg.startTime-trip_start)/trip_duration
+        leg_duration = leg.duration/trip_duration
         leg_label = "<img src='static/images/#{icon_name}' height='100%' />"
         leg_subscript = "#{leg.route}"
 
@@ -520,6 +520,9 @@ render_route_buttons = (itinerary, route_layer, polylines) ->
         # Add event handler to zoom to leg in the map when user clicks the leg button in the footer.
         # The click event for the polylines have been defined in the render_route_layer function.
         $leg.click (e) ->
+             polylines[index].fire("click")
+        # if the i is a block, it needs a separate event handler
+        $leg.find('i').click (e) ->
              polylines[index].fire("click")
 
         $list.append($leg) # Add button to the list that is shown to the user in the footer.
@@ -580,19 +583,29 @@ resize_map = () ->
                                   # $('#map-page [data-role=header]').height() -
                                   $('#map-page [data-role=footer]').height() - # Footer contains buttons/textual info of the route
                                   # $('#route-buttons').height()
-                                  2
+                                  0
     console.log "#map height", height
     $('#map').height(height)
     map.invalidateSize() # Leaflet.js function that updates the map.
+
+    # calculate length of rotated attribution text based on map height
+    attr_width = height - 10;
+    $('.leaflet-control-attribution').css('width', attr_width+"px")
+    attr_height = $('.leaflet-control-attribution').height()
+    console.log ".leaflet-control-attribution height", attr_height
+    $('.leaflet-control-attribution').css('left', attr_width/2-attr_height/8+"px")
+    $('.leaflet-control-attribution').css('top', -attr_width/2-attr_height/2+"px")
 
 $(window).on 'resize', () ->
     resize_map()
 
 # Create a new Leaflet map and set it's center point to the
 # location defined in the config.coffee
-window.map_dbg = map = L.map('map', {minZoom: 10, zoomControl: false})
+window.map_dbg = map = L.map('map', {minZoom: 10, zoomControl: false, attributionControl: false})
     .setView(citynavi.config.area.center, 10)
-    
+
+L.control.attribution({position: 'bottomright'}).addTo(map)
+
 # Starts continuos watching of the user location using Leaflet.js locate function:
 # http://leafletjs.com/reference.html#map-locate
 map.locate
