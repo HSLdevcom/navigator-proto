@@ -462,10 +462,16 @@ render_route_buttons = (itinerary, route_layer, polylines) ->
     length = itinerary.legs.length + 1 # Include space for the "Total" button.
 
     # The "Total" button.
-    $full_trip = $("<li class='leg'><div class='leg-bar' style='margin-right: 3px'><i style='font-weight: lighter'><img />Total</i><div class='leg-indicator'>#{Math.ceil(trip_duration/1000/60)}min</div></div></li>")
+    # even-width style:
+#    $full_trip = $("<li class='leg'><div class='leg-bar' style='margin-right: 3px'><i style='font-weight: lighter'><img />Total</i><div class='leg-indicator'>#{Math.ceil(trip_duration/1000/60)}min</div></div></li>")
+#    $full_trip.css("left", "{0}%")
+#    $full_trip.css("width", "#{1/length*100}%")
 
+    # fixed-width style:
+    $full_trip = $("<li class='leg'><div class='leg-bar' style='margin-right: 3px'><i style='font-weight: lighter'><img />Total</i><div class='leg-indicator'>#{Math.ceil(trip_duration/1000/60)}min</div></div></li>")
     $full_trip.css("left", "{0}%")
-    $full_trip.css("width", "#{1/length*100}%")
+    $full_trip.css("width", "{5}%")
+
     # Add event handler to zoom to show whole itienary on map if
     # there is no other click event defined for a button. The "Total" button is such.
     $full_trip.click (e) ->
@@ -488,21 +494,23 @@ render_route_buttons = (itinerary, route_layer, polylines) ->
         else
             icon_name = googleIcons[leg.routeType]
 
+        color = googleColors[leg.routeType]
+
 # GoodEnoughJourneyPlanner style:
-#        leg_start = (leg.startTime-trip_start)/trip_duration
-#        leg_duration = leg.duration/trip_duration
-#        leg_label = "<img src='static/images/#{icon_name}' height='100%' />"
-#        leg_subscript = "#{leg.route}"
+        leg_start = (leg.startTime-trip_start)/trip_duration*0.95 + 5/100
+        leg_duration = leg.duration/trip_duration*0.95
+        leg_label = "<img src='static/images/#{icon_name}' height='100%' />"
+        leg_subscript = "#{leg.route}"
 
 # YetAnotherJourneyPlanner style:
-        leg_start = (index+1)/length # leg_start and leg_duration are used for positioning the buttons.
-        leg_duration = 1/length
-        leg_label = "<img src='static/images/#{icon_name}' height='100%' /> #{leg.route}"
-        leg_subscript = "#{Math.ceil(leg.duration/1000/60)}min"
+#        leg_start = (index+1)/length # leg_start and leg_duration are used for positioning the buttons.
+#        leg_duration = 1/length
+#        leg_label = "<img src='static/images/#{icon_name}' height='100%' /> #{leg.route}"
+#        leg_subscript = "#{Math.ceil(leg.duration/1000/60)}min"
 
         console.log leg_duration, "/", trip_duration
 
-        $leg = $("<li class='leg'><div class='leg-bar'><i>#{leg_label}</i><div class='leg-indicator'>#{leg_subscript}</div></div></li>")
+        $leg = $("<li class='leg'><div style='background: #{color};' class='leg-bar'><i>#{leg_label}</i><div class='leg-indicator'>#{leg_subscript}</div></div></li>")
 
         $leg.css("left", "#{leg_start*100}%")
         $leg.css("width", "#{leg_duration*100}%")

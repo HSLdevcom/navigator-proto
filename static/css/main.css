@@ -47,7 +47,7 @@
     padding-top: 4px;
 }
 .route-graph li {
-    font-size: 25px;
+    font-size: 18px;
     height: 24px;
     position: absolute;
     top: 0;
@@ -69,17 +69,18 @@
     text-align: center;
     font-style: normal;
     position: relative;
-    top: -4px;
+//    top: -4px;
     font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
     font-weight: normal;
 }
 
 .route-graph .leg-bar .leg-indicator {
-    font-size: 18px;
-    margin-top: -1px;
+    color: white;
+    font-size: 14px;
+    margin-top: 6px;
     font-weight: lighter;
     text-shadow: none;    
-    background: white;
+//    background: white;
 }
 
 ul {
