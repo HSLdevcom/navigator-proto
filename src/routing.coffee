@@ -327,6 +327,8 @@ find_route = (source, target, callback) ->
         # Create empty layer group and add it to the map.
         routeLayer = L.featureGroup().addTo(map)
 
+        maxDuration = _.max(i.duration for i in data.plan.itineraries)
+
         for index in [0, 1, 2]
             $list = $("#route-buttons-#{index}")
             $list.empty()
@@ -340,7 +342,8 @@ find_route = (source, target, callback) ->
                     $list.parent().addClass("active")
                 else
                     polylines = null
-                render_route_buttons($list, data.plan.itineraries[index], routeLayer, polylines)
+                $list.css('width', itinerary.duration/maxDuration*100+"%")
+                render_route_buttons($list, itinerary, routeLayer, polylines)
 
         if callback
             callback(routeLayer)
@@ -490,6 +493,8 @@ render_route_buttons = ($list, itinerary, route_layer, polylines) ->
         sourceMarker.openPopup()
 #    $list.append($full_trip)
 
+    max_duration = trip_duration # use all width for trip duration
+
     # Draw a button for each leg.
     for leg, index in itinerary.legs
       do (index) ->
@@ -506,8 +511,8 @@ render_route_buttons = ($list, itinerary, route_layer, polylines) ->
         color = googleColors[leg.routeType]
 
 # GoodEnoughJourneyPlanner style:
-        leg_start = (leg.startTime-trip_start)/trip_duration
-        leg_duration = leg.duration/trip_duration
+        leg_start = (leg.startTime-trip_start)/max_duration
+        leg_duration = leg.duration/max_duration
         leg_label = "<img src='static/images/#{icon_name}' height='100%' />"
         leg_subscript = "#{leg.route}"
 
@@ -517,7 +522,7 @@ render_route_buttons = ($list, itinerary, route_layer, polylines) ->
 #        leg_label = "<img src='static/images/#{icon_name}' height='100%' /> #{leg.route}"
 #        leg_subscript = "#{Math.ceil(leg.duration/1000/60)}min"
 
-        console.log leg_duration, "/", trip_duration
+        console.log leg_duration, "/", max_duration
 
         $leg = $("<li class='leg'><div style='background: #{color};' class='leg-bar'><i>#{leg_label}</i><div class='leg-indicator'>#{leg_subscript}</div></div></li>")
 
