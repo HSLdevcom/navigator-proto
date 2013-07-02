@@ -79,24 +79,24 @@ $('#map-page').bind 'pageshow', (e, data) ->
 
 # from https://github.com/reitti/reittiopas/blob/master/web/js/utils.coffee
 transportColors =
-    walk: '#000000'
-    1:  '#193695' # Helsinki internal bus lines
-    2:  '#00ab66' # Trams
-    3:  '#193695' # Espoo internal bus lines
-    4:  '#193695' # Vantaa internal bus lines
-    5:  '#193695' # Regional bus lines
-    6:  '#fb6500' # Metro
-    7:  '#00aee7' # Ferry
-    8:  '#193695' # U-lines
-    12: '#ce1141' # Commuter trains
-    21: '#193695' # Helsinki service lines
-    22: '#193695' # Helsinki night buses
-    23: '#193695' # Espoo service lines
-    24: '#193695' # Vantaa service lines
-    25: '#193695' # Region night buses
-    36: '#193695' # Kirkkonummi internal bus lines
-    38: '#193695' # Undocumented, assumed bus
-    39: '#193695' # Kerava internal bus lines
+    walk: '#bee4f8'
+    1:  '#007ac9' # Helsinki internal bus lines
+    2:  '#00985f' # Trams
+    3:  '#007ac9' # Espoo internal bus lines
+    4:  '#007ac9' # Vantaa internal bus lines
+    5:  '#007ac9' # Regional bus lines
+    6:  '#ff6319' # Metro
+    7:  '#00b9e4' # Ferry
+    8:  '#007ac9' # U-lines
+    12: '#64be14' # Commuter trains
+    21: '#007ac9' # Helsinki service lines
+    22: '#007ac9' # Helsinki night buses
+    23: '#007ac9' # Espoo service lines
+    24: '#007ac9' # Vantaa service lines
+    25: '#007ac9' # Region night buses
+    36: '#007ac9' # Kirkkonummi internal bus lines
+    38: '#007ac9' # Undocumented, assumed bus
+    39: '#007ac9' # Kerava internal bus lines
 
 googleColors = 
     null: transportColors.walk
