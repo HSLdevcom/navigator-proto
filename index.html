@@ -71,15 +71,17 @@
                         <h3>Browse map</h3>
                         <p>Calculate routes and browse for points of interest.</p>
                     </a></li>
-                    <li>
-                        <fieldset id="vehiclesettings" data-role="controlgroup" data-type="horizontal">
-                            <label style="margin-right: 0.5em; border-right: solid thin lightgrey;"><input type="checkbox" name="usetransit" checked="checked"><img src="static/images/bus_stop.svg" style="height: 20px;" /></input></label>
+                </ul>
+            </div>
+            <div data-role="content" style="text-align: center">
+                        <fieldset data-role="controlgroup" data-type="horizontal" data-shadow="true" style="display: inline-block">
+                            <label><input type="checkbox" name="usetransit" checked="checked"><img src="static/images/bus_stop.svg" style="height: 20px;" /></input></label>
+                        </fieldset>
+                        <fieldset id="vehiclesettings" data-role="controlgroup" data-type="horizontal" data-shadow="true" style="display: inline-block">
                             <label><input type="radio" name="vehiclesettings" value="WALK" checked="checked"><img src="static/images/walking.svg" style="height: 20px;"/></input></label>
                             <label><input type="radio" name="vehiclesettings" value="BICYCLE"><img src="static/images/bicycle.svg" style="height: 20px;"/></input></label>
                             <label><input type="radio" name="vehiclesettings" value="CAR"><img src="static/images/car.svg" style="height: 20px;"/></input></label>
                         </fieldset>
-                    </li>
-                </ul>
             </div>
         </div>
         <!-- Map page -->
