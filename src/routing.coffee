@@ -345,6 +345,8 @@ find_route = (source, target, callback) ->
                 $list.css('width', itinerary.duration/maxDuration*100+"%")
                 render_route_buttons($list, itinerary, routeLayer, polylines)
 
+        resize_map() # adjust map height to match space left by itineraries
+
         if callback
             callback(routeLayer)
         console.log "opentripplanner callback done"
@@ -549,8 +551,6 @@ render_route_buttons = ($list, itinerary, route_layer, polylines) ->
         $list.append($leg) # Add button to the list that is shown to the user in the footer.
 
     $list.show()
-
-    resize_map()
 
 # Not currently used.
 find_route_reittiopas = (source, target, callback) ->
