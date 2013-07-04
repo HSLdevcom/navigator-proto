@@ -103,6 +103,10 @@
     z-index: 1;
 }
 
+.route-graph .leg-bar i img {
+    opacity: 0.8;
+}
+
 .route-graph .leg-bar .leg-indicator {
     color: black;
     font-size: 14px;

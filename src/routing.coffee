@@ -77,9 +77,9 @@ $('#map-page').bind 'pageshow', (e, data) ->
 
 ## Utilities
 
-# from https://github.com/reitti/reittiopas/blob/master/web/js/utils.coffee
 transportColors =
-    walk: '#bee4f8'
+    walk: '#9ab9c9' # walking; HSL official color is too light #bee4f8
+    wait: '#999999' # waiting time at a stop
     1:  '#007ac9' # Helsinki internal bus lines
     2:  '#00985f' # Trams
     3:  '#007ac9' # Espoo internal bus lines
@@ -99,7 +99,10 @@ transportColors =
     39: '#007ac9' # Kerava internal bus lines
 
 googleColors = 
-    null: transportColors.walk
+    WALK: transportColors.walk
+    CAR: transportColors.walk
+    BICYCLE: transportColors.walk
+    WAIT: transportColors.wait
     0: transportColors[2]
     1: transportColors[6]
     2: transportColors[12]
@@ -108,13 +111,16 @@ googleColors =
     109: transportColors[12]
 
 googleIcons =
-    null: 'walking'
-    0: 'tram_stop'
-    1: 'subway'
-    2: 'train_station2'
-    3: 'bus_stop'
-    4: 'port'
-    109: 'train_station2'
+    WALK: 'walking.svg'
+    CAR: 'car.svg'
+    BICYCLE: 'bicycle.svg'
+    WAIT: 'clock.svg'
+    0: 'tram_stop.svg'
+    1: 'subway.svg'
+    2: 'train_station2.svg'
+    3: 'bus_stop.svg'
+    4: 'port.svg'
+    109: 'train_station2.svg'
 
 format_code = (code) ->
     if code.substring(0,3) == "300" # local train
@@ -280,6 +286,66 @@ route_to_service = (srv_id) ->
     console.log "route_to_service done"
 
 
+# clean up oddities in routing result data from OTP
+otp_cleanup = (data) ->
+    for itinerary in data.plan.itineraries
+        legs = itinerary.legs
+        length = legs.length
+        last = length-1
+
+        # if there's time past walking in either end, add that to walking
+        # XXX what if it's not walking?
+        if not legs[0].routeType and legs[0].startTime != itinerary.startTime
+            legs[0].startTime = itinerary.startTime
+            legs[0].duration = legs[0].endTime - legs[0].startTime
+        if not legs[last].routeType and legs[last].endTime != itinerary.endTime
+            legs[last].endTime = itinerary.endTime
+            legs[last].duration = legs[last].endTime - legs[last].startTime
+
+        new_legs = []
+        time = itinerary.startTime # tracks when next leg should start
+        for leg in itinerary.legs
+            # Route received from OTP is encoded so it needs to be decoded.
+            leg.legGeometry.points = decode_polyline(leg.legGeometry.points, 2)
+
+            # if there's unaccounted time before a walking leg
+            if leg.startTime - time > 1000 and leg.routeType == null
+                # move non-transport legs to occur before wait time
+                wait_time = leg.startTime-time
+                time = leg.endTime
+                leg.startTime -= wait_time
+                leg.endTime -= wait_time
+                new_legs.push leg
+                # add the waiting time as a separate leg
+                new_legs.push
+                    mode: "WAIT"
+                    routeType: null # non-transport
+                    route: ""
+                    duration: wait_time
+                    startTime: leg.endTime
+                    endTime: leg.endTime + wait_time
+                    legGeometry: {points: [leg.legGeometry.points[leg.legGeometry.points.length-1]]}
+            # else if there's unaccounted time before a leg
+            else if leg.startTime - time > 1000
+                wait_time = leg.startTime-time
+                time = leg.endTime
+		# add the waiting time as a separate leg
+                new_legs.push
+                    mode: "WAIT"
+                    routeType: null # non-transport
+                    route: ""
+                    duration: wait_time
+                    startTime: leg.startTime - wait_time
+                    endTime: leg.startTime
+                    legGeometry: {points: [leg.legGeometry.points[0]]}
+                new_legs.push leg
+            else
+                new_legs.push leg
+                time = leg.endTime # next leg should start when this ended
+        itinerary.legs = new_legs
+    return data
+
+
 # Called from marker_changed function when there are both source marker and target marker
 # on the map and either of them has been set to a new place. 
 find_route = (source, target, callback) ->
@@ -319,6 +385,8 @@ find_route = (source, target, callback) ->
             return
 
         window.route_dbg = data
+
+        data = otp_cleanup(data)
 
         if routeLayer != null
             map.removeLayer(routeLayer)
@@ -363,9 +431,8 @@ render_route_layer = (itinerary, routeLayer) ->
     for leg in legs
         do (leg) ->
             uid = Math.floor(Math.random()*1000000)
-            # Route received from OTP is encoded so it needs to be decoded.
-            points = (new L.LatLng(point[0]*1e-5, point[1]*1e-5) for point in decode_polyline(leg.legGeometry.points, 2))
-            color = googleColors[leg.routeType]
+            points = (new L.LatLng(point[0]*1e-5, point[1]*1e-5) for point in leg.legGeometry.points)
+            color = googleColors[leg.routeType ? leg.mode]
             # For walking a dashed line is used
             if leg.routeType != null
                 dashArray = null
@@ -387,8 +454,7 @@ render_route_layer = (itinerary, routeLayer) ->
                 last_stop = leg.to
                 point = {y: stop.lat, x: stop.lon}
                 icon = L.divIcon({className: "navigator-div-icon"})
-                label = "<span style='font-size: 24px; padding-right: 6px'>#{citynavi.iconprovider.get_icon_html(googleIcons[leg.routeType], style='vertical-align: sub; height: 24px')}#{leg.route}</span>"
-                #label = "<span style='font-size: 24px; padding-right: 6px'><img src='#{citynavi.iconprovider.get_icon_path(googleIcons[leg.routeType])}' style='vertical-align: sub; height: 24px '/> #{leg.route}</span>"
+                label = "<span style='font-size: 24px; padding-right: 6px'><img src='static/images/#{googleIcons[leg.routeType ? leg.mode]}' style='vertical-align: sub; height: 24px '/> #{leg.route}</span>"
 
                 # Define function to calculate the transit arrival time and update the element
                 # that has uid specific to this leg once per second by calling this function
@@ -438,8 +504,7 @@ render_route_layer = (itinerary, routeLayer) ->
                     pos = [msg.position.latitude, msg.position.longitude]
                     if not (id of vehicles) # Data for a new vehicle was given from the server
                         # Draw icon for the vehicle
-                        icon = L.divIcon({className: "navigator-div-icon", html: citynavi.iconprovider.get_icon_html(googleIcons[leg.routeType], 'style="height: 20px"')})
-                        #icon = L.divIcon({className: "navigator-div-icon", html: "<img src='#{citynavi.iconprovider.get_icon_path(googleIcons[leg.routeType])}' height='20px' />"})
+                        icon = L.divIcon({className: "navigator-div-icon", html: "<img src='static/images/#{googleIcons[leg.routeType ? leg.mode]}' height='20px' />"})
                         vehicles[id] = L.marker(pos, {icon: icon})
                             .addTo(routeLayer)
                         console.log "new vehicle #{id} on route #{leg.routeId}"
@@ -500,17 +565,12 @@ render_route_buttons = ($list, itinerary, route_layer, polylines) ->
     # Draw a button for each leg.
     for leg, index in itinerary.legs
       do (index) ->
-
-        if leg.mode == "CAR"
-            icon_name = citynavi.iconprovider.get_icon_path("car")
-        else if leg.mode == "BICYCLE"
-            icon_name = citynavi.iconprovider.get_icon_path("bicycle")
-        else if leg.routeType == null and $('#wheelchair').attr('checked')
-            icon_name = citynavi.iconprovider.get_icon_path("wheelchair")
+        if leg.mode == "WALK" and $('#wheelchair').attr('checked')
+            icon_name = "wheelchair.svg"
         else
-            icon_name = citynavi.iconprovider.get_icon_path(googleIcons[leg.routeType])
+            icon_name = googleIcons[leg.routeType ? leg.mode]
 
-        color = googleColors[leg.routeType]
+        color = googleColors[leg.routeType ? leg.mode]
 
 # GoodEnoughJourneyPlanner style:
         leg_start = (leg.startTime-trip_start)/max_duration
