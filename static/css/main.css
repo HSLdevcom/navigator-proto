@@ -9,8 +9,12 @@
 
 .leaflet-container .leaflet-control-attribution {
     transform: rotate(-90deg);
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
     background: none;
-    color: rgba(0,0,0,0.3);
+    opacity: 0.4;
     box-shadow: none;
     text-shadow: none;
 }
