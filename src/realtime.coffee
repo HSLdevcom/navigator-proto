@@ -9,7 +9,7 @@ class Realtime
     # id is called again with the route_id that has been subscribed earlier.
     subscribe_route: (route_id, callback, callback_args) ->
         if @subs[route_id]
-            @.unsubscribe_route route_id
+            @unsubscribe_route route_id
         # Replace all spaces with "_" and all ":" with "-".
         route_path = route_id.replace(/\ /g, "_").replace(/:/g, "-")
         # The path/channel that returns any vehicles for the route_id.
