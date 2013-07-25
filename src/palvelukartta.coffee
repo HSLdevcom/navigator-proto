@@ -1,4 +1,3 @@
-
 # This file is not used anymore.
 
 pk_base_url = 'http://www.hel.fi/palvelukarttaws/rest/v2/'

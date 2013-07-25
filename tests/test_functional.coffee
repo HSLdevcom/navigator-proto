@@ -3,7 +3,7 @@
 
 do chai.should
 
-afterEach (done)-> 
+afterEach (done)->
   if $.mobile.activePage.attr("id") == "front-page"
     done()
     return
@@ -39,7 +39,7 @@ describe 'Find nearest services.', ->
       jQuery('a[data-rel="back"]').filter(":visible").click()
       jQuery('#front-page').bind 'pageshow', (event)->
         jQuery(this).unbind(event)
-        done()     
+        done()
   describe 'Choose Restaurant category from the service directory.', ->
     beforeEach (done)->
       jQuery('a[href="#service-directory?"]').click()
@@ -92,6 +92,3 @@ describe 'Settings', ->
 describe 'Feature: Get directions when typing address.', ->
   describe 'Typed in a destination address piccadilly.', ->
     it 'Should suggest Piccadilly as a destination.'
-
-      
-

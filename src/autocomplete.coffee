@@ -19,7 +19,7 @@ class LocationHistory
     constructor: (@ls_id) ->
         # Try to get history from the local storage. If there is no history,
         # just create empty arrays where locations will be added to.
-        s = localStorage[@ls_id] 
+        s = localStorage[@ls_id]
         if s
             @array = JSON.parse s
         else
@@ -224,7 +224,7 @@ class GoogleCompleter extends RemoteAutocompleter
                 loc = new GoogleLocation pred
                 loc_list.push loc
             # submit_location_predictions is defined in RemoteAutocompleter
-            @submit_location_predictions loc_list 
+            @submit_location_predictions loc_list
 
 NOMINATIM_URL = "http://nominatim.openstreetmap.org/search/"
 
@@ -325,7 +325,7 @@ pred_list = []
 
 # FIXME seems that if there are POICategoryCompleter predictions then no other predictions are shown.
 render_autocomplete_results = (args, new_preds) ->
-    $ul = args.$ul # The list where the predictions are to be included in. 
+    $ul = args.$ul # The list where the predictions are to be included in.
     $input = args.$input # The input element.
     pred_list = pred_list.concat new_preds
     for pred in pred_list
@@ -342,7 +342,7 @@ render_autocomplete_results = (args, new_preds) ->
         $ul.append $el
     $ul.listview "refresh"
     $ul.trigger "updatelayout"
-        
+
 # Event handler for the listview defined in the index.html with id "navigate-to-input"
 # The listview is the search box that shows the list of location suggestions when user types
 # where he wants to go.

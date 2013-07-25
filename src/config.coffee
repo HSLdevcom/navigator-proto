@@ -1,5 +1,4 @@
-
-# Area is a geographical area that City Navigator has been configured to work in. 
+# Area is a geographical area that City Navigator has been configured to work in.
 class Area
     constructor: (opts) ->
         _.extend @, opts

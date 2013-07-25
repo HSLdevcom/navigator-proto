@@ -1,4 +1,3 @@
-
 ## module state variables
 
 # map
@@ -39,13 +38,13 @@ $(document).bind "pagebeforechange", (e, data) ->
         e.preventDefault()
         route_to_service(srv_id)
 
-    # If user has selected an address or service where to go to, then get the 
+    # If user has selected an address or service where to go to, then get the
     # place from the location_history (defined in autocomplete.coffee),
     # find a route to that place and show it on the map.
     if u.hash.indexOf('#map-page?destination=') == 0
         destination = u.hash.replace(/.*\?destination=/, "")
         e.preventDefault()
-        # Destination in this case is the last index in the history. 
+        # Destination in this case is the last index in the history.
         location = location_history.get(destination)
         route_to_destination(location)
 
@@ -98,7 +97,7 @@ transportColors =
     38: '#007ac9' # Undocumented, assumed bus
     39: '#007ac9' # Kerava internal bus lines
 
-googleColors = 
+googleColors =
     WALK: transportColors.walk
     CAR: transportColors.walk
     BICYCLE: transportColors.walk
@@ -138,7 +137,7 @@ format_time = (time) ->
 
 # Route received from OTP is encoded so it needs to be decoded.
 # translated from https://github.com/ahocevar/openlayers/blob/master/lib/OpenLayers/Format/EncodedPolyline.js
-decode_polyline = (encoded, dims) -> 
+decode_polyline = (encoded, dims) ->
     # Start from origo
     point = (0 for i in [0...dims])
 
@@ -178,7 +177,7 @@ set_source_marker = (latlng, options) ->
         measure = options.measure
         if not measure?
             measure = if accuracy < 2000 then "within #{Math.round(accuracy)} meters" else "within #{Math.round(accuracy/1000)} km"
-        
+
         sourceMarker.bindPopup("The starting point for journey planner<br>(tap the red marker to update)<br>You are #{measure} from this point").openPopup()
         if sourceCircle != null
             map.removeLayer(sourceCircle)
@@ -239,7 +238,7 @@ route_to_destination = (target_location) ->
     $.mobile.changePage("#map-page")
     target = new L.LatLng(lat, lng)
     set_target_marker(target, {description: target_location.name, zoomToFit: true})
-    
+
     for marker in poi_markers
         map.removeLayer marker
     poi_markers = []
@@ -268,7 +267,7 @@ route_to_service = (srv_id) ->
         alert("The device hasn't provided the current position!")
         return
     source = sourceMarker.getLatLng()
-    params = 
+    params =
         service: srv_id
         distance: 1000
         lat: source.lat.toPrecision(7)
@@ -347,12 +346,12 @@ otp_cleanup = (data) ->
 
 
 # Called from marker_changed function when there are both source marker and target marker
-# on the map and either of them has been set to a new place. 
+# on the map and either of them has been set to a new place.
 find_route = (source, target, callback) ->
     console.log "find_route", source.toString(), target.toString(), callback?
     # See explanation of the parameters from
     # http://opentripplanner.org/apidoc/0.9.2/resource_Planner.html
-    params = 
+    params =
         toPlace: "#{target.lat},#{target.lng}"
         fromPlace: "#{source.lat},#{source.lng}"
         minTransferTime: 180
@@ -469,7 +468,7 @@ render_route_layer = (itinerary, routeLayer) ->
                     seconds = (duration.seconds()+100).toString().substring(1)
                     minutes = duration.minutes()
                     hours = duration.hours()+24*duration.days()
-                    if (hours > 0) 
+                    if (hours > 0)
                         minutes = (minutes+100).toString().substring(1)
                         minutes = "#{hours}:#{minutes}"
                     $("#counter#{uid}").text "#{sign}#{minutes}:#{seconds}"
@@ -482,12 +481,12 @@ render_route_layer = (itinerary, routeLayer) ->
 
                 secondsCounter() # Start updating the time in the marker.
 
-                # By calling OTP transit/variantForTrip get the whole route for the vehicle, 
+                # By calling OTP transit/variantForTrip get the whole route for the vehicle,
                 # including also those parts that are not part of the itienary leg.
                 # This is done because we draw all parts of the route that, for example,
                 # a bus drives.
                 # FIXME This should be drawn before the leg part is drawn because otherwise
-                # this is drawn on top of it and click events for the line  below are not triggered. 
+                # this is drawn on top of it and click events for the line  below are not triggered.
                 $.getJSON citynavi.config.area.otp_base_url + "transit/variantForTrip", {tripId: leg.tripId, tripAgency: leg.agencyId}, (data) ->
                     geometry = data.geometry
                     points = (new L.LatLng(point[0]*1e-5, point[1]*1e-5) for point in decode_polyline(geometry.points, 2))
@@ -495,7 +494,7 @@ render_route_layer = (itinerary, routeLayer) ->
                     line_layer.addTo(routeLayer)
 
                 # Subscribe the real-time updates for the leg transit mode vehicles from the navigator-server
-                # The leg.routeId is passed for the citynavi.realtime.subscribe_route function 
+                # The leg.routeId is passed for the citynavi.realtime.subscribe_route function
                 # that has been defined in the realtime.coffee file. The routeId can be, for example,
                 # 23 for a bus at Tampere, Finland.
                 console.log "subscribing to #{leg.routeId}"
@@ -528,8 +527,8 @@ render_route_layer = (itinerary, routeLayer) ->
                     previous_positions[id] = pos
             # The row causes all legs polylines to be returned as array from the render_route_layer function.
             # polyline is graphical representation of the leg.
-            polyline 
-            
+            polyline
+
 # Renders the route buttons in the map page footer.
 # Itienary is the  itienary suggested for the user to get from source to target.
 # Route_layer is needed to resize the map when info is added to the footer here.
@@ -615,7 +614,7 @@ render_route_buttons = ($list, itinerary, route_layer, polylines) ->
 
 # Not currently used.
 find_route_reittiopas = (source, target, callback) ->
-    params = 
+    params =
         request: "route"
         detail: "full"
         epsg_in: "wgs84"
@@ -661,7 +660,7 @@ find_route_reittiopas = (source, target, callback) ->
 
 resize_map = () ->
     console.log "resize_map"
-    height = window.innerHeight - 
+    height = window.innerHeight -
                                   # $('#map-page [data-role=header]').height() -
                                   $('#map-page [data-role=footer]').height() - # Footer contains buttons/textual info of the route
                                   # $('#route-buttons').height()
@@ -698,17 +697,17 @@ map.locate
     enableHighAccuracy: true
 
 # Base map layers are created.
-cloudmade = L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{style}/256/{z}/{x}/{y}.png', 
+cloudmade = L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{style}/256/{z}/{x}/{y}.png',
     attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2012 CloudMade',
     key: 'BC9A493B41014CAABB98F0471D759707'
     style: 998
 ).addTo(map)
 
-osm = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
+osm = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     attribution: 'Map data &copy; 2011 OpenStreetMap contributors',
 )
 
-opencyclemap = L.tileLayer('http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png', 
+opencyclemap = L.tileLayer('http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png',
     attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery by <a href="http://www.opencyclemap.org/" target="_blank">OpenCycleMap</a>',
 )
 
@@ -889,7 +888,7 @@ map.on 'contextmenu', (e) ->
             lat = commentMarker.getLatLng().lat
             lon = commentMarker.getLatLng().lng
             uri = "http://api.openstreetmap.org/api/0.6/notes.json"
-            # enable for testing: 
+            # enable for testing:
             # uri = "http://api06.dev.openstreetmap.org/api/0.6/notes.json"
             $.post uri, {lat: lat, lon: lon, text: text}, ()->
                 $('#comment-box').hide()
