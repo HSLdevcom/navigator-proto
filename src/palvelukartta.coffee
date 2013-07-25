@@ -16,14 +16,14 @@ class Service extends Backbone.Model
         return JSON.parse attrs
     get_children: ->
         child_list = []
-        for id in @.get 'child_ids'
+        for id in @get 'child_ids'
             child = @collection.get id
             child_list.push child
         return child_list
     save: ->
         if not localStorage
             return
-        attrs = @.toJSON()
+        attrs = @toJSON()
         #delete attrs['unit_ids']
         str = JSON.stringify attrs
         localStorage[@ls_key] = str
@@ -32,29 +32,29 @@ class ServiceList extends Backbone.Collection
     model: Service
     url: pk_base_url + 'service/'
     initialize: ->
-        @.on "reset", @.handle_reset
+        @on "reset", @handle_reset
 
     handle_reset: ->
-        @.find_parents()
-        @.root_list = srv_list.filter (srv) ->
+        @find_parents()
+        @root_list = srv_list.filter (srv) ->
             return not srv.get('parent')
 
     find_parents: ->
-        @.forEach (srv) =>
+        @forEach (srv) =>
             if not srv.get('child_ids')
                 return
             for child_id in srv.get('child_ids')
-                child = @.get(child_id)
+                child = @get(child_id)
                 if not child
                     # console.log "child #{ child_id } missing"
                 else
                     child.set('parent', srv.id)
     save_to_cache: ->
-        root_ids = @.root_list.map (srv) ->
+        root_ids = @root_list.map (srv) ->
             return srv.id
         if localStorage
             localStorage["pk_service_root"] = JSON.stringify(root_ids)
-        @.forEach (srv) ->
+        @forEach (srv) ->
             srv.save()
     load_from_cache: ->
         console.log "load cache"
@@ -73,7 +73,7 @@ class ServiceList extends Backbone.Collection
             # console.log srv_attrs
             srv_list.push srv_attrs
         # console.log srv_list
-        @.reset srv_list
+        @reset srv_list
         return true
 
     sync: (method, collections, options) ->
@@ -86,7 +86,7 @@ class ServiceListView extends Backbone.View
         'data-role': 'listview'
     initialize: (opts) ->
         @parent_id = opts.parent_id
-        @.listenTo @collection, "reset", @.render
+        @listenTo @collection, "reset", @render
     render: ->
         console.log "serviceview render"
         if not @parent_id

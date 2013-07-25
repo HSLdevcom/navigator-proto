@@ -102,21 +102,21 @@ class Autocompleter
 
 class RemoteAutocompleter extends Autocompleter
     constructor: ->
-        @.xhr = null
-        @.timeout = null
-        @.remote = true
+        @xhr = null
+        @timeout = null
+        @remote = true
 
     # Get predictions but use timeout of 200 milliseconds before making remote
     # fetch and also if previous timeout has been set but it has not yet completed,
     # then abort it before setting the new one.
     get_predictions: (query, callback, args) ->
-        @.abort()
+        @abort()
         timeout_handler = =>
             @timeout = null
-            @.fetch_results()
-        @.callback = callback
-        @.callback_args = args
-        @.query = query
+            @fetch_results()
+        @callback = callback
+        @callback_args = args
+        @query = query
         @timeout = window.setTimeout timeout_handler, 200
 
     # Called when there are results from the remote autocompleter service.
@@ -126,7 +126,7 @@ class RemoteAutocompleter extends Autocompleter
         pred_list = []
         for loc in loc_list
             pred_list.push new LocationPrediction(loc)
-        @.callback @.callback_args, pred_list
+        @callback @callback_args, pred_list
 
     # Abort the timeout that would have caused fetch_results call.
     abort: ->
@@ -140,16 +140,16 @@ class RemoteAutocompleter extends Autocompleter
 # GeocoderCompleter uses the geocoder at the dev.hel.fi server.
 class GeocoderCompleter extends RemoteAutocompleter
     fetch_results: ->
-        if /\d/.test @.query
+        if /\d/.test @query
             @fetch_addresses()
         else
             @fetch_streets()
 
     fetch_addresses: ->
-        # Get maximum 10 predictions for the user input (@.query) from the
+        # Get maximum 10 predictions for the user input (@query) from the
         # dev.hel.fi geocoder.
         @xhr = $.getJSON URL_BASE,
-            name: @.query
+            name: @query
             limit: 10
         , (data) =>
             @xhr = null
@@ -162,11 +162,11 @@ class GeocoderCompleter extends RemoteAutocompleter
                 loc = new Location adr.name, [coords[1], coords[0]]
                 loc_list.push loc
             # submit_location_predictions function is defined in RemoteAutocompleter
-            @.submit_location_predictions loc_list
+            @submit_location_predictions loc_list
 
     fetch_streets: ->
         @xhr = $.getJSON URL_BASE,
-            name: @.query
+            name: @query
             limit: 10
             distinct_streets: true
         , (data) =>
@@ -224,7 +224,7 @@ class GoogleCompleter extends RemoteAutocompleter
                 loc = new GoogleLocation pred
                 loc_list.push loc
             # submit_location_predictions is defined in RemoteAutocompleter
-            @.submit_location_predictions loc_list 
+            @submit_location_predictions loc_list 
 
 NOMINATIM_URL = "http://nominatim.openstreetmap.org/search/"
 
@@ -237,7 +237,7 @@ class OSMCompleter extends RemoteAutocompleter
         sw = area.bbox_sw
         bbox = [sw[1], ne[0], ne[1], sw[0]]
         data =
-            q: @.query
+            q: @query
             format: "json"
             countrycodes: area.country
             limit: 10
@@ -252,7 +252,7 @@ class OSMCompleter extends RemoteAutocompleter
                 name = obj.address.road + ", " + obj.address.city
                 loc = new Location name, [obj.lat, obj.lon]
                 loc_list.push loc
-            @.submit_location_predictions loc_list
+            @submit_location_predictions loc_list
 
 # POICategoryCompleter checks if there are any categories that would match the user input
 # and if there are then it will create CategoryPrediction object, add it to the list of
