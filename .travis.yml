@@ -9,7 +9,7 @@ install:
 - JAVA_PID=$!
 - npm install -g grunt-cli testem coffee-script
 - npm install
-- python bootstrap.py
+- python bootstrap.py --version 2.1.1 # compatible with old setuptools
 - bin/buildout
 before_script:
 - bash -c "while [ ! -f CONNECTED ]; do sleep 2; done"
