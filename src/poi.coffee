@@ -114,9 +114,9 @@ class POICategory
         @provider = provider
         @provider_args = provider_args
     get_icon_path: ->
-        return STATIC_PREFIX + @.icon
+        return STATIC_PREFIX + @icon
     get_icon_html: ->
-        return '<img src="' + @.get_icon_path() + '">'
+        return '<img src="' + @get_icon_path() + '">'
     fetch_pois: (opts) ->
         @provider.fetch_pois @, opts
 
