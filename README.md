@@ -97,6 +97,6 @@ detected.
 
 ## Running Robot Framework tests ##
 
-Run ``python bootstrap.py`` and ``bin/buildout``.
+Run ``python bootstrap.py --version 2.1.1`` and ``bin/buildout``.
 
 Run ``grunt test-robot``.
