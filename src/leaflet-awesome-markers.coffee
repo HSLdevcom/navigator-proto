@@ -8,7 +8,7 @@
 ((window, document, undefined_) ->
   #
   # * Leaflet.AwesomeMarkers assumes that you have already included the Leaflet library.
-  # 
+  #
   L.AwesomeMarkers = {}
   L.AwesomeMarkers.version = "1.0"
   L.AwesomeMarkers.Icon = L.Icon.extend(

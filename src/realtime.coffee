@@ -1,9 +1,9 @@
 class Realtime
     constructor: ->
-        # Create Faye client that connects to the navigator-server 
-        @client = new Faye.Client 'http://dev.hsl.fi/faye'
+        # Create Faye client that connects to the navigator-server
+        @client = new Faye.Client 'http://dev.hsl.fi:9002/faye'
         @subs = {}
-    # Called from routing.coffee render_route_layer function when a new route 
+    # Called from routing.coffee render_route_layer function when a new route
     # suggestion is given to the user that includes also legs other than walking
     # FIXME seems that routes are never unsubscribed unless the subscribe_route
     # id is called again with the route_id that has been subscribed earlier.

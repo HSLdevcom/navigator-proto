@@ -2,7 +2,8 @@ class POI
     constructor: (opts) ->
         _.extend @, opts
 
-URL_BASE = "http://dev.hel.fi/geocoder/v1/poi/" # Provides POI data for Manchester and Helsinki 
+URL_BASE = "http://dev.hel.fi/geocoder/v1/poi/" # Provides POI data for Manchester and Helsinki
+STATIC_PREFIX = "static/images/"
 
 class POIProvider
     constructor: (opts) ->
@@ -167,7 +168,7 @@ console.log citynavi.poi_categories
 $('#service-directory').bind 'pageinit', (e, data) ->
         # Get the ul element(s) (there is only one) inside the div with id "service-directory".
         # and store it to variable $list ($ is just a convention and we could have left it out).
-        $list = $('#service-directory ul') 
+        $list = $('#service-directory ul')
         $list.empty() # If there are child elements in the list then remove them.
         # Initialize the listview and avoid the "cannot call methods on listview prior to
         # initialization" error.
@@ -191,7 +192,7 @@ $('#service-directory').bind 'pageshow', (e, data) ->
         # e.g. Tampere, in the config.coffee and have been stored to citynavi.poi_categories in
         # this file.
         for category, index in citynavi.poi_categories
-            $list.append("<li><a href=\"#service-list?category=#{index}\">#{citynavi.iconprovider.get_icon_html(category.get_icon_name(), 'style="height: 20px" class="ui-li-icon"')}#{category.name}</a></li>")
+            $list.append("<li><a href=\"#service-list?category=#{index}\"><img src=\"#{category.get_icon_path()}\" class='ui-li-icon' style='height: 20px;'/>#{category.name}</a></li>")
 
 #        setTimeout (() -> $list.listview()), 0
         $list.listview("refresh")
@@ -246,8 +247,8 @@ $(document).bind "pagebeforechange", (e, data) ->
                     else
                         dist = Math.round((dist + 10) / 10)
                         dist *= 10
-                    $item = $("<li><a href=\"#map-page\">#{citynavi.iconprovider.get_icon_html(category.get_icon_name(), 'style="height: 20px" class="ui-li-icon"')}#{poi.name}<span class='ui-li-count'>#{dist} m</span></a></li>")
-                    
+                    $item = $("<li><a href=\"#map-page\"><img src=\"#{category.get_icon_path()}\" class='ui-li-icon' style=\"height: 20px;\"/>#{poi.name}<span class='ui-li-count'>#{dist} m</span></a></li>")
+
                     # Bind event handler to the list item
                     $item.click () ->
                         citynavi.poi_list = pois # citynavi has been defined in the config.coffee
