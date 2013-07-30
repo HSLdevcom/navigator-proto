@@ -51,27 +51,27 @@ Or, install build tool with `npm install grunt-cli` and run dev server with
 If you encounter errors, you may want to run commands `sudo apt-get dist-upgrade` and
 `sudo apt-get update` to make sure everything is up-to-date.
 
-## Running tests (on a desktop browser) ##
+## Running tests ##
 
-Install testem with `sudo npm install -g testem coffee-script`.
+Install testem with `sudo npm install -g testem coffee-script`. Install
+the headless browser Phantomjs with `sudo apt-get install phantomjs`.
 
-Run tests with `grunt test`. (This may finish early if you have Firefox 
-running already.)
+Run tests with `grunt test`.
 
-To use Phantomjs instead of Firefox, you can install it with 
-`sudo apt-get install phantomjs` and replace `firefox` with `phantomjs` 
-in `Gruntfile.coffee`.
+### Local desktop browsers ###
 
-## Running tests (on a mobile browser) ##
+To test on Firefox and Chromium, run `grunt test-desktop`.
+
+To test on a different set of browsers, you can edit the option
+`testem.desktop.options.launch_in_ci` in `Gruntfile.coffee`.
+
+### Mobile browsers at Saucelabs ###
 
 Tests can be run on mobile browsers at SauceLabs. (Unfortunately, the current
 SauceLabs integration for testem is mostly just a hack and that's why
 the current experience is quite poor.)
 
-Install saucelauncher from source with `sudo npm install -g
-git://github.com/datakurre/saucelauncher.git`.
-(Once https://github.com/airportyh/saucelauncher/pull/3 has been merged and
-released, you may switch back to a released version of saucelauncher.)
+Install saucelauncher from source with `sudo npm install -g saucelauncher`.
 
 Add `~/.saucelabs.json` in a format:
 
@@ -99,13 +99,4 @@ detected.
 
 Run ``python bootstrap.py --version 2.1.1`` and ``bin/buildout``.
 
-Run ``grunt test-robot``.
-
-## Using icons
-
-Add svg file(s) under folder `./static/images`.  Run `grunt icon` to generate png files.
-
-In code, use `citynavicon.get_icon_path("myicon")` to get path to image that you can, for example use as src attribute in an img html element. Alternatively you can use `citynavicon.get_icon_html(name)` function to get an img element that has attributes style="height: 20px" and class="ui-li-icon". Finally, in the index.html you can include images via defining img element with id="citynavicon-myicon" where "citynavicon-" is mandatory part and "myicon" specifies name of the image.
-
-Note that svg files should define svg as default namespace for grunticon to work at the moment. Also note that svg files should define viewBox="0 0 w h" attribute where w and h correspond the defined width and height attribute values. The viewBox attribute ensures better browser compatability. For more information, see http://www.seowarp.com/blog/2011/06/svg-scaling-problems-in-ie9-and-other-browsers/.
-
+Run ``grunt test-robot-desktop``.
