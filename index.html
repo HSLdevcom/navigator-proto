@@ -23,6 +23,7 @@
         <script>
         // Functional testing with TestEm using mocha+chai-framework.
         if (window.location.hash === '#testem') {
+            window.testem_mode = true;
             jQuery(document).ready(function($) {
                 $('#front-page').bind('pageinit', function() {
                     var loadDependencies, suite = '/tests/test_functional.js';

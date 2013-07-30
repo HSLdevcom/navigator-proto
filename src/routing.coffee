@@ -689,12 +689,14 @@ L.control.attribution({position: 'bottomright'}).addTo(map)
 
 # Starts continuos watching of the user location using Leaflet.js locate function:
 # http://leafletjs.com/reference.html#map-locate
-map.locate
-    setView: false
-    maxZoom: 15
-    watch: true
-    timeout: Infinity
-    enableHighAccuracy: true
+# Don't use geolocation with Testem as it can't cancel the confirmation dialog
+if not window.testem_mode
+    map.locate
+        setView: false
+        maxZoom: 15
+        watch: true
+        timeout: Infinity
+        enableHighAccuracy: true
 
 # Base map layers are created.
 cloudmade = L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{style}/256/{z}/{x}/{y}.png',
