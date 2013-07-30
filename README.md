@@ -51,27 +51,27 @@ Or, install build tool with `npm install grunt-cli` and run dev server with
 If you encounter errors, you may want to run commands `sudo apt-get dist-upgrade` and
 `sudo apt-get update` to make sure everything is up-to-date.
 
-## Running tests (on a desktop browser) ##
+## Running tests ##
 
-Install testem with `sudo npm install -g testem coffee-script`.
+Install testem with `sudo npm install -g testem coffee-script`. Install
+the headless browser Phantomjs with `sudo apt-get install phantomjs`.
 
-Run tests with `grunt test`. (This may finish early if you have Firefox 
-running already.)
+Run tests with `grunt test`.
 
-To use Phantomjs instead of Firefox, you can install it with 
-`sudo apt-get install phantomjs` and replace `firefox` with `phantomjs` 
-in `Gruntfile.coffee`.
+### Local desktop browsers ###
 
-## Running tests (on a mobile browser) ##
+To test on Firefox and Chromium, run `grunt test-desktop`.
+
+To test on a different set of browsers, you can edit the option
+`testem.desktop.options.launch_in_ci` in `Gruntfile.coffee`.
+
+### Mobile browsers at Saucelabs ###
 
 Tests can be run on mobile browsers at SauceLabs. (Unfortunately, the current
 SauceLabs integration for testem is mostly just a hack and that's why
 the current experience is quite poor.)
 
-Install saucelauncher from source with `sudo npm install -g
-git://github.com/datakurre/saucelauncher.git`.
-(Once https://github.com/airportyh/saucelauncher/pull/3 has been merged and
-released, you may switch back to a released version of saucelauncher.)
+Install saucelauncher from source with `sudo npm install -g saucelauncher`.
 
 Add `~/.saucelabs.json` in a format:
 
@@ -99,4 +99,4 @@ detected.
 
 Run ``python bootstrap.py --version 2.1.1`` and ``bin/buildout``.
 
-Run ``grunt test-robot``.
+Run ``grunt test-robot-desktop``.
