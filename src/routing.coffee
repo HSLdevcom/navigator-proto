@@ -666,8 +666,10 @@ resize_map = () ->
                                   # $('#route-buttons').height()
                                   0
     console.log "#map height", height
-    $('#map').height(height)
-    map.invalidateSize() # Leaflet.js function that updates the map.
+
+# commented out for always-fullscreen map underlay:
+#    $('#map').height(height)
+#    map.invalidateSize() # Leaflet.js function that updates the map.
 
     # calculate length of rotated attribution text based on map height
     attr_width = height - 10;
@@ -684,6 +686,10 @@ $(window).on 'resize', () ->
 # location defined in the config.coffee
 window.map_dbg = map = L.map('map', {minZoom: 10, zoomControl: false, attributionControl: false})
     .setView(citynavi.config.area.center, 10)
+
+$(document).ready () ->
+    resize_map()
+    map.invalidateSize()
 
 L.control.attribution({position: 'bottomright'}).addTo(map)
 

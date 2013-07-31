@@ -46,6 +46,7 @@
         </script>
     </head>
     <body>
+        <div id="map" style="width: 100%; height: 100%; border: 0;"></div>
         <!-- data-role="page" and other data-roles are jQuery mobile specific widget attributes -->
         <!-- The jQuery mobile will link to pages with data-role="page" based on the id attribute.
              There are several pages in this index.html document. -->
@@ -87,10 +88,7 @@
         </div>
         <!-- Map page -->
         <div id="map-page" data-role="page">
-            <div data-role="content" style="padding: 0; margin: 0">
-                <div id="map" style="width: 100%; height: 100%; border: 0;"></div>
-            </div>
-            <div data-role="footer" style="padding: 0; margin: 0; border: 0; overflow: visible">
+            <div data-role="footer" data-position="fixed" style="padding: 0; margin: 0; border: 0; overflow: visible;">
                 <ul id="routes" class="route-list" style="display: block">
                     <li>
                         <ul id="route-buttons-0" class="route-graph" style="display: none">
