@@ -1,4 +1,30 @@
 
+/* Make #map visible on all pages, behind actual page content */
+
+/* Fullscreen jQuery Mobile elements are transparent and inert */
+/* XXX IE doesn't implement pointer-events
+       but makes transparent elements inert */
+.ui-mobile, .ui-mobile-viewport, .ui-page {
+    background: none;
+    pointer-events: none;
+}
+
+/* Map is below everything, not inert */
+#map {
+    pointer-events: auto;
+    z-index: -1;
+}
+
+/* UI elements are not inert */
+/* XXX all opaque elements should be listed here to not confuse user
+       all active elements must be listed here to receive input events */
+.ui-page a, .ui-page input, .ui-page fieldset,
+.ui-popup-screen, .ui-popup-container,
+.ui-header, .ui-footer,
+.ui-btn {
+    pointer-events: auto;
+}
+
 .navigator-div-icon {
     height: 100%
 }
@@ -56,8 +82,8 @@
 	left: -8px;
 }
 
-.route-list {
-    background: white;
+#map-page [data-role=footer] {
+    background: none;
 }
 
 :first-child > .route-graph {
@@ -75,7 +101,7 @@
     margin-left: 0px;
     padding-top: 4px;
     margin-top: 19px;
-    background: lightgrey;
+    border: solid thin rgba(255, 255, 255, 0.7);
 }
 .route-graph li {
     font-size: 18px;
