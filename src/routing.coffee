@@ -763,7 +763,7 @@ BackControl = L.Control.extend
         $container.append($button)
         return $container.get(0)
 
-new BackControl().addTo(map)
+# new BackControl().addTo(map)
 
 # Add zoom control to the map
 L.control.zoom().addTo(map)
