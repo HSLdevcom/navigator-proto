@@ -29,6 +29,11 @@
     height: 100%
 }
 
+/* Position the map controls below the title header */
+.leaflet-top {
+    top: 42px;
+}
+
 .leaflet-bottom .leaflet-control-scale {
     margin-bottom: 17px;
 }
