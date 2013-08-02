@@ -175,7 +175,7 @@ class GeocoderCompleter extends RemoteAutocompleter
             loc_list = []
             loc_dict = {}
             for street in objs
-                strt = street.street
+                strt = $.trim street.street
                 continue if strt of loc_dict
                 loc_dict[strt] = true
                 loc = new Location strt, [null, null]
