@@ -183,6 +183,8 @@ class GeocoderCompleter extends RemoteAutocompleter
             if loc_list.length == 1
                 # Make another request.
                 return @fetch_addresses()
+            loc_list = _.sortBy loc_list, (loc) ->
+                loc.name.toLowerCase()
             @submit_location_predictions loc_list
 
 GOOGLE_URL_BASE = "http://dev.hel.fi/geocoder/google/"
