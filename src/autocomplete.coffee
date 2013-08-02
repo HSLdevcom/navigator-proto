@@ -172,9 +172,6 @@ class GeocoderCompleter extends RemoteAutocompleter
         , (data) =>
             @xhr = null
             objs = data.objects
-            if objs.length == 1
-                # Make another request.
-                return @fetch_addresses()
             loc_list = []
             loc_dict = {}
             for street in objs
@@ -183,6 +180,9 @@ class GeocoderCompleter extends RemoteAutocompleter
                 loc_dict[strt] = true
                 loc = new Location strt, [null, null]
                 loc_list.push loc
+            if loc_list.length == 1
+                # Make another request.
+                return @fetch_addresses()
             @submit_location_predictions loc_list
 
 GOOGLE_URL_BASE = "http://dev.hel.fi/geocoder/google/"
