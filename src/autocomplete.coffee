@@ -228,12 +228,11 @@ class GoogleCompleter extends RemoteAutocompleter
             # submit_location_predictions is defined in RemoteAutocompleter
             @submit_location_predictions loc_list
 
-NOMINATIM_URL = "http://nominatim.openstreetmap.org/search/"
+NOMINATIM_URL = "http://open.mapquestapi.com/nominatim/v1/search.php"
 
-# This is not currently used.
 class OSMCompleter extends RemoteAutocompleter
     fetch_results: ->
-        url = NOMINATIM_URL + "?json_callback=?"
+        url = NOMINATIM_URL
         area = citynavi.config
         ne = area.bbox_ne
         sw = area.bbox_sw
