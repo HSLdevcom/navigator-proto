@@ -404,15 +404,31 @@ navigate_to_poi = (poi_list) ->
 
 # Use all completers that have been defined in config.coffee (autocompletion_providers)
 # for the area to collect the predictions.
-get_all_predictions = (input, callback, callback_args) ->
+# Async completers run in parallel but the callback gets the results in order
+get_all_predictions = (input, callback, callback_options) ->
     input = $.trim input
-    for c in completers
+
+    # Deferred representing the in-order callback for the previous completer
+    prev_deferred = $.Deferred().resolve() # first completer waits nothing
+
+    # call each async completer and wire their in-order callbacks
+    for c, i in completers
         if c.remote
             # Do not do remote autocompletion if less than 3 characters
             # input.
             if input.length < 3
                 continue
-        c.get_predictions input, callback, callback_args
+        # a deferred representing the in-order callback for this completer
+        deferred = $.Deferred()
+        deferred.done callback
+        # the out-of-order async callback from this prediction
+        prediction_callback = do (i, deferred, prev_deferred) ->
+            (_options, new_preds) ->
+                # wire this in-order callback after the previous
+                prev_deferred.always () ->
+                    deferred.resolve(callback_options, new_preds)
+        c.get_predictions input, prediction_callback, {}
+        prev_deferred = deferred
 
 pred_list = []
 
