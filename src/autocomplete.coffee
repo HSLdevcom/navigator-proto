@@ -403,9 +403,16 @@ render_autocomplete_results = (args, new_preds) ->
     $ul = args.$ul # The list where the predictions are to be included in.
     $input = args.$input # The input element.
     pred_list = pred_list.concat new_preds
+    seen = {}
     for pred in pred_list
+        key = pred.type + "|" + pred.location?.icon + "|" + pred.name
         if pred.rendered
+            seen[key] = true
             continue
+        if seen[key]
+            console.log "#{key} already seen"
+            continue
+        seen[key] = true
         $el = pred.render() # render function of the Prediction object defined in this file
         $el.data 'index', pred_list.indexOf(pred) # Store the index of the prediction to the element
         pred.rendered = true
