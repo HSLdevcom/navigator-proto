@@ -83,7 +83,10 @@ class Prediction
             $el = $("<li><a href='##{dest_page}'>#{icon_html}#{name}</a></li>")
         else
             dest_page = "map-page"
-            $el = $("<li><a href='##{dest_page}'>#{name}</a></li>")
+        if @location?.icon?
+            icon_html = "<img src='#{@location.icon}'>"
+        $el = $("<li><a href='##{dest_page}'>#{icon_html}#{name}</a></li>")
+        $el.find('img').height(20).addClass('ui-li-icon')
         return $el
 
 class LocationPrediction extends Prediction
@@ -249,10 +252,82 @@ class OSMCompleter extends RemoteAutocompleter
             @xhr = null
             loc_list = []
             for obj in data
-                console.log obj
-                name = obj.address.road + ", " + obj.address.city
-                loc = new Location name, [obj.lat, obj.lon]
-                loc_list.push loc
+                console.log "#{obj.osm_type} #{obj.class} #{obj.type} #{obj.display_name}", obj
+
+# example queries:
+# kamppi
+# kampin
+# mannerheimintie 100
+# nam
+# hsl
+# opastinsilta 6a
+
+# example results:
+# Vantaa
+# Pasila, Helsinki
+# Itä-Pasila, Helsinki
+# Mannerheimintie, Helsinki
+# Mannerheimintie 100, Helsinki
+# Alepa, Mannerheimintie 100, Helsinki
+# HSL, Opastinsilta 6a, Helsinki
+
+                addr = obj.address
+                display = ""
+                name = null
+
+                if area.cities?.length and not (addr.city in area.cities)
+                    continue
+
+                # XXX mapping from types to more obj.address properties
+                if obj.type of addr
+                    name = addr[obj.type]
+
+                # XXX full list of "road" properties?
+                street = addr.road or addr.cycleway or addr.pedestrian
+
+                number = addr.house_number
+
+                suburb = addr.neighbourhood or addr.suburb
+
+                if street
+                    display += street
+                    if number
+                        display += " #{number}"
+                    display += ", #{addr.city}"
+                else if suburb
+                    # XXX how to detect that this is a suburb?
+                    display += "#{suburb}, #{addr.city}"
+                else
+                    display += addr.city
+
+                if display.length and name and not (obj.type in ['city', 'suburb', 'neighbourhood', 'pedestrian'])
+                    display = "#{name}, #{display}"
+
+                # XXX own icons, more icons
+                if display.length and not obj.icon and (name or not number) and not (obj.type in ['house', 'pedestrian', 'cycleway', 'service', 'residential','tertiary', 'secondary', 'primary', 'trunk', 'motorway', 'unclassified'])
+                    # ei nimeä eikä numeroa -> tyyppi
+                    # ei nimeä mutta numero -> katuosoite -> ei tyyppiä
+                    # nimi mutta ei numeroa -> tyyppi
+                    # nimi ja numeroa -> tyyppi
+                    typename = obj.type
+                    if typename == "yes"
+                        typename = obj.class
+                    typename = typename.replace /_/g, " "
+                    typename = typename.replace /^./, (c) -> c.toUpperCase()
+#                    typename = typename.charAt(0).toUpperCase() + typename.slice(1)
+                    display = "#{typename}: #{display}"
+
+                if display.length and (name or street or obj.icon) and obj.lat? and obj.lon?
+                    if not _.all(display.toLowerCase().indexOf(part) != -1 for part in @query.toLowerCase().split(" "))
+                        console.log "#{display} doesn't match #{@query}"
+                        continue
+
+                    loc = new Location "#{display}", [obj.lat, obj.lon]
+                    if obj.icon
+                        loc.icon = obj.icon
+
+                    loc_list.push loc
+
             @submit_location_predictions loc_list
 
 # POICategoryCompleter checks if there are any categories that would match the user input
