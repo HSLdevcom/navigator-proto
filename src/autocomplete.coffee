@@ -130,6 +130,9 @@ class RemoteAutocompleter extends Autocompleter
             pred_list.push new LocationPrediction(loc)
         @callback @callback_args, pred_list
 
+    submit_prediction_failure: () ->
+        @callback @callback_args, []
+
     # Abort the timeout that would have caused fetch_results call.
     abort: ->
         if @timeout
@@ -153,8 +156,11 @@ class GeocoderCompleter extends RemoteAutocompleter
         @xhr = $.getJSON URL_BASE,
             name: @query
             limit: 10
-        , (data) =>
+        @xhr.always () ->
             @xhr = null
+        @xhr.fail () =>
+            @submit_prediction_failure()
+        @xhr.done (data) =>
             objs = data.objects
             loc_list = []
             # Create Location object of the each received data object,
@@ -171,8 +177,11 @@ class GeocoderCompleter extends RemoteAutocompleter
             name: @query
             limit: 10
             distinct_streets: true
-        , (data) =>
+        @xhr.always () ->
             @xhr = null
+        @xhr.fail () =>
+            @submit_prediction_failure()
+        @xhr.done (data) =>
             objs = data.objects
             loc_list = []
             loc_dict = {}
@@ -216,8 +225,12 @@ class GoogleCompleter extends RemoteAutocompleter
         # Query is the user input.
         data = {query: @query, location: location.join(','), radius: radius}
         data['country'] = area.country
-        @xhr = $.getJSON url, data, (data) =>
+        @xhr = $.getJSON url, data
+        @xhr.always = () ->
             @xhr = null
+        @xhr.fail () =>
+            @submit_prediction_failure()
+        @xhr.done (data) =>
             #console.log "GoogleCompleter data: ", data
             preds = data.predictions
             loc_list = []
@@ -243,12 +256,16 @@ class OSMCompleter extends RemoteAutocompleter
             q: @query
             format: "json"
             countrycodes: area.country
-            limit: 10
+            limit: 20
             bounded: 1
             addressdetails: 1
             viewbox: bbox.join(',')
-        @xhr = $.getJSON url, data, (data) =>
+        @xhr = $.getJSON url, data
+        @xhr.always () =>
             @xhr = null
+        @xhr.fail () =>
+            @submit_prediction_failure()
+        @xhr.done (data) =>
             loc_list = []
             for obj in data
                 console.log "#{obj.osm_type} #{obj.class} #{obj.type} #{obj.display_name}", obj
