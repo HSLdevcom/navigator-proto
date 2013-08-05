@@ -86,7 +86,7 @@ helsinki = new Area(
             {type: "swimming_pool"}
             {type: "toilet"} # XXX is this what's available here?
         ]
-    autocompletion_providers: ["poi_categories", "geocoder"]
+    autocompletion_providers: ["poi_categories", "geocoder", "osm"]
 )
 
 class CityNavigator
