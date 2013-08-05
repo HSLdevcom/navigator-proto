@@ -378,46 +378,47 @@ find_route = (source, target, callback) ->
     # # http://opentripplanner.org/apidoc/0.9.2/resource_Planner.html
     $.getJSON citynavi.config.area.otp_base_url + "plan", params, (data) ->
         console.log "opentripplanner callback got data"
-        if data.error?.msg
-            $('#error-popup p').text(data.error.msg)
-            $('#error-popup').popup('open')
-            return
-
-        window.route_dbg = data
-
         data = otp_cleanup(data)
-
-        if routeLayer != null
-            map.removeLayer(routeLayer)
-            routeLayer = null
-
-        # Create empty layer group and add it to the map.
-        routeLayer = L.featureGroup().addTo(map)
-
-        maxDuration = _.max(i.duration for i in data.plan.itineraries)
-
-        for index in [0, 1, 2]
-            $list = $("#route-buttons-#{index}")
-            $list.empty()
-            $list.hide()
-            $list.parent().removeClass("active")
-            if index of data.plan.itineraries
-                itinerary = data.plan.itineraries[index]
-                # Render the route both on the map and on the footer.
-                if index == 0
-                    polylines = render_route_layer(itinerary, routeLayer)
-                    $list.parent().addClass("active")
-                else
-                    polylines = null
-                $list.css('width', itinerary.duration/maxDuration*100+"%")
-                render_route_buttons($list, itinerary, routeLayer, polylines)
-
-        resize_map() # adjust map height to match space left by itineraries
-
+        display_route_result(data)
         if callback
             callback(routeLayer)
         console.log "opentripplanner callback done"
     console.log "find_route done"
+
+display_route_result = (data) ->
+    if data.error?.msg
+        $('#error-popup p').text(data.error.msg)
+        $('#error-popup').popup('open')
+        return
+
+    window.route_dbg = data
+
+    if routeLayer != null
+        map.removeLayer(routeLayer)
+        routeLayer = null
+
+    # Create empty layer group and add it to the map.
+    routeLayer = L.featureGroup().addTo(map)
+
+    maxDuration = _.max(i.duration for i in data.plan.itineraries)
+
+    for index in [0, 1, 2]
+        $list = $("#route-buttons-#{index}")
+        $list.empty()
+        $list.hide()
+        $list.parent().removeClass("active")
+        if index of data.plan.itineraries
+            itinerary = data.plan.itineraries[index]
+            # Render the route both on the map and on the footer.
+            if index == 0
+                polylines = render_route_layer(itinerary, routeLayer)
+                $list.parent().addClass("active")
+            else
+                polylines = null
+            $list.css('width', itinerary.duration/maxDuration*100+"%")
+            render_route_buttons($list, itinerary, routeLayer, polylines)
+
+    resize_map() # adjust map height to match space left by itineraries
 
 # Renders each leg of the route to the map and also draws icons of real-time vehicle
 # locations to the map if available.
