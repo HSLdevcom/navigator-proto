@@ -284,12 +284,55 @@ route_to_service = (srv_id) ->
         console.log "palvelukartta callback done"
     console.log "route_to_service done"
 
+offline_cleanup = (data) ->
+    for itinerary in data.plan.itineraries
+        new_legs = []
+        time = itinerary.startTime # tracks when next leg should start
+        for leg in itinerary.legs
+            # endTime not defined
+            leg.endTime = leg.startTime+leg.duration
+
+            # mode and routeType are hard-coded as bus
+            # XXX how to do this for other areas?
+            if citynavi.config.area.id == "helsinki"
+                if leg.routeId?.match /^1019/
+                    [leg.mode, leg.routeType] = ["FERRY", 4]
+                    leg.route = "Ferry"
+                else if leg.routeId?.match /^1300/
+                    [leg.mode, leg.routeType] = ["SUBWAY", 1]
+                    leg.route = "Metro"
+                else if leg.routeId?.match /^300/
+                    [leg.mode, leg.routeType] = ["RAIL", 2]
+                else if leg.routeId?.match /^10(0|10)/
+                    [leg.mode, leg.routeType] = ["TRAM", 0]
+                else if leg.mode != "WALK"
+                    [leg.mode, leg.routeType] = ["BUS", 3]
+
+            if leg.startTime - time > 1000
+                wait_time = leg.startTime-time
+                time = leg.endTime
+		# add the waiting time as a separate leg
+                new_legs.push
+                    mode: "WAIT"
+                    routeType: null # non-transport
+                    route: ""
+                    duration: wait_time
+                    startTime: leg.startTime - wait_time
+                    endTime: leg.startTime
+                    legGeometry: {points: [leg.legGeometry.points[0]]}
+            new_legs.push leg
+            time = leg.endTime
+        itinerary.legs = new_legs
+    return data
+
 find_route_offline = (source, target, callback) ->
     $.mobile.loading('show');
     window.citynavi.reach.find source, target, (itinerary) ->
         $.mobile.loading('hide')
 
-        display_route_result plan: itineraries: [itinerary]
+        data = plan: itineraries: [itinerary]
+        data = offline_cleanup data
+        display_route_result data
 
         if (callback)
             callback(routeLayer)
