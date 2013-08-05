@@ -59,7 +59,7 @@ class Prediction
                 # function defined later in this file with the @location as a parameter.
                 @location.fetch_details navigate_to_location, @location
             else
-                $input.val("#{@name} ")
+                $input.val("#{@location.street} ")
                 $input.focus()
                 $input.trigger("keyup")
         else
@@ -168,6 +168,13 @@ class GeocoderCompleter extends RemoteAutocompleter
             for adr in objs
                 coords = adr.location.coordinates
                 loc = new Location adr.name, [coords[1], coords[0]]
+                loc.street = $.trim adr.street
+                if adr.number
+                    loc.number = adr.number
+                    if adr.letter
+                        loc.number += adr.letter
+                    if adr.number_end
+                        loc.number += "-" + adr.number_end
                 loc_list.push loc
             # submit_location_predictions function is defined in RemoteAutocompleter
             @submit_location_predictions loc_list
@@ -189,7 +196,8 @@ class GeocoderCompleter extends RemoteAutocompleter
                 strt = $.trim street.street
                 continue if strt of loc_dict
                 loc_dict[strt] = true
-                loc = new Location strt, [null, null]
+                loc = new Location strt+" ...", [null, null]
+                loc.street = strt
                 loc_list.push loc
             if loc_list.length == 1
                 # Make another request.
@@ -298,6 +306,8 @@ class OSMCompleter extends RemoteAutocompleter
                 if obj.type of addr
                     name = addr[obj.type]
 
+                is_street = obj.type in ['house', 'living_street', 'pedestrian', 'cycleway', 'service', 'residential','tertiary', 'secondary', 'primary', 'trunk', 'motorway', 'unclassified']
+
                 # XXX full list of "road" properties?
                 street = addr.road or addr.cycleway or addr.pedestrian
 
@@ -316,11 +326,11 @@ class OSMCompleter extends RemoteAutocompleter
                 else
                     display += addr.city
 
-                if display.length and name and not (obj.type in ['city', 'suburb', 'neighbourhood', 'pedestrian'])
+                if display.length and name and not (obj.type in ['city', 'suburb', 'neighbourhood', 'pedestrian', 'cycleway'])
                     display = "#{name}, #{display}"
 
                 # XXX own icons, more icons
-                if display.length and not obj.icon and (name or not number) and not (obj.type in ['house', 'pedestrian', 'cycleway', 'service', 'residential','tertiary', 'secondary', 'primary', 'trunk', 'motorway', 'unclassified'])
+                if display.length and not obj.icon and (name or not number) and not is_street
                     # ei nimeä eikä numeroa -> tyyppi
                     # ei nimeä mutta numero -> katuosoite -> ei tyyppiä
                     # nimi mutta ei numeroa -> tyyppi
@@ -341,7 +351,10 @@ class OSMCompleter extends RemoteAutocompleter
                     loc = new Location "#{display}", [obj.lat, obj.lon]
                     if obj.icon
                         loc.icon = obj.icon
-
+                    if is_street
+                        loc.street = street
+                        if number
+                            loc.number = number
                     loc_list.push loc
 
             @submit_location_predictions loc_list
@@ -437,7 +450,19 @@ render_autocomplete_results = (args, new_preds) ->
     $input = args.$input # The input element.
     pred_list = pred_list.concat new_preds
     seen = {}
+    seen_streets = {}
+    seen_addresses = {}
     for pred in pred_list
+        if pred.location?.street
+            key = pred.location.street
+            if seen_streets[key] and not pred.location.number
+                continue
+            seen_streets[key] = true
+            if pred.location.number
+                key = pred.location.street + "|" + pred.location.number
+                if seen_addresses[key]
+                    continue
+                seen_addresses[key] = true
         key = pred.type + "|" + pred.location?.icon + "|" + pred.name
         if pred.rendered
             seen[key] = true
