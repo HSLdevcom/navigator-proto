@@ -364,4 +364,4 @@ $(document).on "listviewbeforefilter", "#navigate-to-input", (e, data) ->
         # XXX should wait for all ongoing predictions to finish first
         if event.keyCode == 13 # if enter is pressed
             if pred_list.length == 1 # if there's a unique prediction
-                pred_list[0].select {$input: $input, $ul: $ul} # select it
+                pred_list[0].select $input, $ul # select it
