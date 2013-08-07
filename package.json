@@ -13,14 +13,16 @@
   "author": "",
   "license": "EUPL v1.2/AGPLv3",
   "readmeFilename": "README.md",
-  "devDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-contrib-watch": "~0.3.1",
-    "grunt-contrib-coffee": "~0.6.0",
-    "grunt-contrib-connect": "~0.2.0",
-    "grunt-exec": "~0.4.0",
-    "grunt-testem": "~0.3.4",
-    "mocha": "~1.9.0",
-    "chai": "~1.5.0"
+  "//": ["Using dependencies instead of devDependencies to enable npm update.",
+         "More info at: https://github.com/isaacs/npm/issues/2369"],
+  "dependencies": {
+    "grunt": "0.x",
+    "grunt-contrib-watch": "0.x",
+    "grunt-contrib-coffee": "0.x",
+    "grunt-contrib-connect": "0.x",
+    "grunt-exec": "0.x",
+    "grunt-testem": "0.x",
+    "mocha": "1.x",
+    "chai": "1.x"
   }
 }
