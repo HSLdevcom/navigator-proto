@@ -52,7 +52,7 @@ class Prediction
     select: ($input, $ul) ->
         if @type == "location"
             coords = @location.coords
-            if coords[0]? and coords[1]?
+            if (not coords?) or (coords[0]? and coords[1]?)
                 $.mobile.showPageLoadingMsg()
                 # Call fetch_details that by default does nothing but for GoogleLocation gets
                 # the location coordinates. The fetch_details function will call navigate_to_location
