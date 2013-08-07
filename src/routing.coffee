@@ -330,7 +330,10 @@ find_route_offline = (source, target, callback) ->
     window.citynavi.reach.find source, target, (itinerary) ->
         $.mobile.loading('hide')
 
-        data = plan: itineraries: [itinerary]
+        if itinerary
+            data = plan: itineraries: [itinerary]
+        else
+            data = plan: itineraries: []
         data = offline_cleanup data
         display_route_result data
 
