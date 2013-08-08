@@ -310,7 +310,7 @@ offline_cleanup = (data) ->
 
             # mode and routeType are hard-coded as bus
             # XXX how to do this for other areas?
-            if citynavi.config.area.id == "helsinki"
+            if citynavi.config.id == "helsinki"
                 if leg.routeId?.match /^1019/
                     [leg.mode, leg.routeType] = ["FERRY", 4]
                     leg.route = "Ferry"
@@ -433,11 +433,11 @@ find_route_otp = (source, target, callback) ->
             params.mode = $(mode).attr('name')+","+params.mode
     if $('#wheelchair').attr('checked')
         params.wheelchair = "true"
-    if $('#prefer-free').attr('checked') and citynavi.config.area.id == "manchester"
+    if $('#prefer-free').attr('checked') and citynavi.config.id == "manchester"
         params.preferredRoutes = "GMN_1,GMN_2,GMN_3"
     # Call plan in the OpenTripPlanner RESTful API. See:
     # # http://opentripplanner.org/apidoc/0.9.2/resource_Planner.html
-    $.getJSON citynavi.config.area.otp_base_url + "plan", params, (data) ->
+    $.getJSON citynavi.config.otp_base_url + "plan", params, (data) ->
         console.log "opentripplanner callback got data"
         data = otp_cleanup(data)
         display_route_result(data)
@@ -553,7 +553,7 @@ render_route_layer = (itinerary, routeLayer) ->
                 # a bus drives.
                 # FIXME This should be drawn before the leg part is drawn because otherwise
                 # this is drawn on top of it and click events for the line  below are not triggered.
-                $.getJSON citynavi.config.area.otp_base_url + "transit/variantForTrip", {tripId: leg.tripId, tripAgency: leg.agencyId}, (data) ->
+                $.getJSON citynavi.config.otp_base_url + "transit/variantForTrip", {tripId: leg.tripId, tripAgency: leg.agencyId}, (data) ->
                     geometry = data.geometry
                     points = (new L.LatLng(point[0]*1e-5, point[1]*1e-5) for point in decode_polyline(geometry.points, 2))
                     line_layer = new L.Polyline(points, {color: color, opacity: 0.2})
@@ -766,7 +766,7 @@ $(window).on 'resize', () ->
 # Create a new Leaflet map and set it's center point to the
 # location defined in the config.coffee
 window.map_dbg = map = L.map('map', {minZoom: 10, zoomControl: false, attributionControl: false})
-    .setView(citynavi.config.area.center, 10)
+    .setView(citynavi.config.center, 10)
 
 $(document).ready () ->
     resize_map()
@@ -876,8 +876,8 @@ map.on 'locationfound', (e) ->
     point = e.latlng
     transform_location point
 
-    bbox_sw = citynavi.config.area.bbox_sw
-    bbox_ne = citynavi.config.area.bbox_ne
+    bbox_sw = citynavi.config.bbox_sw
+    bbox_ne = citynavi.config.bbox_ne
 
     # Check if the location is sensible
     if not (bbox_sw[0] < point.lat < bbox_ne[0]) or not (bbox_sw[1] < point.lng < bbox_ne[1])
@@ -890,8 +890,8 @@ map.on 'locationfound', (e) ->
         console.log(bbox_sw[0], point.lat, bbox_ne[0])
         console.log(bbox_sw[1], point.lng, bbox_ne[1])
         console.log("using area center instead of geolocation outside area")
-        point.lat = citynavi.config.area.center[0]
-        point.lng = citynavi.config.area.center[1]
+        point.lat = citynavi.config.center[0]
+        point.lng = citynavi.config.center[1]
         e.accuracy = 2001 # don't draw red circle
         radius = 50 # draw small grey circle
         measure = "nowhere near"
