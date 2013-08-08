@@ -14,7 +14,7 @@ class GeocoderPOIProvider extends POIProvider
     fetch_pois: (category, opts) ->
         params =
             category__type: category.type
-            municipality__id: citynavi.config.area.poi_muni_id
+            municipality__id: citynavi.config.poi_muni_id
         if opts.location
             params.lat = opts.location[0]
             params.lon = opts.location[1]
@@ -77,7 +77,7 @@ class WaagPOIProvider extends POIProvider
         # Make call to the geocoder, where
         # parameters are: location coordinates, service category type in "OSM format", possibly osm::wheelchair, layer=osm, geom=1, per_page=20
         # returned 10 POIs include: name, location coordinates, service category, private bool, and dist. to the POI
-        $.getJSON "#{WAAG_URL}/#{citynavi.config.area.waag_id}/nodes", params, (data) =>
+        $.getJSON "#{WAAG_URL}/#{citynavi.config.waag_id}/nodes", params, (data) =>
             poi_list = []
             for res in data.results
                 type = res.geom.type
@@ -153,8 +153,8 @@ generate_area_poi_categories = (area) ->
             cat_list.push cat
     return cat_list
 
-# Generate POI categories based on the citynavi.config.area that has been defined in the config.coffee
-citynavi.poi_categories = generate_area_poi_categories citynavi.config.area
+# Generate POI categories based on the citynavi.config that has been defined in the config.coffee
+citynavi.poi_categories = generate_area_poi_categories citynavi.config
 console.log citynavi.poi_categories
 
 #test_it = ->
@@ -227,7 +227,7 @@ $(document).bind "pagebeforechange", (e, data) ->
             if not position_missing_alert_shown
                 alert "The device hasn't provided its current location. Using region center instead."
                 position_missing_alert_shown = true
-            current_location = citynavi.config.area.center
+            current_location = citynavi.config.center
         # Fetch the nearby POIs using the current_location and a callback function that creates the
         # service list that is shown to the user.
         category.fetch_pois

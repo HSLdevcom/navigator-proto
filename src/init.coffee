@@ -30,7 +30,6 @@ $(document).ajaxStart (e) ->
 
 $(document).ajaxStop (e) ->
     $.mobile.loading('hide')
-<<<<<<< HEAD
 
 class CityNavigator
     constructor: (opts) ->
@@ -46,5 +45,3 @@ class CityNavigator
 # The area for which the city-navigator is configured to.
 window.citynavi = new CityNavigator()
 
-=======
->>>>>>> Remove unnecessary whitespace.

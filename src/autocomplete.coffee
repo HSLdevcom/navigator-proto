@@ -71,7 +71,7 @@ class Prediction
             args = {callback: navigate_to_poi, location: citynavi.get_source_location()}
             if not args.location?
                 alert "The device hasn't provided its current location. Using region center instead."
-                args.location = citynavi.config.area.center
+                args.location = citynavi.config.center
             @category.fetch_pois args
     render: -> # create the list element
         $el = ''
@@ -207,7 +207,7 @@ class GoogleLocation extends Location
 class GoogleCompleter extends RemoteAutocompleter
     fetch_results: ->
         url = GOOGLE_URL_BASE + "autocomplete/"
-        area = citynavi.config.area
+        area = citynavi.config
         location = citynavi.get_source_location_or_area_center()
         # FIXME
         radius = 12000
@@ -234,7 +234,7 @@ NOMINATIM_URL = "http://nominatim.openstreetmap.org/search/"
 class OSMCompleter extends RemoteAutocompleter
     fetch_results: ->
         url = NOMINATIM_URL + "?json_callback=?"
-        area = citynavi.config.area
+        area = citynavi.config
         ne = area.bbox_ne
         sw = area.bbox_sw
         bbox = [sw[1], ne[0], ne[1], sw[0]]
@@ -282,7 +282,7 @@ generate_area_completers = (area) ->
     (supported_completers[id] for id in area.autocompletion_providers)
 
 # completers is a subset of the supported_completers.
-completers = generate_area_completers citynavi.config.area
+completers = generate_area_completers citynavi.config
 
 test_completer = ->
     callback = (args, data) ->

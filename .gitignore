@@ -1,3 +1,4 @@
+src/local_config.coffee
 static/js/
 *~
 node_modules
