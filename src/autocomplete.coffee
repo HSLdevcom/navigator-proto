@@ -196,7 +196,7 @@ class GeocoderCompleter extends RemoteAutocompleter
                 strt = $.trim street.street
                 continue if strt of loc_dict
                 loc_dict[strt] = true
-                loc = new Location strt+" ...", [null, null]
+                loc = new Location strt+" \u2026", [null, null]
                 loc.street = strt
                 loc_list.push loc
             if loc_list.length == 1
