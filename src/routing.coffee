@@ -285,7 +285,7 @@ route_to_service = (srv_id) ->
     console.log "route_to_service done"
 
 offline_cleanup = (data) ->
-    for itinerary in data.plan.itineraries
+    for itinerary in data.plan?.itineraries or []
         new_legs = []
         time = itinerary.startTime # tracks when next leg should start
         for leg in itinerary.legs
@@ -342,7 +342,7 @@ find_route_offline = (source, target, callback) ->
 
 # clean up oddities in routing result data from OTP
 otp_cleanup = (data) ->
-    for itinerary in data.plan.itineraries
+    for itinerary in data.plan?.itineraries or []
         legs = itinerary.legs
         length = legs.length
         last = length-1
@@ -450,6 +450,7 @@ find_route_otp = (source, target, callback) ->
 display_route_result = (data) ->
     if data.error?.msg
         $('#error-popup p').text(data.error.msg)
+        $('#error-popup').popup()
         $('#error-popup').popup('open')
         return
 
