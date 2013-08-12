@@ -501,6 +501,7 @@ render_route_layer = (itinerary, routeLayer) ->
                 dashArray = null
             else
                 dashArray = "5,10"
+                color = "#000" # override line color to black for visibility
             polyline = new L.Polyline(points, {color: color, weight: 8, opacity: 0.2, clickable: false, dashArray: dashArray})
             polyline.addTo(routeLayer) # The route leg line is added to the routeLayer
             # Make zooming to the leg via click possible.
