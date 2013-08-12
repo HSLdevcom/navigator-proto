@@ -60,20 +60,16 @@
                 <!-- "Search box" with the list of results for the location that the user wants to go to. -->
                 <ul id="navigate-to-input" data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Where do you want to go?"></ul>
             </div>
-            <div data-role="content" style="padding-bottom: 0">
-                <ul data-role="listview" style="margin-bottom: 0">
-                    <li><a href="#service-directory?">
-                        <h3>Find nearest services</h3>
-                        <p>Find a service that is nearest to your current location.</p>
-                    </a></li>
+            <div data-role="content" style="padding-bottom: 0; text-align: right">
+                    <a href="#service-directory?" data-role="button" data-inline="true" data-icon="arrow-r">
+                        Find nearest services
+                    </a>
                     <!-- pageshow event for the map-page is handled in the routing.coffee -->
-                    <li><a href="#map-page">
-                        <h3>Browse map</h3>
-                        <p>Calculate routes and browse for points of interest.</p>
-                    </a></li>
-                </ul>
+                    <a href="#map-page" data-role="button" data-inline="true" data-icon="arrow-r">
+                        Browse map
+                    </a>
             </div>
-            <div data-role="content" style="text-align: center">
+            <div data-role="content" style="position: absolute; width: 100%; bottom: 0; text-align: center">
                         <fieldset data-role="controlgroup" data-type="horizontal" data-shadow="true" style="display: inline-block">
                             <label><input type="checkbox" name="usetransit" checked="checked"><img src="static/images/bus_stop.svg" style="height: 20px;" /></input></label>
                         </fieldset>
