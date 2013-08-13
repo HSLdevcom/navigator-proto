@@ -1,10 +1,5 @@
 # This file is not used anymore.
 
-pk_base_url = 'http://www.hel.fi/palvelukarttaws/rest/v2/'
-
-#get_pk_object = (url, callback) ->
-#    $.getJSON(pk_base_url + url + '?callback=?', callback)
-
 class Service extends Backbone.Model
     initialize: ->
         @ls_key = "pk_service_" + @id
@@ -29,7 +24,7 @@ class Service extends Backbone.Model
 
 class ServiceList extends Backbone.Collection
     model: Service
-    url: pk_base_url + 'service/'
+    url: citynavi.config.hel_servicemap_service_url
     initialize: ->
         @on "reset", @handle_reset
 
