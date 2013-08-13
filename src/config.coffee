@@ -100,20 +100,28 @@ defaults =
 
     maps:
         cloudmade:
+            name: "CloudMade"
             url_template: 'http://{s}.tile.cloudmade.com/{key}/{style}/256/{z}/{x}/{y}.png'
-            attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2012 CloudMade'
-            key: 'BC9A493B41014CAABB98F0471D759707'
-            style: 998
+            opts:
+                attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2012 CloudMade'
+                key: 'BC9A493B41014CAABB98F0471D759707'
+                style: 998
         osm:
+            name: "OpenStreetMap"
             url_template: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-            attribution: 'Map data &copy; 2011 OpenStreetMap contributors'
+            opts:
+                attribution: 'Map data &copy; 2011 OpenStreetMap contributors'
         opencyclemap:
+            name: "OpenCyclemap"
             url_template: 'http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png'
-            attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery by <a href="http://www.opencyclemap.org/" target="_blank">OpenCycleMap</a>'
+            opts:
+                attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery by <a href="http://www.opencyclemap.org/" target="_blank">OpenCycleMap</a>'
         mapquest:
+            name: "MapQuest"
             url_template: 'http://otile{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg'
-            subdomains: '1234'
-            attribution: 'Map data &copy; 2013 OpenStreetMap contributors, Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">'
+            opts:
+                subdomains: '1234'
+                attribution: 'Map data &copy; 2013 OpenStreetMap contributors, Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">'
 
 tampere =
     name: "Tampere"
