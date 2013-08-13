@@ -121,6 +121,12 @@ googleIcons =
     4: 'port.svg'
     109: 'train_station2.svg'
 
+{
+    hel_servicemap_unit_url,
+    osm_notes_url,
+    reittiopas_url
+} = citynavi.config
+
 format_code = (code) ->
     if code.substring(0,3) == "300" # local train
         return code.charAt(4)
@@ -272,7 +278,7 @@ route_to_service = (srv_id) ->
         distance: 1000
         lat: source.lat.toPrecision(7)
         lon: source.lng.toPrecision(7)
-    $.getJSON "http://www.hel.fi/palvelukarttaws/rest/v2/unit/?callback=?", params, (data) ->
+    $.getJSON hel_servicemap_unit_url + "?callback=?", params, (data) ->
         console.log "palvelukartta callback got data"
         window.service_dbg = data
         if data.length == 0
@@ -702,7 +708,7 @@ find_route_reittiopas = (source, target, callback) ->
         epsg_out: "wgs84"
         from: "#{source.lng},#{source.lat}"
         to: "#{target.lng},#{target.lat}"
-    $.getJSON "http://tuukka.kapsi.fi/tmp/reittiopas.cgi?callback=?", params, (data) ->
+    $.getJSON reittiopas_url, params, (data) ->
         window.route_dbg = data
 
         if routeLayer != null
@@ -976,9 +982,7 @@ map.on 'contextmenu', (e) ->
             text = $('#comment-box textarea').val()
             lat = commentMarker.getLatLng().lat
             lon = commentMarker.getLatLng().lng
-            uri = "http://api.openstreetmap.org/api/0.6/notes.json"
-            # enable for testing:
-            # uri = "http://api06.dev.openstreetmap.org/api/0.6/notes.json"
+            uri = osm_notes_url
             $.post uri, {lat: lat, lon: lon, text: text}, ()->
                 $('#comment-box').hide()
                 resize_map() # causes map redraw & notes update
