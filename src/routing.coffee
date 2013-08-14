@@ -284,6 +284,22 @@ route_to_service = (srv_id) ->
         console.log "palvelukartta callback done"
     console.log "route_to_service done"
 
+create_wait_leg = (start_time, duration, point, placename) ->
+    leg =
+        mode: "WAIT"
+        routeType: null # non-transport
+        route: ""
+        duration: duration
+        startTime: start_time
+        endTime: start_time + duration
+        legGeometry: {points: [point]}
+        from:
+            lat: point[0]*1e-5
+            lon: point[1]*1e-5
+            name: placename
+    leg.to = leg.from
+    return leg
+
 offline_cleanup = (data) ->
     for itinerary in data.plan?.itineraries or []
         new_legs = []
@@ -312,14 +328,8 @@ offline_cleanup = (data) ->
                 wait_time = leg.startTime-time
                 time = leg.endTime
 		# add the waiting time as a separate leg
-                new_legs.push
-                    mode: "WAIT"
-                    routeType: null # non-transport
-                    route: ""
-                    duration: wait_time
-                    startTime: leg.startTime - wait_time
-                    endTime: leg.startTime
-                    legGeometry: {points: [leg.legGeometry.points[0]]}
+                new_legs.push create_wait_leg leg.startTime - wait_time,
+                    wait_time, leg.legGeometry.points[0], leg.from.name
             new_legs.push leg
             time = leg.endTime
         itinerary.legs = new_legs
@@ -371,27 +381,15 @@ otp_cleanup = (data) ->
                 leg.endTime -= wait_time
                 new_legs.push leg
                 # add the waiting time as a separate leg
-                new_legs.push
-                    mode: "WAIT"
-                    routeType: null # non-transport
-                    route: ""
-                    duration: wait_time
-                    startTime: leg.endTime
-                    endTime: leg.endTime + wait_time
-                    legGeometry: {points: [leg.legGeometry.points[leg.legGeometry.points.length-1]]}
+                new_legs.push create_wait_leg leg.endTime, wait_time,
+                    _.last(leg.legGeometry.points), leg.to.name
             # else if there's unaccounted time before a leg
             else if leg.startTime - time > 1000
                 wait_time = leg.startTime-time
                 time = leg.endTime
 		# add the waiting time as a separate leg
-                new_legs.push
-                    mode: "WAIT"
-                    routeType: null # non-transport
-                    route: ""
-                    duration: wait_time
-                    startTime: leg.startTime - wait_time
-                    endTime: leg.startTime
-                    legGeometry: {points: [leg.legGeometry.points[0]]}
+                new_legs.push create_wait_leg leg.startTime - wait_time,
+                    wait_time, leg.legGeometry.points[0], leg.from.name
                 new_legs.push leg
             else
                 new_legs.push leg
@@ -511,9 +509,8 @@ render_route_layer = (itinerary, routeLayer) ->
                     if marker?
                         marker.openPopup()
             polyline.addTo(routeLayer)
-            # For other than walking legs draw info including line number, icon (bus, tram, etc.), and arrival
-            # time of the transit to the leg start position
-            if leg.routeType != null
+            # Always show route and time information at the leg start position
+            if true
                 stop = leg.from
                 last_stop = leg.to
                 point = {y: stop.lat, x: stop.lon}
@@ -540,12 +537,16 @@ render_route_layer = (itinerary, routeLayer) ->
                     setTimeout secondsCounter, 1000
 
                 marker = L.marker(new L.LatLng(point.y, point.x), {icon: icon}).addTo(routeLayer)
-                    .bindPopup("<b>Time: #{moment(leg.startTime).format("HH:mm")}</b><br /><b>From:</b> #{stop.name}<br /><b>To:</b> #{last_stop.name}")
-                    .bindLabel(label + "<span id='counter#{uid}' style='display: inline-block; font-size: 24px; padding-left: 6px; border-left: thin grey solid'></span>", {noHide: true})
+                    .bindPopup("<b>Time: #{moment(leg.startTime).format("HH:mm")}&mdash;#{moment(leg.endTime).format("HH:mm")}</b><br /><b>From:</b> #{stop.name or ""}<br /><b>To:</b> #{last_stop.name or ""}")
+
+                # for transit and at itinerary start also walking, show counter
+                if leg.routeType? or leg == legs[0]
+                    marker.bindLabel(label + "<span id='counter#{uid}' style='display: inline-block; font-size: 24px; padding-left: 6px; border-left: thin grey solid'></span>", {noHide: true})
                     .showLabel()
 
-                secondsCounter() # Start updating the time in the marker.
+                    secondsCounter() # Start updating the time in the marker.
 
+            if leg.routeType?
                 # By calling OTP transit/variantForTrip get the whole route for the vehicle,
                 # including also those parts that are not part of the itienary leg.
                 # This is done because we draw all parts of the route that, for example,
@@ -624,6 +625,18 @@ render_route_buttons = ($list, itinerary, route_layer, polylines) ->
         sourceMarker.openPopup()
 #    $list.append($full_trip)
 
+    # label with itinerary start time
+    $start = $("<li class='leg'><div class='leg-bar'><i><img src='static/images/walking.svg' height='100%' style='visibility: hidden' /></i><div class='leg-indicator' style='font-style: italic; text-align: left'>#{moment(trip_start).format("HH:mm")}</div></div></li>")
+    $start.css("left", "#{0}%")
+    $start.css("width", "#{10}%")
+    $list.append($start)
+
+    # label with itinerary end time
+    $end = $("<li class='leg'><div class='leg-bar'><i><img src='static/images/walking.svg' height='100%' style='visibility: hidden' /></i><div class='leg-indicator' style='font-style: italic; text-align: right'>#{moment(trip_start+trip_duration).format("HH:mm")}</div></div></li>")
+    $end.css("right", "#{0}%")
+    $end.css("width", "#{10}%")
+    $list.append($end)
+
     max_duration = trip_duration # use all width for trip duration
 
     # Draw a button for each leg.
@@ -641,7 +654,12 @@ render_route_buttons = ($list, itinerary, route_layer, polylines) ->
         leg_start = (leg.startTime-trip_start)/max_duration
         leg_duration = leg.duration/max_duration
         leg_label = "<img src='static/images/#{icon_name}' height='100%' />"
-        leg_subscript = "#{leg.route}"
+
+        # for long non-transit legs, display distance in place of route
+        if not leg.routeType? and leg.distance? and leg_duration > 0.2
+            leg_subscript = "<div class='leg-indicator' style='font-weight: normal'>#{Math.ceil(leg.distance/100)/10}km</div>"
+        else
+            leg_subscript = "<div class='leg-indicator'>#{leg.route}</div>"
 
 # YetAnotherJourneyPlanner style:
 #        leg_start = (index+1)/length # leg_start and leg_duration are used for positioning the buttons.
@@ -649,9 +667,7 @@ render_route_buttons = ($list, itinerary, route_layer, polylines) ->
 #        leg_label = "<img src='static/images/#{icon_name}' height='100%' /> #{leg.route}"
 #        leg_subscript = "#{Math.ceil(leg.duration/1000/60)}min"
 
-        console.log leg_duration, "/", max_duration
-
-        $leg = $("<li class='leg'><div style='background: #{color};' class='leg-bar'><i>#{leg_label}</i><div class='leg-indicator'>#{leg_subscript}</div></div></li>")
+        $leg = $("<li class='leg'><div style='background: #{color};' class='leg-bar'><i>#{leg_label}</i>#{leg_subscript}</div></li>")
 
         $leg.css("left", "#{leg_start*100}%")
         $leg.css("width", "#{leg_duration*100}%")
