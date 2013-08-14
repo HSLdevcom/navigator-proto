@@ -272,9 +272,19 @@ offline_cleanup = (data) ->
     for itinerary in data.plan?.itineraries or []
         new_legs = []
         time = itinerary.startTime # tracks when next leg should start
-        for leg in itinerary.legs
+        for leg, index in itinerary.legs
             # endTime not defined
             leg.endTime = leg.startTime+leg.duration
+            # from and to not provided for walks
+            if leg.mode == "WALK"
+                leg.from =
+                    lat: leg.legGeometry.points[0][0]*1e-5
+                    lon: leg.legGeometry.points[0][1]*1e-5
+                    name: legs?[index-1].to.name
+                leg.to =
+                    lat: _.last(leg.legGeometry.points)[0]*1e-5
+                    lon: _.last(leg.legGeometry.points)[1]*1e-5
+                    name: legs?[index+1].from.name
 
             # mode and routeType are hard-coded as bus
             # XXX how to do this for other areas?
