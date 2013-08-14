@@ -3,6 +3,9 @@
 # map
 map = null
 
+# Background map layers.
+layers = {}
+
 # map markers for current position, routing source, routing target, comment
 positionMarker = sourceMarker = targetMarker = commentMarker = null
 
@@ -76,50 +79,15 @@ $('#map-page').bind 'pageshow', (e, data) ->
 
 ## Utilities
 
-transportColors =
-    walk: '#9ab9c9' # walking; HSL official color is too light #bee4f8
-    wait: '#999999' # waiting time at a stop
-    1:  '#007ac9' # Helsinki internal bus lines
-    2:  '#00985f' # Trams
-    3:  '#007ac9' # Espoo internal bus lines
-    4:  '#007ac9' # Vantaa internal bus lines
-    5:  '#007ac9' # Regional bus lines
-    6:  '#ff6319' # Metro
-    7:  '#00b9e4' # Ferry
-    8:  '#007ac9' # U-lines
-    12: '#64be14' # Commuter trains
-    21: '#007ac9' # Helsinki service lines
-    22: '#007ac9' # Helsinki night buses
-    23: '#007ac9' # Espoo service lines
-    24: '#007ac9' # Vantaa service lines
-    25: '#007ac9' # Region night buses
-    36: '#007ac9' # Kirkkonummi internal bus lines
-    38: '#007ac9' # Undocumented, assumed bus
-    39: '#007ac9' # Kerava internal bus lines
+transport_colors = citynavi.config.colors.hsl
+google_colors = citynavi.config.colors.google
+google_icons = citynavi.config.icons.google
 
-googleColors =
-    WALK: transportColors.walk
-    CAR: transportColors.walk
-    BICYCLE: transportColors.walk
-    WAIT: transportColors.wait
-    0: transportColors[2]
-    1: transportColors[6]
-    2: transportColors[12]
-    3: transportColors[5]
-    4: transportColors[7]
-    109: transportColors[12]
-
-googleIcons =
-    WALK: 'walking.svg'
-    CAR: 'car.svg'
-    BICYCLE: 'bicycle.svg'
-    WAIT: 'clock.svg'
-    0: 'tram_stop.svg'
-    1: 'subway.svg'
-    2: 'train_station2.svg'
-    3: 'bus_stop.svg'
-    4: 'port.svg'
-    109: 'train_station2.svg'
+{
+    hel_servicemap_unit_url,
+    osm_notes_url,
+    reittiopas_url
+} = citynavi.config
 
 format_code = (code) ->
     if code.substring(0,3) == "300" # local train
@@ -272,7 +240,7 @@ route_to_service = (srv_id) ->
         distance: 1000
         lat: source.lat.toPrecision(7)
         lon: source.lng.toPrecision(7)
-    $.getJSON "http://www.hel.fi/palvelukarttaws/rest/v2/unit/?callback=?", params, (data) ->
+    $.getJSON hel_servicemap_unit_url + "?callback=?", params, (data) ->
         console.log "palvelukartta callback got data"
         window.service_dbg = data
         if data.length == 0
@@ -310,7 +278,7 @@ offline_cleanup = (data) ->
 
             # mode and routeType are hard-coded as bus
             # XXX how to do this for other areas?
-            if citynavi.config.area.id == "helsinki"
+            if citynavi.config.id == "helsinki"
                 if leg.routeId?.match /^1019/
                     [leg.mode, leg.routeType] = ["FERRY", 4]
                     leg.route = "Ferry"
@@ -433,11 +401,11 @@ find_route_otp = (source, target, callback) ->
             params.mode = $(mode).attr('name')+","+params.mode
     if $('#wheelchair').attr('checked')
         params.wheelchair = "true"
-    if $('#prefer-free').attr('checked') and citynavi.config.area.id == "manchester"
+    if $('#prefer-free').attr('checked') and citynavi.config.id == "manchester"
         params.preferredRoutes = "GMN_1,GMN_2,GMN_3"
     # Call plan in the OpenTripPlanner RESTful API. See:
     # # http://opentripplanner.org/apidoc/0.9.2/resource_Planner.html
-    $.getJSON citynavi.config.area.otp_base_url + "plan", params, (data) ->
+    $.getJSON citynavi.config.otp_base_url + "plan", params, (data) ->
         console.log "opentripplanner callback got data"
         data = otp_cleanup(data)
         display_route_result(data)
@@ -493,7 +461,7 @@ render_route_layer = (itinerary, routeLayer) ->
         do (leg) ->
             uid = Math.floor(Math.random()*1000000)
             points = (new L.LatLng(point[0]*1e-5, point[1]*1e-5) for point in leg.legGeometry.points)
-            color = googleColors[leg.routeType ? leg.mode]
+            color = google_colors[leg.routeType ? leg.mode]
             # For walking a dashed line is used
             if leg.routeType != null
                 dashArray = null
@@ -515,7 +483,7 @@ render_route_layer = (itinerary, routeLayer) ->
                 last_stop = leg.to
                 point = {y: stop.lat, x: stop.lon}
                 icon = L.divIcon({className: "navigator-div-icon"})
-                label = "<span style='font-size: 24px; padding-right: 6px'><img src='static/images/#{googleIcons[leg.routeType ? leg.mode]}' style='vertical-align: sub; height: 24px '/> #{leg.route}</span>"
+                label = "<span style='font-size: 24px; padding-right: 6px'><img src='static/images/#{google_icons[leg.routeType ? leg.mode]}' style='vertical-align: sub; height: 24px '/> #{leg.route}</span>"
 
                 # Define function to calculate the transit arrival time and update the element
                 # that has uid specific to this leg once per second by calling this function
@@ -553,7 +521,7 @@ render_route_layer = (itinerary, routeLayer) ->
                 # a bus drives.
                 # FIXME This should be drawn before the leg part is drawn because otherwise
                 # this is drawn on top of it and click events for the line  below are not triggered.
-                $.getJSON citynavi.config.area.otp_base_url + "transit/variantForTrip", {tripId: leg.tripId, tripAgency: leg.agencyId}, (data) ->
+                $.getJSON citynavi.config.otp_base_url + "transit/variantForTrip", {tripId: leg.tripId, tripAgency: leg.agencyId}, (data) ->
                     geometry = data.geometry
                     points = (new L.LatLng(point[0]*1e-5, point[1]*1e-5) for point in decode_polyline(geometry.points, 2))
                     line_layer = new L.Polyline(points, {color: color, opacity: 0.2})
@@ -569,7 +537,7 @@ render_route_layer = (itinerary, routeLayer) ->
                     pos = [msg.position.latitude, msg.position.longitude]
                     if not (id of vehicles) # Data for a new vehicle was given from the server
                         # Draw icon for the vehicle
-                        icon = L.divIcon({className: "navigator-div-icon", html: "<img src='static/images/#{googleIcons[leg.routeType ? leg.mode]}' height='20px' />"})
+                        icon = L.divIcon({className: "navigator-div-icon", html: "<img src='static/images/#{google_icons[leg.routeType ? leg.mode]}' height='20px' />"})
                         vehicles[id] = L.marker(pos, {icon: icon})
                             .addTo(routeLayer)
                         console.log "new vehicle #{id} on route #{leg.routeId}"
@@ -646,9 +614,9 @@ render_route_buttons = ($list, itinerary, route_layer, polylines) ->
         if leg.mode == "WALK" and $('#wheelchair').attr('checked')
             icon_name = "wheelchair.svg"
         else
-            icon_name = googleIcons[leg.routeType ? leg.mode]
+            icon_name = google_icons[leg.routeType ? leg.mode]
 
-        color = googleColors[leg.routeType ? leg.mode]
+        color = google_colors[leg.routeType ? leg.mode]
 
 # GoodEnoughJourneyPlanner style:
         leg_start = (leg.startTime-trip_start)/max_duration
@@ -702,15 +670,15 @@ find_route_reittiopas = (source, target, callback) ->
         epsg_out: "wgs84"
         from: "#{source.lng},#{source.lat}"
         to: "#{target.lng},#{target.lat}"
-    $.getJSON "http://tuukka.kapsi.fi/tmp/reittiopas.cgi?callback=?", params, (data) ->
+    $.getJSON reittiopas_url, params, (data) ->
         window.route_dbg = data
 
         if routeLayer != null
             map.removeLayer(routeLayer)
             routeLayer = null
         else
-            map.removeLayer(osm)
-            map.addLayer(cloudmade)
+            map.removeLayer(layers["osm"])
+            map.addLayer(layers["cloudmade"])
 
         route = L.featureGroup().addTo(map)
         routeLayer = route
@@ -719,7 +687,7 @@ find_route_reittiopas = (source, target, callback) ->
         for leg in legs
           do () ->
             points = (new L.LatLng(point.y, point.x) for point in leg.shape)
-            color = transportColors[leg.type]
+            color = transport_colors[leg.type]
             polyline = new L.Polyline(points, {color: color})
                 .on 'click', (e) ->
                     map.fitBounds(e.target.getBounds())
@@ -766,7 +734,7 @@ $(window).on 'resize', () ->
 # Create a new Leaflet map and set it's center point to the
 # location defined in the config.coffee
 window.map_dbg = map = L.map('map', {minZoom: 10, zoomControl: false, attributionControl: false})
-    .setView(citynavi.config.area.center, 10)
+    .setView(citynavi.config.center, 10)
 
 $(document).ready () ->
     resize_map()
@@ -785,25 +753,13 @@ if not window.testem_mode
         timeout: Infinity
         enableHighAccuracy: true
 
-# Base map layers are created.
-cloudmade = L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{style}/256/{z}/{x}/{y}.png',
-    attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2012 CloudMade',
-    key: 'BC9A493B41014CAABB98F0471D759707'
-    style: 998
-).addTo(map)
+create_tile_layer = (map_config) ->
+    L.tileLayer(map_config.url_template, map_config.opts)
 
-osm = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    attribution: 'Map data &copy; 2011 OpenStreetMap contributors',
-)
+for key, value of citynavi.config.maps
+    layers[key] = create_tile_layer(value)
 
-opencyclemap = L.tileLayer('http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png',
-    attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery by <a href="http://www.opencyclemap.org/" target="_blank">OpenCycleMap</a>',
-)
-
-mapquest = L.tileLayer("http://otile{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg",
-    subdomains: "1234"
-    attribution: 'Map data &copy; 2013 OpenStreetMap contributors, Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">'
-)
+layers["cloudmade"].addTo(map)
 
 # Use the leafletOsmNotes() function in file file "static/js/leaflet-osm-notes.js"
 # to create layer for showing error notes from OSM in the map.
@@ -811,15 +767,12 @@ osmnotes = new leafletOsmNotes()
 
 # Add the base maps and "error notes" layer to the layers control and add it to the map.
 # See http://leafletjs.com/examples/layers-control.html for more info.
-L.control.layers({
-    "CloudMade": cloudmade
-    "OpenStreetMap": osm
-    "OpenCycleMap": opencyclemap
-    "MapQuest": mapquest
-},
-{
+control_layers = {}
+for key, value of citynavi.config.maps
+    control_layers[value.name] = layers[key]
+
+L.control.layers(control_layers,
     "View map errors": osmnotes
-}
 ).addTo(map)
 
 # Add scale control to the map that shows current scale in
@@ -876,8 +829,8 @@ map.on 'locationfound', (e) ->
     point = e.latlng
     transform_location point
 
-    bbox_sw = citynavi.config.area.bbox_sw
-    bbox_ne = citynavi.config.area.bbox_ne
+    bbox_sw = citynavi.config.bbox_sw
+    bbox_ne = citynavi.config.bbox_ne
 
     # Check if the location is sensible
     if not (bbox_sw[0] < point.lat < bbox_ne[0]) or not (bbox_sw[1] < point.lng < bbox_ne[1])
@@ -890,8 +843,8 @@ map.on 'locationfound', (e) ->
         console.log(bbox_sw[0], point.lat, bbox_ne[0])
         console.log(bbox_sw[1], point.lng, bbox_ne[1])
         console.log("using area center instead of geolocation outside area")
-        point.lat = citynavi.config.area.center[0]
-        point.lng = citynavi.config.area.center[1]
+        point.lat = citynavi.config.center[0]
+        point.lng = citynavi.config.center[1]
         e.accuracy = 2001 # don't draw red circle
         radius = 50 # draw small grey circle
         measure = "nowhere near"
@@ -976,9 +929,7 @@ map.on 'contextmenu', (e) ->
             text = $('#comment-box textarea').val()
             lat = commentMarker.getLatLng().lat
             lon = commentMarker.getLatLng().lng
-            uri = "http://api.openstreetmap.org/api/0.6/notes.json"
-            # enable for testing:
-            # uri = "http://api06.dev.openstreetmap.org/api/0.6/notes.json"
+            uri = osm_notes_url
             $.post uri, {lat: lat, lon: lon, text: text}, ()->
                 $('#comment-box').hide()
                 resize_map() # causes map redraw & notes update
