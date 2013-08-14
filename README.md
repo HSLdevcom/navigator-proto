@@ -1,4 +1,3 @@
-
 ## City Navigator proto ##
 
 Like a car navigator but for taking public transport, based on Open Data.
@@ -50,6 +49,11 @@ Or, install build tool with `npm install grunt-cli` and run dev server with
 
 If you encounter errors, you may want to run commands `sudo apt-get dist-upgrade` and
 `sudo apt-get update` to make sure everything is up-to-date.
+
+You may want to change some settings, for example the city where the navigating is
+supposed to happen. To do so, run
+`cp src/local_config.coffee.template src/local_config.coffee` and modify
+`src/local_config.coffee` according to the comments within the file.
 
 ## Running tests ##
 
