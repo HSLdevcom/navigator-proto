@@ -87,8 +87,18 @@
 	left: -8px;
 }
 
-#map-page [data-role=footer] {
+/* The footers with the route graphs should be transparent */
+#map-page [data-role=footer], #navigation-page [data-role=footer] {
     background: none;
+}
+
+/* On the navigation page, hide the non-active routes */
+#navigation-page .route-list > li.active{
+    display: block;
+}
+
+#navigation-page .route-list > li {
+    display: none;
 }
 
 :first-child > .route-graph {

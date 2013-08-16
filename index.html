@@ -95,21 +95,21 @@
         <div id="map-page" data-role="page">
             <div data-role="header" data-theme="b">
                 <a href="" data-rel="back">Back</a>
-                <h1></h1>
+                <h1 style="margin-bottom: 0; margin-top: 0"><a href="#navigation-page" data-icon="play" data-role="button" data-inline="true" style="margin-top: 3px; margin-bottom: 7px">Let's go</a></h1>
                 <a href="#map-page-menu" data-icon="menu" class="ui-btn-right" data-rel="popup" data-iconpos="notext" data-transition="slidedown" data-shadow="false" data-iconshadow="false">Menu</a>
             </div>
             <div data-role="footer" data-position="fixed" style="padding: 0; margin: 0; border: 0; overflow: visible;">
                 <ul id="routes" class="route-list" style="display: block">
                     <li>
-                        <ul id="route-buttons-0" class="route-graph" style="display: none">
+                        <ul class="route-buttons-0 route-graph" style="display: none">
                         </ul>
                     </li>
                     <li>
-                        <ul id="route-buttons-1" class="route-graph" style="display: none">
+                        <ul class="route-buttons-1 route-graph" style="display: none">
                         </ul>
                     </li>
                     <li>
-                        <ul id="route-buttons-2" class="route-graph" style="display: none">
+                        <ul class="route-buttons-2 route-graph" style="display: none">
                         </ul>
                     </li>
                 </ul>
@@ -128,6 +128,38 @@
                 </div>
             </div>
             <div id="map-page-menu" data-role="popup">
+                <ul data-role="listview" data-inset="true">
+                  <li><a href="#settings">
+                      <h3>Settings</h3>
+                      <p>Access the routing settings.</p>
+                  </a></li>
+                </ul>
+            </div>
+        </div>
+        <!-- Navigation page -->
+        <div id="navigation-page" data-role="page">
+            <div data-role="header" data-theme="b" style="text-align: center">
+                <a href="" data-rel="back">Back</a>
+                <h1 style="margin-bottom: 0; margin-top: 0"><a data-icon="pause" data-role="button" data-inline="true" style="margin-top: 3px; margin-bottom: 7px">Pause</a></h1>
+                <a href="#navigation-page-menu" data-icon="menu" class="ui-btn-right" data-rel="popup" data-iconpos="notext" data-transition="slidedown">Menu</a>
+            </div>
+            <div data-role="footer" data-position="fixed" style="padding: 0; margin: 0; border: 0; overflow: visible;">
+                <ul class="route-list" style="display: block">
+                    <li>
+                        <ul class="route-buttons-0 route-graph" style="display: none">
+                        </ul>
+                    </li>
+                    <li>
+                        <ul class="route-buttons-1 route-graph" style="display: none">
+                        </ul>
+                    </li>
+                    <li>
+                        <ul class="route-buttons-2 route-graph" style="display: none">
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div id="navigation-page-menu" data-role="popup">
                 <ul data-role="listview" data-inset="true">
                   <li><a href="#settings">
                       <h3>Settings</h3>
