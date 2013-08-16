@@ -55,20 +55,13 @@
                 <h1>Navigator</h1>
                 <!-- Settings button.
                      data-icon="gear" and class="ui-btn-right" are jQuery mobile specific -->
-                <a href="#settings" data-icon="gear" class="ui-btn-right">Settings</a>
+                <a href="#front-page-menu" data-icon="menu" class="ui-btn-right" data-rel="popup" data-iconpos="notext" data-transition="slidedown">Menu</a>
             </div>
             <div data-role="content">
                 <!-- "Search box" with the list of results for the location that the user wants to go to. -->
                 <ul id="navigate-to-input" data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Where do you want to go?"></ul>
             </div>
             <div data-role="content" style="padding-bottom: 0; text-align: right">
-                    <a href="#service-directory?" data-role="button" data-inline="true" data-icon="arrow-r">
-                        Find nearest services
-                    </a>
-                    <!-- pageshow event for the map-page is handled in the routing.coffee -->
-                    <a href="#map-page" data-role="button" data-inline="true" data-icon="arrow-r">
-                        Browse map
-                    </a>
             </div>
             <div data-role="content" style="position: absolute; width: 100%; bottom: 0; text-align: center; padding-left: 0; padding-right: 0">
                         <fieldset data-role="controlgroup" data-type="horizontal" data-shadow="true" style="display: inline-block">
@@ -80,13 +73,30 @@
                             <label><input type="radio" name="vehiclesettings" value="CAR"><img src="static/images/car.svg" style="height: 20px;"/></input></label>
                         </fieldset>
             </div>
+            <div id="front-page-menu" data-role="popup">
+                <ul data-role="listview" data-inset="true">
+                  <li><a href="#settings">
+                      <h3>Settings</h3>
+                      <p>Access the routing settings.</p>
+                  </a></li>
+                  <li><a href="#service-directory?">
+                      <h3>Find nearest services</h3>
+                      <p>Find a service that is nearest to your current location.</p>
+                  </a></li>
+                  <!-- pageshow event for the map-page is handled in the routing.coffee -->
+                  <li><a href="#map-page">
+                      <h3>Browse map</h3>
+                      <p>Calculate routes and browse for points of interest.</p>
+                  </a></li>
+                </ul>
+            </div>
         </div>
         <!-- Map page -->
         <div id="map-page" data-role="page">
-            <div data-role="header">
+            <div data-role="header" data-theme="b">
                 <a href="" data-rel="back">Back</a>
                 <h1></h1>
-                <a href="#settings" data-icon="gear" class="ui-btn-right">Settings</a>
+                <a href="#map-page-menu" data-icon="menu" class="ui-btn-right" data-rel="popup" data-iconpos="notext" data-transition="slidedown" data-shadow="false" data-iconshadow="false">Menu</a>
             </div>
             <div data-role="footer" data-position="fixed" style="padding: 0; margin: 0; border: 0; overflow: visible;">
                 <ul id="routes" class="route-list" style="display: block">
@@ -116,6 +126,14 @@
                     <p>Error</p>
                     <a href="#" data-role="button" data-rel="back">Dismiss</a>
                 </div>
+            </div>
+            <div id="map-page-menu" data-role="popup">
+                <ul data-role="listview" data-inset="true">
+                  <li><a href="#settings">
+                      <h3>Settings</h3>
+                      <p>Access the routing settings.</p>
+                  </a></li>
+                </ul>
             </div>
         </div>
         <!-- This page is for palvelukartta.coffee but neither is not used anymore as
