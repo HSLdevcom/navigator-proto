@@ -442,7 +442,7 @@ display_route_result = (data) ->
     maxDuration = _.max(i.duration for i in data.plan.itineraries)
 
     for index in [0, 1, 2]
-        $list = $("#route-buttons-#{index}")
+        $list = $(".route-buttons-#{index}")
         $list.empty()
         $list.hide()
         $list.parent().removeClass("active")
