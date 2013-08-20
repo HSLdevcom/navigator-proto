@@ -71,6 +71,8 @@ defaults =
     osm_notes_url: "http://api.openstreetmap.org/api/0.6/notes.json"
     faye_url: "http://dev.hsl.fi:9002/faye"
 
+    icon_base_path: "static/images/"
+
     colors:
         hsl: hsl_colors
         google:

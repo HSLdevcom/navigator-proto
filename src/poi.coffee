@@ -1,14 +1,13 @@
 {
     hel_geocoder_poi_url,
     waag_url,
-    waag_id
+    waag_id,
+    icon_base_path
 } = citynavi.config
 
 class POI
     constructor: (opts) ->
         _.extend @, opts
-
-STATIC_PREFIX = "static/images/"
 
 class POIProvider
     constructor: (opts) ->
@@ -118,7 +117,7 @@ class POICategory
         @provider = provider
         @provider_args = provider_args
     get_icon_path: ->
-        return STATIC_PREFIX + @icon
+        return icon_base_path + @icon
     get_icon_html: ->
         return '<img src="' + @get_icon_path() + '">'
     fetch_pois: (opts) ->
