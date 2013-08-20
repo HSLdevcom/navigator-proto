@@ -64,12 +64,14 @@ defaults =
     hel_geocoder_poi_url: hel_geocoder_base_url + "poi/"
     waag_url: "http://test-api.citysdk.waag.org/"
     google_url: "http://dev.hel.fi/geocoder/google/"
-    nominatim_url: "http://nominatim.openstreetmap.org/search/"
+    nominatim_url: "http://open.mapquestapi.com/nominatim/v1/search.php"
     hel_servicemap_service_url: hel_servicemap_base_url + "service/"
     hel_servicemap_unit_url: hel_servicemap_base_url + "unit/"
     reittiopas_url: "http://tuukka.kapsi.fi/tmp/reittiopas.cgi?callback=?"
     osm_notes_url: "http://api.openstreetmap.org/api/0.6/notes.json"
     faye_url: "http://dev.hsl.fi:9002/faye"
+
+    icon_base_path: "static/images/"
 
     colors:
         hsl: hsl_colors

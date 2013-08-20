@@ -1,9 +1,13 @@
+{
+    hel_geocoder_poi_url,
+    waag_url,
+    waag_id,
+    icon_base_path
+} = citynavi.config
+
 class POI
     constructor: (opts) ->
         _.extend @, opts
-
-URL_BASE = "http://dev.hel.fi/geocoder/v1/poi/" # Provides POI data for Manchester and Helsinki
-STATIC_PREFIX = "static/images/"
 
 class POIProvider
     constructor: (opts) ->
@@ -21,7 +25,7 @@ class GeocoderPOIProvider extends POIProvider
         # Make call to the geocoder, where
         # parameters are: location coordinates, service category type, and id of the municipality if any
         # returned POIs include: name, location coordinates, service category, and dist. to the POI
-        $.getJSON URL_BASE, params, (data) =>
+        $.getJSON hel_geocoder_poi_url, params, (data) =>
             poi_list = []
             for obj in data.objects
                 poi = new POI
@@ -54,7 +58,6 @@ get_polygon_center = (polygon) ->
   return [x / f + off_.lat, y / f + off_.lng]
 
 # WaagPOIProvider fetches POIs based on Open Street Map (OSM) data utilzing Waag City SDK.
-WAAG_URL = "http://test-api.citysdk.waag.org"
 class WaagPOIProvider extends POIProvider
     fetch_pois: (category, opts) ->
         count = 10
@@ -77,7 +80,7 @@ class WaagPOIProvider extends POIProvider
         # Make call to the geocoder, where
         # parameters are: location coordinates, service category type in "OSM format", possibly osm::wheelchair, layer=osm, geom=1, per_page=20
         # returned 10 POIs include: name, location coordinates, service category, private bool, and dist. to the POI
-        $.getJSON "#{WAAG_URL}/#{citynavi.config.waag_id}/nodes", params, (data) =>
+        $.getJSON "#{waag_url}#{waag_id}/nodes", params, (data) =>
             poi_list = []
             for res in data.results
                 type = res.geom.type
@@ -114,7 +117,7 @@ class POICategory
         @provider = provider
         @provider_args = provider_args
     get_icon_path: ->
-        return STATIC_PREFIX + @icon
+        return icon_base_path + @icon
     get_icon_html: ->
         return '<img src="' + @get_icon_path() + '">'
     fetch_pois: (opts) ->

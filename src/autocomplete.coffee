@@ -1,4 +1,8 @@
-URL_BASE = "http://dev.hel.fi/geocoder/v1/address/"
+{
+    hel_geocoder_address_url,
+    google_url,
+    nominatim_url
+} = citynavi.config
 
 class Location
     constructor: (@name, @coords) ->
@@ -153,7 +157,7 @@ class GeocoderCompleter extends RemoteAutocompleter
     fetch_addresses: ->
         # Get maximum 10 predictions for the user input (@query) from the
         # dev.hel.fi geocoder.
-        @xhr = $.getJSON URL_BASE,
+        @xhr = $.getJSON hel_geocoder_address_url,
             name: @query
             limit: 10
         @xhr.always () ->
@@ -180,7 +184,7 @@ class GeocoderCompleter extends RemoteAutocompleter
             @submit_location_predictions loc_list
 
     fetch_streets: ->
-        @xhr = $.getJSON URL_BASE,
+        @xhr = $.getJSON hel_geocoder_address_url,
             name: @query
             limit: 10
             distinct_streets: true
@@ -206,14 +210,12 @@ class GeocoderCompleter extends RemoteAutocompleter
                 loc.name.toLowerCase()
             @submit_location_predictions loc_list
 
-GOOGLE_URL_BASE = "http://dev.hel.fi/geocoder/google/"
-
 class GoogleLocation extends Location
     constructor: (pred) ->
         @name = pred.description
         @info = pred
     fetch_details: (callback, args) ->
-        url = GOOGLE_URL_BASE + "details/"
+        url = google_url + "details/"
         params = {reference: @info.reference}
         $.getJSON url, params, (data) =>
             res = data.result
@@ -225,7 +227,7 @@ class GoogleLocation extends Location
 # server that is used by tampere and manchester areas.
 class GoogleCompleter extends RemoteAutocompleter
     fetch_results: ->
-        url = GOOGLE_URL_BASE + "autocomplete/"
+        url = google_url + "autocomplete/"
         area = citynavi.config
         location = citynavi.get_source_location_or_area_center()
         # FIXME
@@ -251,11 +253,9 @@ class GoogleCompleter extends RemoteAutocompleter
             # submit_location_predictions is defined in RemoteAutocompleter
             @submit_location_predictions loc_list
 
-NOMINATIM_URL = "http://open.mapquestapi.com/nominatim/v1/search.php"
-
 class OSMCompleter extends RemoteAutocompleter
     fetch_results: ->
-        url = NOMINATIM_URL
+        url = nominatim_url
         area = citynavi.config
         ne = area.bbox_ne
         sw = area.bbox_sw
