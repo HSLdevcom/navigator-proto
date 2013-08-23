@@ -418,11 +418,25 @@ class POICategoryCompleter extends Autocompleter
             pred_list.push new CategoryPrediction(cat)
         callback args, pred_list
 
+
+class HistoryCompleter extends Autocompleter
+    get_predictions: (query, callback, args) ->
+        console.log "historycompleter"
+        pred_list = []
+        for location in location_history.history by -1
+            if query.length and location.name.toLowerCase().indexOf(query.toLowerCase()) != 0
+                continue
+            pred_list.push new LocationPrediction(location)
+            if pred_list.length >= 10
+                break
+        callback args, pred_list
+
 supported_completers =
     poi_categories: new POICategoryCompleter
     geocoder: new GeocoderCompleter
     google: new GoogleCompleter
-    osm: new OSMCompleter # This is not currently used.
+    osm: new OSMCompleter
+    history: new HistoryCompleter
 
 generate_area_completers = (area) ->
     (supported_completers[id] for id in area.autocompletion_providers)
