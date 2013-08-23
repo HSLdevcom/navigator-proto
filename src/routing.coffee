@@ -36,6 +36,15 @@ $(document).bind "pagebeforechange", (e, data) ->
     console.log "pagebeforechange", data.toPage
     u = $.mobile.path.parseUrl(data.toPage)
 
+    if u.hash.indexOf('#navigation-page') == 0
+        # start from the beginning
+        start_bounds = L.latLngBounds([sourceMarker.getLatLng()])
+        # include the current device position as well
+        if position_bounds?
+            start_bounds.extend position_bounds
+        zoom = Math.min(map.getBoundsZoom(start_bounds), 18)
+        map.setView(start_bounds.getCenter(), zoom)
+
     # The "#map-page?service" is used with the palvelukartta.coffee.
     if u.hash.indexOf('#map-page?service=') == 0
         srv_id = u.hash.replace(/.*\?service=/, "")
@@ -76,6 +85,27 @@ $('#map-page').bind 'pageshow', (e, data) ->
     else if position_point?
         zoom = Math.min(map.getBoundsZoom(position_bounds), 15)
         map.setView(position_point, zoom)
+
+$('#map-page [data-rel="back"]').on 'click', (e) ->
+        if routeLayer?
+            map.removeLayer routeLayer
+            routeLayer = null
+        if sourceMarker?
+            map.removeLayer sourceMarker
+            sourceMarker = null
+        if targetMarker?
+            map.removeLayer targetMarker
+            targetMarker = null
+        if commentMarker?
+            map.removeLayer commentMarker
+            commentMarker = null
+
+        if position_point
+            zoom = Math.min(map.getBoundsZoom(position_bounds), 15)
+            map.setView(position_point, zoom)
+            set_source_marker(position_point, {accuracy: positionMarker.getRadius()})
+        else
+            map.setView(citynavi.config.center, 10)
 
 
 ## Utilities
@@ -147,14 +177,18 @@ set_source_marker = (latlng, options) ->
         if not measure?
             measure = if accuracy < 2000 then "within #{Math.round(accuracy)} meters" else "within #{Math.round(accuracy/1000)} km"
 
-        sourceMarker.bindPopup("The starting point for journey planner<br>(tap the red marker to update)<br>You are #{measure} from this point").openPopup()
+        sourceMarker.bindPopup("The starting point for journey planner<br>(tap the red marker to update)<br>You are #{measure} from this point")
+
         if sourceCircle != null
             map.removeLayer(sourceCircle)
             sourceCircle = null
 # don't display the gray source circle - confusing?
 #            sourceCircle = L.circle(latlng, accuracy, {color: 'gray', opacity: 0.2, weight: 1}).addTo(map)
     else
-        sourceMarker.bindPopup("The starting point for journey<br>(drag the marker to change)").openPopup()
+        sourceMarker.bindPopup("The starting point for journey<br>(drag the marker to change)")
+
+    if options.popup
+        sourceMarker.openPopup()
 
     marker_changed(options)
 
@@ -330,6 +364,8 @@ find_route_offline = (source, target, callback) ->
         if (callback)
             callback(routeLayer)
 
+        $.mobile.changePage "#map-page"
+
 # clean up oddities in routing result data from OTP
 otp_cleanup = (data) ->
     for itinerary in data.plan?.itineraries or []
@@ -423,6 +459,7 @@ find_route_otp = (source, target, callback) ->
         display_route_result(data)
         if callback
             callback(routeLayer)
+        $.mobile.changePage "#map-page"
         console.log "opentripplanner callback done"
 
 display_route_result = (data) ->
@@ -876,7 +913,9 @@ map.on 'locationfound', (e) ->
     else if sourceMarker == null
         zoom = Math.min(map.getBoundsZoom(e.bounds), 15)
         map.setView(point, zoom)
-        set_source_marker(point, {accuracy: radius, measure: measure})
+        # if the position is abnormally resolved outside front page, explain
+        popup = $.mobile.activePage.attr("id") != "front-page"
+        set_source_marker(point, {accuracy: radius, measure: measure, popup: popup})
 
     if e.accuracy > 2000
         return
@@ -897,7 +936,7 @@ map.on 'click', (e) ->
 
     # place the marker that's missing, giving priority to the source marker
     if sourceMarker == null
-        set_source_marker(e.latlng)
+        set_source_marker(e.latlng, {popup: true})
     else if targetMarker == null
         set_target_marker(e.latlng)
 
