@@ -8,6 +8,7 @@ layers = {}
 
 # map markers for current position, routing source, routing target, comment
 positionMarker = sourceMarker = targetMarker = commentMarker = null
+positionMarker2 = null
 
 # map feature for accuracy of geolocated routing source
 sourceCircle = null
@@ -150,7 +151,8 @@ set_source_marker = (latlng, options) ->
         if sourceCircle != null
             map.removeLayer(sourceCircle)
             sourceCircle = null
-        sourceCircle = L.circle(latlng, accuracy, {color: 'gray'}).addTo(map)
+# don't display the gray source circle - confusing?
+#            sourceCircle = L.circle(latlng, accuracy, {color: 'gray', opacity: 0.2, weight: 1}).addTo(map)
     else
         sourceMarker.bindPopup("The starting point for journey<br>(drag the marker to change)").openPopup()
 
@@ -846,6 +848,7 @@ map.on 'locationfound', (e) ->
         if sourceMarker != null
             if positionMarker != null
                map.removeLayer(positionMarker) # red circle was stale
+               map.removeLayer(positionMarker2)
                positionMarker = null
             return # no interest in updating to new location outside area
         # If there is no source marker then edit location to be on the center of the area
@@ -868,6 +871,7 @@ map.on 'locationfound', (e) ->
     # if there is no source marker (indicating navigation start point) add it to map.
     if positionMarker != null
         map.removeLayer(positionMarker)
+        map.removeLayer(positionMarker2)
         positionMarker = null
     else if sourceMarker == null
         zoom = Math.min(map.getBoundsZoom(e.bounds), 15)
@@ -878,7 +882,11 @@ map.on 'locationfound', (e) ->
         return
     # Add the position marker to the map and set click event handler for it
     # to set source marker (indicating navigation start point).
-    positionMarker = L.circle(point, radius, {color: 'red'}).addTo(map)
+    positionMarker = L.circle(point, radius, {color: 'red', weight: 1, opacity: 0.4}).addTo(map)
+        .on 'click', (e) ->
+            set_source_marker(point, {accuracy: radius, measure: measure})
+    # Draw position center as a fixed-size circle
+    positionMarker2 = L.circleMarker(point, {radius: 7, color: 'red', weight: 2, fillOpacity: 1, }).addTo(map)
         .on 'click', (e) ->
             set_source_marker(point, {accuracy: radius, measure: measure})
 
