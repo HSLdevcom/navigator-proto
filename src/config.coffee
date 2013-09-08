@@ -72,6 +72,7 @@ defaults =
     faye_url: "http://dev.hsl.fi:9002/faye"
 
     icon_base_path: "static/images/"
+    icon_grunticon_png_path: "static/images/grunticon/png/"
 
     colors:
         hsl: hsl_colors
@@ -89,16 +90,16 @@ defaults =
 
     icons:
         google:
-            WALK: 'walking.svg'
-            CAR: 'car.svg'
-            BICYCLE: 'bicycle.svg'
-            WAIT: 'clock.svg'
-            0: 'tram_stop.svg'
-            1: 'subway.svg'
-            2: 'train_station2.svg'
-            3: 'bus_stop.svg'
-            4: 'port.svg'
-            109: 'train_station2.svg'
+            WALK: 'walking'
+            CAR: 'car'
+            BICYCLE: 'bicycle'
+            WAIT: 'clock'
+            0: 'tram_stop'
+            1: 'subway'
+            2: 'train_station2'
+            3: 'bus_stop'
+            4: 'port'
+            109: 'train_station2'
 
     maps:
         cloudmade:

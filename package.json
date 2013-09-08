@@ -23,6 +23,7 @@
     "grunt-exec": "0.x",
     "grunt-testem": "0.x",
     "mocha": "1.x",
-    "chai": "1.x"
+    "chai": "1.x",
+    "grunt-grunticon": "0.x"
   }
 }

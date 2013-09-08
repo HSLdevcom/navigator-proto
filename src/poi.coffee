@@ -1,8 +1,7 @@
 {
     hel_geocoder_poi_url,
     waag_url,
-    waag_id,
-    icon_base_path
+    waag_id
 } = citynavi.config
 
 class POI
@@ -116,10 +115,8 @@ class POICategory
     set_provider: (provider, provider_args) ->
         @provider = provider
         @provider_args = provider_args
-    get_icon_path: ->
-        return icon_base_path + @icon
-    get_icon_html: ->
-        return '<img src="' + @get_icon_path() + '">'
+    get_icon_name: ->
+        return @icon
     fetch_pois: (opts) ->
         @provider.fetch_pois @, opts
 
@@ -195,8 +192,8 @@ $('#service-directory').bind 'pageshow', (e, data) ->
         # e.g. Tampere, in the config.coffee and have been stored to citynavi.poi_categories in
         # this file.
         for category, index in citynavi.poi_categories
-            $list.append("<li><a href=\"#service-list?category=#{index}\"><img src=\"#{category.get_icon_path()}\" class='ui-li-icon' style='height: 20px;'/>#{category.name}</a></li>")
-
+            icon_html = citynavi.iconprovider.get_icon_html(category.get_icon_name(), 'style="height: 20px" class="ui-li-icon"')
+            $list.append("<li><a href=\"#service-list?category=#{index}\">#{icon_html}#{category.name}</a></li>")
 #        setTimeout (() -> $list.listview()), 0
         $list.listview("refresh")
 
@@ -250,8 +247,8 @@ $(document).bind "pagebeforechange", (e, data) ->
                     else
                         dist = Math.round((dist + 10) / 10)
                         dist *= 10
-                    $item = $("<li><a href=\"#map-page\"><img src=\"#{category.get_icon_path()}\" class='ui-li-icon' style=\"height: 20px;\"/>#{poi.name}<span class='ui-li-count'>#{dist} m</span></a></li>")
-
+                    icon_html = citynavi.iconprovider.get_icon_html(category.get_icon_name(), 'style="height: 20px" class="ui-li-icon"')
+                    $item = $("<li><a href=\"#map-page\">#{icon_html}#{poi.name}<span class='ui-li-count'>#{dist} m</span></a></li>")
                     # Bind event handler to the list item
                     $item.click () ->
                         citynavi.poi_list = pois # citynavi has been defined in the config.coffee
