@@ -26,6 +26,12 @@ interpolations = []
 
 ## Events before a page is shown
 
+# set a class on the html root element based on the active page, for css use
+$(document).bind "pageshow", (e, data) ->
+    page_id = $.mobile.activePage.attr("id")
+    # XXX toggle instead of set:
+    $('html').attr('class', "ui-mobile mode-#{page_id}")
+
 # This event is triggered when a page is about to be shown.
 # There are also other pagebeforechange event handlers in other files.
 # In this event handler map page related events are handled.

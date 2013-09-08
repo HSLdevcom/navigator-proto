@@ -31,11 +31,35 @@
 
 /* Position the map controls below the title header */
 .leaflet-top {
-    top: 42px;
+    top: 45px;
+    transition: top 200ms ease;
+}
+
+.mode-front-page .leaflet-top {
+    top: 81px;
+}
+
+
+.leaflet-right .leaflet-control {
+    margin-right: 15px;
+}
+
+.leaflet-top .leaflet-control {
+    margin-top: 15px;
+}
+
+.leaflet-left .leaflet-control {
+    margin-left: 15px;
 }
 
 .leaflet-bottom .leaflet-control-scale {
     margin-bottom: 17px;
+}
+
+.mode-map-page .leaflet-control-scale,
+.mode-navigation-page .leaflet-control-scale {
+    opacity: 0;
+    transition: opacity 200ms;
 }
 
 .leaflet-container .leaflet-control-attribution {
@@ -48,6 +72,7 @@
     opacity: 0.4;
     box-shadow: none;
     text-shadow: none;
+    margin: 0;
 }
 
 .leaflet-label {
