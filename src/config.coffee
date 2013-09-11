@@ -146,6 +146,7 @@ tampere =
             {type: "bar"}
             {type: "pub"}
             {type: "supermarket"}
+            {type: "pharmacy"}
             {type: "toilet"}
             {type: "recycling"}
         ]
@@ -170,6 +171,7 @@ manchester =
             {type: "pub"}
             {type: "supermarket"}
             {type: "swimming_pool"}
+            {type: "pharmacy"}
         ],
         "geocoder": [
             {type: "park"}
@@ -196,6 +198,7 @@ helsinki =
             {type: "bar"}
             {type: "pub"}
             {type: "supermarket"}
+            {type: "pharmacy"}
         ],
         "geocoder": [
             {type: "park"}

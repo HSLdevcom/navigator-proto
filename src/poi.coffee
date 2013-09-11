@@ -130,6 +130,7 @@ supported_poi_categories = {
     "swimming_pool": new POICategory {type: "swimming_pool", name: "Swimming pool", icon: "swimming_indoor.svg"}
     "cafe": new POICategory {type: "cafe", name: "Cafe", icon: "cafe.svg"}
     "bar": new POICategory {type: "bar", name: "Bar", icon: "bar.svg"}
+    "pharmacy": new POICategory {type: "pharmacy", name: "Pharmacy", icon: "pharmacy.svg", waag_filter: {"osm::amenity": "pharmacy"}}
     "toilet": new POICategory {type: "toilet", name: "Toilet (public)", icon: "toilets_men.svg", waag_filter: {"osm::amenity": "toilets"}}
     "pub": new POICategory {type: "pub", name: "Pub", icon: "pub.svg"}
     "supermarket": new POICategory {type: "supermarket", name: "Supermarket", icon: "supermarket.svg", waag_filter: {"osm::shop": "supermarket"}}
