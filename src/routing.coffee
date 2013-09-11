@@ -564,7 +564,7 @@ render_route_layer = (itinerary, routeLayer) ->
 
                 # for transit and at itinerary start also walking, show counter
                 if leg.routeType? or leg == legs[0]
-                    marker.bindLabel(label + "<span id='counter#{uid}' style='display: inline-block; font-size: 24px; padding-left: 6px; border-left: thin grey solid'></span>", {noHide: true})
+                    marker.bindLabel(label + "<span id='counter#{uid}' class='counter firstleg#{leg == legs[0]}'></span>", {noHide: true})
                     .showLabel()
 
                     secondsCounter() # Start updating the time in the marker.

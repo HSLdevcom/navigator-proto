@@ -112,6 +112,21 @@
 	left: -8px;
 }
 
+.leaflet-label .counter {
+    display: inline-block;
+    font-size: 24px;
+    padding-left: 6px;
+    border-left: thin grey solid;
+}
+
+.leaflet-label .counter.firstlegfalse {
+    display: none;
+}
+
+.mode-navigation-page .leaflet-label .counter.firstlegfalse {
+    display: inline-block;
+}
+
 /* The footers with the route graphs should be transparent */
 #map-page [data-role=footer], #navigation-page [data-role=footer] {
     background: none;
