@@ -1,8 +1,7 @@
 {
     hel_geocoder_poi_url,
     waag_url,
-    waag_id,
-    icon_base_path
+    waag_id
 } = citynavi.config
 
 class POI
@@ -116,25 +115,23 @@ class POICategory
     set_provider: (provider, provider_args) ->
         @provider = provider
         @provider_args = provider_args
-    get_icon_path: ->
-        return icon_base_path + @icon
-    get_icon_html: ->
-        return '<img src="' + @get_icon_path() + '">'
+    get_icon_name: ->
+        return @icon
     fetch_pois: (opts) ->
         @provider.fetch_pois @, opts
 
 supported_poi_categories = {
-    "library": new POICategory {type: "library", name: "Library", plural_name: "Libraries", icon: "library.svg"}
-    "recycling": new POICategory {type: "recycling", name: "Recycling point", icon: "recycling.svg"}
-    "park": new POICategory {type: "park", name: "Park", icon: "coniferous_and_deciduous.svg", waag_filter: {"osm::leisure": "park"}}
-    "swimming_pool": new POICategory {type: "swimming_pool", name: "Swimming pool", icon: "swimming_indoor.svg"}
-    "cafe": new POICategory {type: "cafe", name: "Cafe", icon: "cafe.svg"}
-    "bar": new POICategory {type: "bar", name: "Bar", icon: "bar.svg"}
-    "pharmacy": new POICategory {type: "pharmacy", name: "Pharmacy", icon: "pharmacy.svg", waag_filter: {"osm::amenity": "pharmacy"}}
-    "toilet": new POICategory {type: "toilet", name: "Toilet (public)", icon: "toilets_men.svg", waag_filter: {"osm::amenity": "toilets"}}
-    "pub": new POICategory {type: "pub", name: "Pub", icon: "pub.svg"}
-    "supermarket": new POICategory {type: "supermarket", name: "Supermarket", icon: "supermarket.svg", waag_filter: {"osm::shop": "supermarket"}}
-    "restaurant": new POICategory {type: "restaurant", name: "Restaurant", icon: "restaurant.svg"}
+    "library": new POICategory {type: "library", name: "Library", plural_name: "Libraries", icon: "library"}
+    "recycling": new POICategory {type: "recycling", name: "Recycling point", icon: "recycling"}
+    "park": new POICategory {type: "park", name: "Park", icon: "coniferous_and_deciduous", waag_filter: {"osm::leisure": "park"}}
+    "swimming_pool": new POICategory {type: "swimming_pool", name: "Swimming pool", icon: "swimming_indoor"}
+    "cafe": new POICategory {type: "cafe", name: "Cafe", icon: "cafe"}
+    "bar": new POICategory {type: "bar", name: "Bar", icon: "bar"}
+    "pharmacy": new POICategory {type: "pharmacy", name: "Pharmacy", icon: "pharmacy", waag_filter: {"osm::amenity": "pharmacy"}}
+    "toilet": new POICategory {type: "toilet", name: "Toilet (public)", icon: "toilets_men", waag_filter: {"osm::amenity": "toilets"}}
+    "pub": new POICategory {type: "pub", name: "Pub", icon: "pub"}
+    "supermarket": new POICategory {type: "supermarket", name: "Supermarket", icon: "supermarket", waag_filter: {"osm::shop": "supermarket"}}
+    "restaurant": new POICategory {type: "restaurant", name: "Restaurant", icon: "restaurant"}
 }
 
 # Go through the list of POI providers and the list of categories under the POI providers:
@@ -196,8 +193,9 @@ $('#service-directory').bind 'pageshow', (e, data) ->
         # e.g. Tampere, in the config.coffee and have been stored to citynavi.poi_categories in
         # this file.
         for category, index in citynavi.poi_categories
-            $list.append("<li><a href=\"#service-list?category=#{index}\"><img src=\"#{category.get_icon_path()}\" class='ui-li-icon' style='height: 20px;'/>#{category.name}</a></li>")
-
+            icon_html = citynavi.iconprovider.get_icon_html(category.get_icon_name(), 'style="height: 20px" class="ui-li-icon"')
+            $list.append("<li><a href=\"#service-list?category=#{index}\">#{icon_html}#{category.name}</a></li>")
+            
 #        setTimeout (() -> $list.listview()), 0
         $list.listview("refresh")
 
@@ -251,7 +249,8 @@ $(document).bind "pagebeforechange", (e, data) ->
                     else
                         dist = Math.round((dist + 10) / 10)
                         dist *= 10
-                    $item = $("<li><a href=\"#map-page\"><img src=\"#{category.get_icon_path()}\" class='ui-li-icon' style=\"height: 20px;\"/>#{poi.name}<span class='ui-li-count'>#{dist} m</span></a></li>")
+                    icon_html = citynavi.iconprovider.get_icon_html(category.get_icon_name(), 'style="height: 20px" class="ui-li-icon"')
+                    $item = $("<li><a href=\"#map-page\">#{icon_html}#{poi.name}<span class='ui-li-count'>#{dist} m</span></a></li>")
 
                     # Bind event handler to the list item
                     $item.click () ->

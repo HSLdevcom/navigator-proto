@@ -258,7 +258,7 @@ route_to_destination = (target_location) ->
         for poi in citynavi.poi_list
           do (poi) ->
             icon = L.AwesomeMarkers.icon
-                svg: poi.category.get_icon_path()
+                topIcon: citynavi.iconprovider.get_icon_path(poi.category.get_icon_name())
                 color: 'green'
             latlng = new L.LatLng(poi.coords[0], poi.coords[1])
             marker = L.marker(latlng, {icon: icon})
@@ -538,7 +538,9 @@ render_route_layer = (itinerary, routeLayer) ->
                 last_stop = leg.to
                 point = {y: stop.lat, x: stop.lon}
                 icon = L.divIcon({className: "navigator-div-icon"})
-                label = "<span style='font-size: 24px; padding-right: 6px'><img src='static/images/#{google_icons[leg.routeType ? leg.mode]}' style='vertical-align: sub; height: 24px '/> #{leg.route}</span>"
+                google_icon = google_icons[leg.routeType ? leg.mode]
+                icon_html = citynavi.iconprovider.get_icon_html(google_icon, "style='vertical-align: sub; height: 24px'")
+                label = "<span style='font-size: 24px; padding-right: 6px'>#{icon_html} #{leg.route}</span>"
 
                 # Define function to calculate the transit arrival time and update the element
                 # that has uid specific to this leg once per second by calling this function
@@ -592,7 +594,8 @@ render_route_layer = (itinerary, routeLayer) ->
                     pos = [msg.position.latitude, msg.position.longitude]
                     if not (id of vehicles) # Data for a new vehicle was given from the server
                         # Draw icon for the vehicle
-                        icon = L.divIcon({className: "navigator-div-icon", html: "<img src='static/images/#{google_icons[leg.routeType ? leg.mode]}' height='20px' />"})
+                        google_icon = google_icons[leg.routeType ? leg.mode]
+                        icon = L.divIcon({className: "navigator-div-icon", html: citynavi.iconprovider.get_icon_html(google_icon, 'height="20px"')})
                         vehicles[id] = L.marker(pos, {icon: icon})
                             .addTo(routeLayer)
                         console.log "new vehicle #{id} on route #{leg.routeId}"
@@ -649,13 +652,14 @@ render_route_buttons = ($list, itinerary, route_layer, polylines) ->
 #    $list.append($full_trip)
 
     # label with itinerary start time
-    $start = $("<li class='leg'><div class='leg-bar'><i><img src='static/images/walking.svg' height='100%' style='visibility: hidden' /></i><div class='leg-indicator' style='font-style: italic; text-align: left'>#{moment(trip_start).format("HH:mm")}</div></div></li>")
+    icon_html = citynavi.iconprovider.get_icon_html('walking', 'height="100%" style="visibility: hidden"')
+    $start = $("<li class='leg'><div class='leg-bar'><i>#{icon_html}</i><div class='leg-indicator' style='font-style: italic; text-align: left'>#{moment(trip_start).format("HH:mm")}</div></div></li>")
     $start.css("left", "#{0}%")
     $start.css("width", "#{10}%")
     $list.append($start)
 
     # label with itinerary end time
-    $end = $("<li class='leg'><div class='leg-bar'><i><img src='static/images/walking.svg' height='100%' style='visibility: hidden' /></i><div class='leg-indicator' style='font-style: italic; text-align: right'>#{moment(trip_start+trip_duration).format("HH:mm")}</div></div></li>")
+    $end = $("<li class='leg'><div class='leg-bar'><i>#{icon_html}</i><div class='leg-indicator' style='font-style: italic; text-align: right'>#{moment(trip_start+trip_duration).format("HH:mm")}</div></div></li>")
     $end.css("right", "#{0}%")
     $end.css("width", "#{10}%")
     $list.append($end)
@@ -667,7 +671,7 @@ render_route_buttons = ($list, itinerary, route_layer, polylines) ->
       do (index) ->
 
         if leg.mode == "WALK" and $('#wheelchair').attr('checked')
-            icon_name = "wheelchair.svg"
+            icon_name = "wheelchair"
         else
             icon_name = google_icons[leg.routeType ? leg.mode]
 
@@ -676,7 +680,7 @@ render_route_buttons = ($list, itinerary, route_layer, polylines) ->
 # GoodEnoughJourneyPlanner style:
         leg_start = (leg.startTime-trip_start)/max_duration
         leg_duration = leg.duration/max_duration
-        leg_label = "<img src='static/images/#{icon_name}' height='100%' />"
+        leg_label = citynavi.iconprovider.get_icon_html(icon_name, 'height="100%"')
 
         # for long non-transit legs, display distance in place of route
         if not leg.routeType? and leg.distance? and leg_duration > 0.2
@@ -687,7 +691,8 @@ render_route_buttons = ($list, itinerary, route_layer, polylines) ->
 # YetAnotherJourneyPlanner style:
 #        leg_start = (index+1)/length # leg_start and leg_duration are used for positioning the buttons.
 #        leg_duration = 1/length
-#        leg_label = "<img src='static/images/#{icon_name}' height='100%' /> #{leg.route}"
+#        icon_html = citynavi.iconprovider.get_icon_html(icon_name, 'height="100%"')
+#        leg_label = "#{icon_html} #{leg.route}"
 #        leg_subscript = "#{Math.ceil(leg.duration/1000/60)}min"
 
         $leg = $("<li class='leg'><div style='background: #{color};' class='leg-bar'><i>#{leg_label}</i>#{leg_subscript}</div></li>")

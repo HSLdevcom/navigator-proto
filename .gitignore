@@ -14,3 +14,5 @@ log.html
 report.html
 output.xml
 selenium-screenshot-*.png
+static/images/grunticon/
+static/images/modified_helper/hashes.json

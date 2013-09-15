@@ -104,3 +104,23 @@ detected.
 Run ``python bootstrap.py --version 2.1.1`` and ``bin/buildout``.
 
 Run ``grunt test-robot-desktop``.
+
+## Using icons ##
+
+Add svg file(s) under folder `./static/images` that has been defined to be used in `Gruntfile.coffee` and
+in `src/config.coffee`.  Run `grunt icon` to generate the png files.
+
+In code, use `citynavicon.get_icon_path("myicon")` to get path to image that
+you can, for example use as src attribute in an img html element. Alternatively, you
+can use `citynavicon.get_icon_html(name, [attribute_string])` function to get an img element
+with the specified name and with an optional attribute_string such as
+``style="height: 20px" class="ui-li-icon"``. Finally, in the index.html
+you can include images via defining img element with class="citynavicon-myicon" where
+"citynavicon-" is mandatory part and "myicon" specifies name of the image. The class definitions
+are applied when `iconprovider.modify_img_elements()` is called.
+
+Note that svg files should define svg as default namespace for grunticon to work at the
+moment. Also note that svg files should define viewBox="0 0 w h" attribute where w and
+h correspond the defined width and height attribute values. The viewBox attribute
+ensures better browser compatability. For more information,
+see http://www.seowarp.com/blog/2011/06/svg-scaling-problems-in-ie9-and-other-browsers/.
