@@ -82,12 +82,12 @@ class Prediction
         name = @name
         if @type == "category" # Prediction is for a category
             dest_page = "select-nearest"
-            icon_html = @category.get_icon_html()
+            icon_html = citynavi.iconprovider.get_icon_html(@category.get_icon_name())
             name = "Closest " + name.toLowerCase() # For example, "Closest library"
         else
             dest_page = "map-page"
         if @location?.icon?
-            icon_html = "<img src='#{@location.icon}'>"
+            icon_html = citynavi.iconprovider.get_icon_html(@location.icon)
         $el = $("<li><a href='##{dest_page}'>#{icon_html}#{name}</a></li>")
         $el.find('img').height(20).addClass('ui-li-icon')
         return $el

@@ -16,8 +16,9 @@ module.exports = (grunt) ->
       files: [
         'Gruntfile.coffee'
         'src/*.coffee'
+        'static/images/*.svg'
       ]
-      tasks: 'default'
+      tasks: ['default', 'iconifmodified']
 
     testem:
       headless:
@@ -71,17 +72,33 @@ module.exports = (grunt) ->
         options:
           port: 9001
           base: "."
-
+    grunticon:
+      city_nav_icons:
+        options:
+          src: "static/images/"
+          dest: "static/images/grunticon/"
+    iconifmodified:
+      options:
+        hashFile: 'static/images/modified_helper/hashes.json'
+      grunticon:
+        src: ['static/images/*.svg']
+        options:
+          tasks: ['grunticon']
+          
   grunt.loadNpmTasks 'grunt-contrib-coffee'
   grunt.loadNpmTasks 'grunt-contrib-watch'
   grunt.loadNpmTasks 'grunt-contrib-connect'
   grunt.loadNpmTasks 'grunt-exec'
   grunt.loadNpmTasks 'grunt-testem'
+  grunt.loadNpmTasks 'grunt-grunticon'
 
+  grunt.loadTasks 'static/images/modified_helper'
+  
   grunt.registerTask 'default', ['coffee']
-  grunt.registerTask 'server', ['coffee', 'connect', 'watch']
+  grunt.registerTask 'server', ['coffee', 'iconifmodified', 'connect', 'watch']
   grunt.registerTask 'test', ['coffee', 'testem:headless']
   grunt.registerTask 'test-desktop', ['coffee', 'testem:desktop']
   grunt.registerTask 'test-mobile', ['coffee', 'testem:mobile']
   grunt.registerTask 'test-robot', ['coffee', 'connect', 'exec:robot']
   grunt.registerTask 'test-robot-desktop', ['coffee', 'connect', 'exec:robot_desktop']
+  grunt.registerTask 'icon', ['iconifmodified']
