@@ -518,9 +518,11 @@ render_route_layer = (itinerary, routeLayer) ->
     previous_positions = []
 
     sum = (xs) -> _.reduce(xs, ((x, y) -> x+y), 0)
-    total_walking = sum(leg.distance for leg in legs when leg.distance and not leg.routeType?)
+    total_walking_distance = sum(leg.distance for leg in legs when leg.distance and not leg.routeType?)
+    total_walking_duration = sum(leg.duration for leg in legs when leg.distance and not leg.routeType?)
 
-    $('.control-details').html("<div class='route-details'><div><i><img src='static/images/clock.svg'> #{Math.ceil(itinerary.duration/1000/60)}min<\/i>&nbsp;&nbsp; &nbsp;&nbsp;<i><img src='static/images/walking.svg'> #{Math.ceil(total_walking/100)/10}km<\/i></div></div>")
+    # coffeescript parser would fail with string interpolation syntax here:
+    $('.control-details').html("<div class='route-details'><div>Itinerary total:&nbsp;&nbsp; &nbsp;&nbsp;<i><img src='static/images/clock.svg'> "+Math.ceil(itinerary.duration/1000/60)+"min<\/i>&nbsp;&nbsp; &nbsp;&nbsp;<i><img src='static/images/walking.svg'> "+Math.ceil(total_walking_duration/1000/60)+"min / "+Math.ceil(total_walking_distance/100)/10+"km<\/i></div></div>")
 
     for leg in legs
         do (leg) ->
