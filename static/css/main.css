@@ -187,6 +187,11 @@
     display: none;
 }
 
+.mode-navigation-page .route-graph {
+    width: 100% !important;
+    transition: width 100ms;
+}
+
 :first-child > .route-graph {
     margin-top: 0px;
 }
