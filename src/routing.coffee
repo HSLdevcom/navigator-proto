@@ -111,7 +111,7 @@ $('#map-page [data-rel="back"]').on 'click', (e) ->
             map.setView(position_point, zoom)
             set_source_marker(position_point, {accuracy: positionMarker.getRadius()})
         else
-            map.setView(citynavi.config.center, 10)
+            map.setView(citynavi.config.center, citynavi.config.min_zoom)
 
 
 ## Utilities
@@ -788,8 +788,8 @@ $(window).on 'resize', () ->
 
 # Create a new Leaflet map and set it's center point to the
 # location defined in the config.coffee
-window.map_dbg = map = L.map('map', {minZoom: 10, zoomControl: false, attributionControl: false})
-    .setView(citynavi.config.center, 10)
+window.map_dbg = map = L.map('map', {minZoom: citynavi.config.min_zoom, zoomControl: false, attributionControl: false})
+    .setView(citynavi.config.center, citynavi.config.min_zoom)
 
 $(document).ready () ->
     resize_map()

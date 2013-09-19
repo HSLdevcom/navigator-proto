@@ -210,6 +210,30 @@ class GeocoderCompleter extends RemoteAutocompleter
                 loc.name.toLowerCase()
             @submit_location_predictions loc_list
 
+# Bag42Completer uses the geocoder at bag42.nl.
+class Bag42Completer extends RemoteAutocompleter
+    fetch_results: ->
+        # Get maximum 10 predictions for the user input (@query) from the
+        # dev.hel.fi geocoder.
+        @xhr = $.getJSON citynavi.config.bag42_url,
+            address: @query
+            maxitems: 10
+        @xhr.always () ->
+            @xhr = null
+        @xhr.fail () =>
+            @submit_prediction_failure()
+        @xhr.done (data) =>
+            objs = data.results
+            loc_list = []
+            # Create Location object of the each received data object,
+            # add it to the the list, and finally call submit_location_predictions
+            for adr in objs or []
+                coords = adr.geometry.location
+                loc = new Location adr.formatted_address.replace(/\n/g, ", "), [coords.lat, coords.lng]
+                loc_list.push loc
+            # submit_location_predictions function is defined in RemoteAutocompleter
+            @submit_location_predictions loc_list
+
 class GoogleLocation extends Location
     constructor: (pred) ->
         @name = pred.description
@@ -246,8 +270,10 @@ class GoogleCompleter extends RemoteAutocompleter
             loc_list = []
             for pred in preds
                 city_name = pred.terms[1].value
-                if city_name not in area.cities
+                if area.cities and city_name not in area.cities
                     continue
+                if area.google_suffix and pred.description.lastIndexOf(area.google_suffix) == pred.description.length - area.google_suffix.length
+                    pred.description = pred.description.substring(0, pred.description.length - area.google_suffix.length)
                 loc = new GoogleLocation pred
                 loc_list.push loc
             # submit_location_predictions is defined in RemoteAutocompleter
@@ -434,6 +460,7 @@ class HistoryCompleter extends Autocompleter
 supported_completers =
     poi_categories: new POICategoryCompleter
     geocoder: new GeocoderCompleter
+    bag42: new Bag42Completer
     google: new GoogleCompleter
     osm: new OSMCompleter
     history: new HistoryCompleter

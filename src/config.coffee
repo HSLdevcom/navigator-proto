@@ -65,6 +65,7 @@ defaults =
     waag_url: "http://test-api.citysdk.waag.org/"
     google_url: "http://dev.hel.fi/geocoder/google/"
     nominatim_url: "http://open.mapquestapi.com/nominatim/v1/search.php"
+    bag42_url: "http://bag42.nl/api/v0/geocode/json"
     hel_servicemap_service_url: hel_servicemap_base_url + "service/"
     hel_servicemap_unit_url: hel_servicemap_base_url + "unit/"
     reittiopas_url: "http://tuukka.kapsi.fi/tmp/reittiopas.cgi?callback=?"
@@ -72,6 +73,8 @@ defaults =
     faye_url: "http://dev.hsl.fi:9002/faye"
 
     icon_base_path: "static/images/"
+
+    min_zoom: 10
 
     colors:
         hsl: hsl_colors
@@ -209,6 +212,34 @@ helsinki =
         ]
     autocompletion_providers: ["poi_categories", "history", "geocoder", "osm"]
 
+nl =
+    name: "Netherlands"
+    country: "nl"
+    cities: null
+    google_autocomplete_append: "Netherlands"
+    google_suffix: ", The Netherlands"
+    bbox_ne: [53.617498100000006, 13.43461]
+    bbox_sw: [43.554167, 2.35503]
+    center: [52.37832, 4.89973]
+    min_zoom: 8
+    otp_base_url: "http://144.76.26.165/amsterdam/otp-rest-servlet/ws/"
+    poi_muni_id: null
+    waag_id: "admr.nl.nederland"
+    poi_providers:
+        "waag": [
+            {type: "library"}
+            {type: "park"}
+            {type: "swimming_pool"}
+            {type: "restaurant"}
+            {type: "cafe"}
+            {type: "bar"}
+            {type: "pub"}
+            {type: "supermarket"}
+            {type: "toilet"}
+            {type: "recycling"}
+        ]
+    autocompletion_providers: ["poi_categories", "osm", "bag42", "google"]
+
 
 # Save and set configuration.
 #############################
@@ -218,6 +249,7 @@ citynavi.update_configs {
     helsinki
     manchester
     tampere
+    nl
 }
 
 citynavi.set_config("manchester")
