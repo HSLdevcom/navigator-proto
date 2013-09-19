@@ -31,6 +31,7 @@
 
 /* Position the map controls below the title header */
 .leaflet-top {
+    width: 100%;
     top: 45px;
     transition: top 200ms ease;
 }
@@ -60,6 +61,44 @@
 .mode-navigation-page .leaflet-control-scale {
     opacity: 0;
     transition: opacity 200ms;
+}
+
+.mode-front-page .control-details {
+    display: none;
+}
+
+.leaflet-right .control-details {
+    visibility: hidden;
+}
+
+.leaflet-container .control-details {
+    width: 100%;
+    background: white;
+    background: rgba(255, 255, 255, 0.5);
+    margin: 0;
+}
+
+.route-details {
+    font-size: 18px;
+    height: 20px;
+    vertical-align: middle;
+    text-align: center;
+    padding: 2px 0px;
+}
+
+.route-details > div {
+    margin-top: -2px;
+    height: 100%;
+}
+
+.route-details i {
+    font-style: normal;
+    height: 100%;
+}
+
+.route-details i img {
+    height: 100%;
+    vertical-align: sub;
 }
 
 .leaflet-container .leaflet-control-attribution {

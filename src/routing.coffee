@@ -96,6 +96,11 @@ $('#map-page [data-rel="back"]').on 'click', (e) ->
         if routeLayer?
             map.removeLayer routeLayer
             routeLayer = null
+
+        $('.route-list ul').empty().hide().parent().removeClass("active")
+
+        $('.control-details').empty()
+
         if sourceMarker?
             map.removeLayer sourceMarker
             sourceMarker = null
@@ -512,6 +517,11 @@ render_route_layer = (itinerary, routeLayer) ->
     vehicles = []
     previous_positions = []
 
+    sum = (xs) -> _.reduce(xs, ((x, y) -> x+y), 0)
+    total_walking = sum(leg.distance for leg in legs when leg.distance and not leg.routeType)
+
+    $('.control-details').html("<div class='route-details'><div><i><img src='static/images/clock.svg'> #{Math.ceil(itinerary.duration/1000/60)}min<\/i>&nbsp;&nbsp; &nbsp;&nbsp;<i><img src='static/images/walking.svg'> #{Math.ceil(total_walking/100)/10}km<\/i></div></div>")
+
     for leg in legs
         do (leg) ->
             uid = Math.floor(Math.random()*1000000)
@@ -794,6 +804,18 @@ window.map_dbg = map = L.map('map', {minZoom: citynavi.config.min_zoom, zoomCont
 $(document).ready () ->
     resize_map()
     map.invalidateSize()
+
+DetailsControl = L.Control.extend
+    options: {
+        position: 'topleft'
+    },
+
+    onAdd: (map) ->
+        $container = $("<div class='control-details'></div>")
+        return $container.get(0)
+
+new DetailsControl().addTo(map)
+new DetailsControl({position: 'topright'}).addTo(map)
 
 L.control.attribution({position: 'bottomright'}).addTo(map)
 
