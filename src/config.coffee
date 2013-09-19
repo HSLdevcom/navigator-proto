@@ -62,7 +62,7 @@ hel_servicemap_base_url = "http://www.hel.fi/palvelukarttaws/rest/v2/"
 defaults =
     hel_geocoder_address_url: hel_geocoder_base_url + "address/"
     hel_geocoder_poi_url: hel_geocoder_base_url + "poi/"
-    waag_url: "http://test-api.citysdk.waag.org/"
+    waag_url: "http://api.citysdk.waag.org/"
     google_url: "http://dev.hel.fi/geocoder/google/"
     nominatim_url: "http://open.mapquestapi.com/nominatim/v1/search.php"
     bag42_url: "http://bag42.nl/api/v0/geocode/json"
