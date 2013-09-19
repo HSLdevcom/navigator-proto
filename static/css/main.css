@@ -158,11 +158,13 @@
     border-left: thin grey solid;
 }
 
-.leaflet-label .counter.firstlegfalse {
+.leaflet-label .counter.firstlegfalse,
+.leaflet-label .counter.transitroutefalse {
     display: none;
 }
 
-.mode-navigation-page .leaflet-label .counter.firstlegfalse {
+.mode-navigation-page .leaflet-label .counter.firstlegfalse,
+.mode-navigation-page .leaflet-label .counter.transitroutefalse {
     display: inline-block;
 }
 

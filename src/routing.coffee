@@ -521,6 +521,8 @@ render_route_layer = (itinerary, routeLayer) ->
     total_walking_distance = sum(leg.distance for leg in legs when leg.distance and not leg.routeType?)
     total_walking_duration = sum(leg.duration for leg in legs when leg.distance and not leg.routeType?)
 
+    route_includes_transit = _.any(leg.routeType? for leg in legs)
+
     # coffeescript parser would fail with string interpolation syntax here:
     $('.control-details').html("<div class='route-details'><div>Itinerary total:&nbsp;&nbsp; &nbsp;&nbsp;<i><img src='static/images/clock.svg'> "+Math.ceil(itinerary.duration/1000/60)+"min<\/i>&nbsp;&nbsp; &nbsp;&nbsp;<i><img src='static/images/walking.svg'> "+Math.ceil(total_walking_duration/1000/60)+"min / "+Math.ceil(total_walking_distance/100)/10+"km<\/i></div></div>")
 
@@ -576,7 +578,7 @@ render_route_layer = (itinerary, routeLayer) ->
 
                 # for transit and at itinerary start also walking, show counter
                 if leg.routeType? or leg == legs[0]
-                    marker.bindLabel(label + "<span id='counter#{uid}' class='counter firstleg#{leg == legs[0]}'></span>", {noHide: true})
+                    marker.bindLabel(label + "<span id='counter#{uid}' class='counter firstleg#{leg == legs[0]} transitroute#{route_includes_transit}'></span>", {noHide: true})
                     .showLabel()
 
                     secondsCounter() # Start updating the time in the marker.
