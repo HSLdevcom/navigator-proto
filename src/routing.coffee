@@ -552,7 +552,7 @@ render_route_layer = (itinerary, routeLayer) ->
                 last_stop = leg.to
                 point = {y: stop.lat, x: stop.lon}
                 icon = L.divIcon({className: "navigator-div-icon"})
-                label = "<span style='font-size: 24px; padding-right: 6px'><img src='static/images/#{google_icons[leg.routeType ? leg.mode]}' style='vertical-align: sub; height: 24px '/> #{leg.route}</span>"
+                label = "<span style='font-size: 24px;'><img src='static/images/#{google_icons[leg.routeType ? leg.mode]}' style='vertical-align: sub; height: 24px'/><span>#{leg.route}</span></span>"
 
                 # Define function to calculate the transit arrival time and update the element
                 # that has uid specific to this leg once per second by calling this function
