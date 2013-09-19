@@ -384,7 +384,7 @@
      id="g1327">
     <path
        d="M 66.275,1.768 C 24.94,1.768 1.704,23.139 1.704,66.804 L 1.704,516.927 C 1.704,557.771 22.599,579.156 63.896,579.156 L 515.92,579.156 C 557.227,579.156 578.149,558.841 578.149,516.927 L 578.149,66.804 C 578.149,24.203 557.227,1.768 514.628,1.768 C 514.624,1.768 66.133,1.625 66.275,1.768 z "
-       style="fill:#111;stroke:#eee;stroke-width:3.40799999"
+       style="fill:#111111;fill-opacity:0.0;stroke:#eeeeee;stroke-opacity:0.0;stroke-width:3.40799999"
        id="path1329" />
   </g>
   <g
@@ -408,14 +408,14 @@
        y="2" />
   </g>
   <rect
-     style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:10;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     style="fill:#111111;fill-opacity:1;stroke:none;stroke-width:10;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
      id="rect2160"
      width="285.71429"
      height="122.85714"
      x="154.19182"
      y="223.45724" />
   <rect
-     style="fill:none;stroke:#ffffff;stroke-width:21.16843796;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+     style="fill:none;stroke:#111111;stroke-width:21.16843796;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
      id="rect3184"
      width="371.95969"
      height="371.95969"
@@ -427,6 +427,6 @@
      height="122.85714"
      width="285.71429"
      id="rect3186"
-     style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:10;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     style="fill:#111111;fill-opacity:1;stroke:none;stroke-width:10;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
      transform="matrix(0,1,-1,0,0,0)" />
 </svg>
