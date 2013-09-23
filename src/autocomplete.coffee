@@ -371,11 +371,15 @@ class OSMCompleter extends RemoteAutocompleter
                 if area.cities?.length and not (addr.city in area.cities)
                     continue
 
-                # XXX mapping from types to more obj.address properties
-                if obj.type of addr
-                    name = addr[obj.type]
+                type = obj.type
+                if type == "yes"
+                    type = obj.class
 
-                is_street = obj.type in ['house', 'living_street', 'pedestrian', 'cycleway', 'service', 'residential','tertiary', 'secondary', 'primary', 'trunk', 'motorway', 'unclassified']
+                # XXX mapping from types to more obj.address properties
+                if type of addr
+                    name = addr[type]
+
+                is_street = type in ['building', 'house', 'living_street', 'pedestrian', 'cycleway', 'service', 'residential','tertiary', 'secondary', 'primary', 'trunk', 'motorway', 'unclassified']
 
                 # XXX full list of "road" properties?
                 street = addr.road or addr.cycleway or addr.pedestrian
@@ -395,7 +399,7 @@ class OSMCompleter extends RemoteAutocompleter
                 else
                     display += addr.city
 
-                if display.length and name and not (obj.type in ['city', 'suburb', 'neighbourhood', 'pedestrian', 'cycleway'])
+                if display.length and name and not (type in ['city', 'suburb', 'neighbourhood', 'pedestrian', 'cycleway'])
                     display = "#{name}, #{display}"
 
                 # XXX own icons, more icons
@@ -404,10 +408,7 @@ class OSMCompleter extends RemoteAutocompleter
                     # ei nimeä mutta numero -> katuosoite -> ei tyyppiä
                     # nimi mutta ei numeroa -> tyyppi
                     # nimi ja numeroa -> tyyppi
-                    typename = obj.type
-                    if typename == "yes"
-                        typename = obj.class
-                    typename = typename.replace /_/g, " "
+                    typename = type.replace /_/g, " "
                     typename = typename.replace /^./, (c) -> c.toUpperCase()
 #                    typename = typename.charAt(0).toUpperCase() + typename.slice(1)
                     display = "#{typename}: #{display}"
