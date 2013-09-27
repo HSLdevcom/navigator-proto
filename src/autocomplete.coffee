@@ -134,8 +134,8 @@ class RemoteAutocompleter extends Autocompleter
             pred_list.push new LocationPrediction(loc)
         @callback @callback_args, pred_list
 
-    submit_prediction_failure: () ->
-        @callback @callback_args, []
+    submit_prediction_failure: (error) ->
+        @callback @callback_args, null, error
 
     # Abort the timeout that would have caused fetch_results call.
     abort: ->
@@ -148,6 +148,8 @@ class RemoteAutocompleter extends Autocompleter
 
 # GeocoderCompleter uses the geocoder at the dev.hel.fi server.
 class GeocoderCompleter extends RemoteAutocompleter
+    @DESCRIPTION = "Geocoder"
+
     fetch_results: ->
         if /\d/.test @query
             @fetch_addresses()
@@ -163,7 +165,7 @@ class GeocoderCompleter extends RemoteAutocompleter
         @xhr.always () ->
             @xhr = null
         @xhr.fail () =>
-            @submit_prediction_failure()
+            @submit_prediction_failure("Request failed")
         @xhr.done (data) =>
             objs = data.objects
             loc_list = []
@@ -191,7 +193,7 @@ class GeocoderCompleter extends RemoteAutocompleter
         @xhr.always () ->
             @xhr = null
         @xhr.fail () =>
-            @submit_prediction_failure()
+            @submit_prediction_failure("Request failed")
         @xhr.done (data) =>
             objs = data.objects
             loc_list = []
@@ -212,6 +214,8 @@ class GeocoderCompleter extends RemoteAutocompleter
 
 # Bag42Completer uses the geocoder at bag42.nl.
 class Bag42Completer extends RemoteAutocompleter
+    @DESCRIPTION = "Bag42"
+
     fetch_results: ->
         # Get maximum 10 predictions for the user input (@query) from the
         # dev.hel.fi geocoder.
@@ -221,7 +225,7 @@ class Bag42Completer extends RemoteAutocompleter
         @xhr.always () ->
             @xhr = null
         @xhr.fail () =>
-            @submit_prediction_failure()
+            @submit_prediction_failure("Request failed")
         @xhr.done (data) =>
             objs = data.results
             loc_list = []
@@ -250,6 +254,7 @@ class GoogleLocation extends Location
 # GoogleCompleter is currently undocumented geocoder in the dev.hel.fi
 # server that is used by tampere and manchester areas.
 class GoogleCompleter extends RemoteAutocompleter
+    @DESCRIPTION = "Google geocoder"
     fetch_results: ->
         url = google_url + "autocomplete/"
         area = citynavi.config
@@ -263,7 +268,7 @@ class GoogleCompleter extends RemoteAutocompleter
         @xhr.always = () ->
             @xhr = null
         @xhr.fail () =>
-            @submit_prediction_failure()
+            @submit_prediction_failure("Request failed")
         @xhr.done (data) =>
             #console.log "GoogleCompleter data: ", data
             preds = data.predictions
@@ -320,6 +325,7 @@ letters_to_accents =
     'Z': '[Zz\u0179-\u017e\u01f1-\u01f3\u1dbb\u1e90-\u1e95\u2124\u2128\u24b5\u24cf\u24e9\u3390-\u3394\uff3a\uff5a]'
 
 class OSMCompleter extends RemoteAutocompleter
+    @DESCRIPTION = "OpenStreetMap Nominatim"
     fetch_results: ->
         url = nominatim_url
         area = citynavi.config
@@ -338,7 +344,7 @@ class OSMCompleter extends RemoteAutocompleter
         @xhr.always () =>
             @xhr = null
         @xhr.fail () =>
-            @submit_prediction_failure()
+            @submit_prediction_failure("Request failed")
         @xhr.done (data) =>
             loc_list = []
             # results must contain matches to all these to be accepted
@@ -433,6 +439,7 @@ class OSMCompleter extends RemoteAutocompleter
 # and if there are then it will create CategoryPrediction object, add it to the list of
 # predictions and call the callback function (render_autocomplete_results).
 class POICategoryCompleter extends Autocompleter
+    @DESCRIPTION = "POI categories"
     get_predictions: (query, callback, args) ->
         if not query.length
             return
@@ -447,6 +454,7 @@ class POICategoryCompleter extends Autocompleter
 
 
 class HistoryCompleter extends Autocompleter
+    @DESCRIPTION = "Destination history"
     get_predictions: (query, callback, args) ->
         console.log "historycompleter"
         pred_list = []
@@ -519,21 +527,33 @@ get_all_predictions = (input, callback, callback_options) ->
         deferred = $.Deferred()
         deferred.done callback
         # the out-of-order async callback from this prediction
-        prediction_callback = do (i, deferred, prev_deferred) ->
-            (_options, new_preds) ->
+        prediction_callback = do (c, i, deferred, prev_deferred) ->
+            (_options, new_preds, error) ->
                 # wire this in-order callback after the previous
                 prev_deferred.always () ->
-                    deferred.resolve(callback_options, new_preds)
+                    deferred.resolve(callback_options, new_preds, error, c)
         c.get_predictions input, prediction_callback, {}
         prev_deferred = deferred
+
+    prev_deferred.always () ->
+        callback callback_options, null, null, null
 
 pred_list = []
 
 # FIXME seems that if there are POICategoryCompleter predictions then no other predictions are shown.
-render_autocomplete_results = (args, new_preds) ->
+render_autocomplete_results = (args, new_preds, error, completer) ->
     $ul = args.$ul # The list where the predictions are to be included in.
     $input = args.$input # The input element.
-    pred_list = pred_list.concat new_preds
+    if not completer?
+        console.log "not completer?"
+        if pred_list.length == 0
+            $ul.append("<li><em>No search results.</em></li>")
+        else
+            $ul.append("<li><em>Search done.</em></li>")
+    else if not new_preds?
+        $ul.append("<li><em>#{completer.constructor.DESCRIPTION} failed#{if error then ": "+error else ""}</em></li>")
+    else
+        pred_list = pred_list.concat new_preds
     seen = {}
     seen_streets = {}
     seen_addresses = {}
