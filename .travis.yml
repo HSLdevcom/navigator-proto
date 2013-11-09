@@ -21,10 +21,6 @@ script:
 env:
   global:
   - ARTIFACTS_S3_BUCKET=citynavigator
-  - secure: gtHJlaIQ8QYpMiK/shwv412Vutq4GRqG9puO0RZ6pFxVfuMIulDzB68OZ3Q7yokbqbrcCzGxns5ftbSWzE+G7y49KEDPCENz/kFcHrG4GM6GmoMqTcXQmRgehkAovhxejZxOUTHtzWMwK2lzsQbaf/TS+iUSRxsfbfEMJemTkRY=
-  - secure: W7UNkRyb3/OX4fm8KMKrxXSTkG24b0RHvfucU96/aaWEHOBYA51F4DRzZSAdUQ2upAYxjV0d16Oxa8Lktu6iEl0mik2HKfy/nYa6uJRL71fodRMrjBWlSXmOXzJAhePvDWW2wZ9Vaxesj128HRqtqg2rXbNBTWK5zfNK74L7hAI=
-  - secure: lryiCffIgrxZyVUeTpiLmFqDa1RzE7E+QLgL2dJXwf8iiu0TFGt7FMh4wwmFY+Q8ym/a/1ugplYExo/nrVlzZaZWnZ9THgXDubQpLhmGIYFHCsqNHbB6dYjTTgwYEZqW0zIPBK1CBXlHah8RlvwPPtjD9mea60Pn5s2RA6WIBEk=
-  - secure: APO3plvHRjATKgmQmtOAVpGoaF3Emd6P8XZ+hnzUPpgjYnwZJSFeHYFyCjDt1eb7FK9Whi+pNSYIdMklaZgsh57t85EQceyHOQ943tpCIWexHyBaSZ0QA8arDXrFDca9jaup4UmA8UH29TUFx5JzbFSNGElARRuHZhHxEX3wpFs=
   matrix:
   - TARGET=
   - TARGET=-robot

@@ -8,7 +8,7 @@ City Navigator
 
    robot
 
-This is how City Navigator looks like:
+This is how City Navigator looks like when started:
 
 .. figure:: navigatorwindow.png
 
@@ -32,7 +32,7 @@ This is how City Navigator looks like:
 
        Capture page screenshot  navigatorwindow.png
 
-In detail:
+Once City Navigator has located you, just type, where are you planning to go:
 
 .. figure:: navigatorwindow-annotated.png
 
@@ -44,13 +44,14 @@ In detail:
        ...  xpath=//input[@placeholder='Where do you want to go?']
        ...  search
        ${note} =  Add pointy note  search
-       ...  Just type here, where do you want to go, and press enter.
+       ...  Just type here, where do you want to go, and wait a second for \
+       ...  the results.
        ...  position=bottom  width=300
        Input text  search  market
        Capture page screenshot  navigatorwindow-annotated.png
        Remove elements  ${note}
 
-And in action:
+And pick the right result form the list:
 
 .. figure:: navigatorwindow-results.png
 
@@ -63,9 +64,13 @@ And in action:
        Assign id to element
        ...  xpath=//a[contains(text(), 'Wellington Road')]
        ...  market-link
+       ${note} =  Add pointy note  market-link
+       ...  Click the result to see the available routes.
+       ...  position=bottom  width=300
        Capture page screenshot  navigatorwindow-results.png
+       Remote elements  ${note}
 
-More...
+That's all! Now you are ready to navigate and have fun!
 
 .. figure:: navigatorwindow-final.png
 
