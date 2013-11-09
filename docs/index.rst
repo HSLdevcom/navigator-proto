@@ -19,6 +19,17 @@ This is how City Navigator looks like:
 
    Show navigator window
        Go to  ${START_URL}
+
+       Execute Javascript
+       ...    return (function(){
+       ...        map_dbg.fire('locationfound', {
+       ...            'accuracy': 100,
+       ...            'latlng': L.latLng(citynavi.config.center),
+       ...            'bounds': L.latLngBounds(citynavi.config.bbox_sw,
+       ...                                     citynavi.config.bbox_ne)
+       ...        });
+       ...    })();
+
        Capture page screenshot  navigatorwindow.png
 
 In detail:
@@ -47,17 +58,21 @@ And in action:
    :class: hidden
 
    Show search results
-       Page should contain  Search done.
+       Wait until element is visible
+       ...  xpath=//a[contains(text(), 'Wellington Road')]
+       Assign id to element
+       ...  xpath=//a[contains(text(), 'Wellington Road')]
+       ...  market-link
        Capture page screenshot  navigatorwindow-results.png
 
 More...
 
-.. figure:: navigatorwindow-result.png
+.. figure:: navigatorwindow-final.png
 
 .. code:: robotframework
    :class: hidden
 
    Show search result
-       Click link  xpath=//a[contains(text(), 'Wellington Road')]
-       Page should contain  Let's go
-       Capture page screenshot  navigatorwindow-result.png
+       Click link  market-link
+       Sleep  10 s
+       Capture page screenshot  navigatorwindow-final.png
