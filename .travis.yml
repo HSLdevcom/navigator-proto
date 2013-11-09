@@ -7,7 +7,7 @@ addons:
 install:
 - npm install -g grunt-cli testem coffee-script
 - npm install
-- python bootstrap.py -v 2.2.1
+- python bootstrap.py --version 2.1.1
 - bin/buildout
 before_script:
 - gem install travis-artifacts
