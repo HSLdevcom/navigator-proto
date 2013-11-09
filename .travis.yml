@@ -14,7 +14,7 @@ before_script:
 - sh -e /etc/init.d/xvfb start
 - gem install travis-artifacts
 after_script:
-- travis-artifacts upload --path html --target-path ""
+- travis-artifacts upload --path html --target-path docs
 - travis-artifacts upload --path *.png
 - travis-artifacts upload --path log.html
 - travis-artifacts upload --path report.html
@@ -42,4 +42,4 @@ notifications:
 #   - "Change: %{compare_url}"
 #   - "Details: %{build_url}"
     - "Tests: http://citynavigator.s3-website-us-east-1.amazonaws.com/artifacts/%{build_number}/%{build_number}.1/report.html"
-    - "Docs: http://citynavigator.s3-website-us-east-1.amazonaws.com/"
+    - "Docs: http://citynavigator.s3-website-us-east-1.amazonaws.com/docs"
