@@ -33,3 +33,13 @@ env:
   matrix:
   - TARGET=
   - TARGET=-robot
+notifications:
+  irc:
+    channels:
+    - irc.freenode.org#hsldevcom
+    template:
+    - "%{repository}#%{build_number} (%{branch} | %{commit} | %{author}): %{message}"
+#   - "Change: %{compare_url}"
+#   - "Details: %{build_url}"
+    - "Tests: http://citynavigator.s3-website-us-east-1.amazonaws.com/artifacts/%{build_number}/%{build_number}.1/report.html"
+    - "Docs: http://citynavigator.s3-website-us-east-1.amazonaws.com/"
