@@ -4,6 +4,7 @@ syntax: glob
 .installed.cfg
 bin
 develop-eggs
+docs/*.png
 eggs
 log.html
 node_modules

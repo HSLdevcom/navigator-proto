@@ -5,18 +5,26 @@ addons:
   - username: $SAUCE_USERNAME
   - access_key: $SAUCE_ACCESS_KEY
 install:
+- sudo apt-get install python-virtualenv
 - npm install -g grunt-cli testem coffee-script
 - npm install
 - virtualenv test-env --no-setuptools
 - test-env/bin/python bootstrap.py
 - bin/buildout -N -t 3
+before_script:
+- gem install travis-artifacts
+after_script:
+- travis-artifacts upload --path html --target-path
 script:
 - grunt test$TARGET
 - grunt sphinx-build
 env:
-  matrix:
-  - TARGET=
-  - TARGET=-robot
+  - ARTIFACTS_S3_BUCKET=citynavigator
   global:
   - secure: NDk+62qN264PFCYfam1ai1RZWu8RRoVPCbr8sCA4MHn1XWmn+f0FTqVoPSSihwc3kB9kS0Z+fdu70PjQcsY+su9ovjApWNB9Cq/CF0BvJRD0NcJazxjQd+nPXj7uJuDtkKfDheSxtbqIYOTL1wooV94iqoC+2l+rtiJfObkZM7s=
   - secure: jf4Qz+bQR0z9bE6JpGGm40gr1PtgBvr66E/UUcWI4Q7jHnc7RjtTAf9fORG6i7X3Q62tRlt8d2BIo4RIn+AM5+wI0+5ZXV8fbZs706gzS9s2gJt0ilG67V7mIUQuqTqWCWnbgPgjCEQx4l1k9qrCEf5zlsB45W4x20nJD7SlgP8=
+  - secure: rGEJ2q6xPwkqtc/AEe/KPVNmiUTwDLoDl+0qRMrP3GcODPii4Im9KcXwn3myhSjOt0Jodw0Dk05Sj52DbXj2+IgEu669J9MYxvuS0kXBnI6pPJrqzicGcUmbGMp5AlFcKnUJAhKvV+fiXc4sxA2lqwRbJ/rDOyrBQp+XrMP8S14=
+  - secure: YlkDVx9fBOa7Iyz5e296s+5CgAqWXoj/pexl9KJ9L1qIa74PE2HG5ME2yWzIVn97dTlqGIhkO65GNwYKrN5OBnKbsCC7PTtcd4+9JkMBbqTE3UEva5tXB7T55rFHu4V7ClE0ivtrIbjMDvaNsV2YVD1PyJrQYMt7WkUu7U2EUj4=
+  matrix:
+  - TARGET=
+  - TARGET=-robot
