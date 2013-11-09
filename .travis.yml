@@ -1,35 +1,22 @@
----
 language: node_Js
-node_js: "0.10"
+node_js: '0.10'
+addons:
+  sauce_connect:
+  - username: $SAUCE_USERNAME
+  - access_key: $SAUCE_ACCESS_KEY
 install:
-- curl -O http://saucelabs.com/downloads/Sauce-Connect-latest.zip
-- unzip Sauce-Connect-latest.zip
-- java -jar Sauce-Connect.jar $SAUCE_USERNAME $SAUCE_ACCESS_KEY -i $TRAVIS_JOB_ID
-  -f CONNECTED 1>/dev/null &
-- JAVA_PID=$!
 - npm install -g grunt-cli testem coffee-script
 - npm install
-- python bootstrap.py --version 2.1.1 # compatible with old setuptools
-- bin/buildout
-before_script:
-- bash -c "while [ ! -f CONNECTED ]; do sleep 2; done"
-script: grunt test$TARGET
+- virtualenv test-env --no-setuptools
+- test-env/bin/python bootstrap.py
+- bin/buildout -N -t 3
+script:
+- grunt test$TARGET
+- grunt sphinx-build
 env:
   matrix:
   - TARGET=
   - TARGET=-robot
-#  - TARGET=-mobile
   global:
-  - SAUCE_USERNAME=navigator-proto
-  # From https://github.com/theintern/intern/wiki/Travis-CI-integration
-  # Sauce Labs are OK with this and it is currently necessary to expose this information for testing pull requests;
-  # please get your own free key if you want to test yourself
-  - SAUCE_ACCESS_KEY=5b6e172d-edb6-41ba-bde0-c284b475f7fe
-  - secure: |-
-      NSa08sEGEb2aaiv4kUGdB/gi4h2QJWghc9Syzy7vIelHPSkKJl1aG7OPbVXX
-      XVAlbGRSkP++3ShW/mFJ/ntZpWxcSt8K/p4mRE1f3r9aGv/PkkNlJKODC143
-      s8GTjslJgi9Ll/ao1Ys9aeCkRdYKfqMWM4fJMWkeucuh3lZ+HAw=
-  - secure: |-
-      foXH7e95axy5JLZBd8vA3nr5OuALylDu9X4032k0kK2JFxMY7GQJ9s4XTJ88
-      RP1noE/ClfmdCICnvrT5kWRQUkwKNc+bpXxRDmhioumooKUAfRcQi9mEvt6O
-      a8B/1BTjjTXuv3LPr7wwNNTn8l22n40Qpum2mrTi6k1ZjN6uiEE=
+  - secure: NDk+62qN264PFCYfam1ai1RZWu8RRoVPCbr8sCA4MHn1XWmn+f0FTqVoPSSihwc3kB9kS0Z+fdu70PjQcsY+su9ovjApWNB9Cq/CF0BvJRD0NcJazxjQd+nPXj7uJuDtkKfDheSxtbqIYOTL1wooV94iqoC+2l+rtiJfObkZM7s=
+  - secure: jf4Qz+bQR0z9bE6JpGGm40gr1PtgBvr66E/UUcWI4Q7jHnc7RjtTAf9fORG6i7X3Q62tRlt8d2BIo4RIn+AM5+wI0+5ZXV8fbZs706gzS9s2gJt0ilG67V7mIUQuqTqWCWnbgPgjCEQx4l1k9qrCEf5zlsB45W4x20nJD7SlgP8=
