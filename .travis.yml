@@ -12,7 +12,7 @@ install:
 before_script:
 - gem install travis-artifacts
 after_script:
-- travis-artifacts upload --path html --target-path
+- travis-artifacts upload --path html --target-path ./
 script:
 - grunt test$TARGET
 - grunt sphinx-build

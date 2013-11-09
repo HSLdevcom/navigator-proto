@@ -65,7 +65,7 @@ module.exports = (grunt) ->
       robot_desktop:
         command: 'bin/pybot tests'
       robot:
-        command: 'bin/pybot -v REMOTE_URL:http://$SAUCE_USERNAME:$SAUCE_ACCESS_KEY@ondemand.saucelabs.com:80/wd/hub -v DESIRED_CAPABILITIES:tunnel-identifier:$TRAVIS_JOB_ID -v BUILD_NUMBER:travis-$TRAVIS_BUILD_NUMBER tests'
+        command: 'bin/pybot -v REMOTE_URL:http://$SAUCE_USERNAME:$SAUCE_ACCESS_KEY@ondemand.saucelabs.com:80/wd/hub -v DESIRED_CAPABILITIES:tunnel-identifier:$TRAVIS_JOB_NUMBER -v BUILD_NUMBER:travis-$TRAVIS_BUILD_NUMBER tests'
       sphinx_build:
         command: 'bin/sphinx-build docs html'
     connect:
