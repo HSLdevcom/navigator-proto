@@ -44,8 +44,7 @@ Once City Navigator has located you, just type, where are you planning to go:
        ...  xpath=//input[@placeholder='Where do you want to go?']
        ...  search
        ${note} =  Add pointy note  search
-       ...  Just type here, where do you want to go, and wait a second for \
-       ...  the results.
+       ...  Just type here, where do you want to go, and wait a second for the results.
        ...  position=bottom  width=300
        Input text  search  market
        Capture page screenshot  navigatorwindow-annotated.png
