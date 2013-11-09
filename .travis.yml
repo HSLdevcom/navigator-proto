@@ -8,7 +8,7 @@ install:
 - sudo apt-get install python-virtualenv
 - npm install -g grunt-cli testem coffee-script
 - npm install
-- virtualenv test-env --no-setuptools
+- virtualenv test-env
 - test-env/bin/python bootstrap.py
 - bin/buildout -N -t 3
 before_script:
