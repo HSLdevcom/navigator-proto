@@ -67,7 +67,7 @@ And pick the right result form the list:
        ...  Click the result to see the available routes.
        ...  position=bottom  width=300
        Capture page screenshot  navigatorwindow-results.png
-       Remote elements  ${note}
+       Remove elements  ${note}
 
 That's all! Now you are ready to navigate and have fun!
 

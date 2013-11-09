@@ -68,6 +68,8 @@ module.exports = (grunt) ->
         command: 'bin/pybot -v REMOTE_URL:http://$SAUCE_USERNAME:$SAUCE_ACCESS_KEY@ondemand.saucelabs.com:80/wd/hub -v DESIRED_CAPABILITIES:tunnel-identifier:$TRAVIS_JOB_NUMBER -v BUILD_NUMBER:travis-$TRAVIS_BUILD_NUMBER tests'
       sphinx_build:
         command: 'bin/sphinx-build docs html'
+      sphinx_test:
+        command: 'bin/pybot docs'
     connect:
       server:
         options:
@@ -88,3 +90,4 @@ module.exports = (grunt) ->
   grunt.registerTask 'test-robot', ['coffee', 'connect', 'exec:robot']
   grunt.registerTask 'test-robot-desktop', ['coffee', 'connect', 'exec:robot_desktop']
   grunt.registerTask 'sphinx-build', ['coffee', 'connect', 'exec:sphinx_build']
+  grunt.registerTask 'sphinx-test', ['coffee', 'connect', 'exec:sphinx_test']

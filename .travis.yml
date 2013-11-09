@@ -15,9 +15,14 @@ before_script:
 - gem install travis-artifacts
 after_script:
 - travis-artifacts upload --path html --target-path ''
+- travis-artifacts upload --path *.png
+- travis-artifacts upload --path log.html
+- travis-artifacts upload --path report.html
+- travis-artifacts upload --path output.xml
 script:
 - grunt test$TARGET
 - grunt sphinx-build
+- grunt sphinx-test
 env:
   global:
   - ARTIFACTS_S3_BUCKET=citynavigator
