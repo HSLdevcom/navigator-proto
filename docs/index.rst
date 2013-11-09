@@ -26,7 +26,7 @@ In detail:
 .. figure:: navigatorwindow-annotated.png
 
 .. code:: robotframework
-   :display: hidden
+   :class: hidden
 
    Annotate navigator window
        Assign id to element
