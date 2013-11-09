@@ -43,7 +43,7 @@ Once City Navigator has located you, just type, where are you planning to go:
        Assign id to element
        ...  xpath=//input[@placeholder='Where do you want to go?']
        ...  search
-       ${note} =  Add pointy note  search
+       ${note} =  Add note  search
        ...  Just type here, where do you want to go, and wait a second for the results.
        ...  position=bottom  width=300
        Input text  search  market
@@ -63,7 +63,7 @@ And pick the right result form the list:
        Assign id to element
        ...  xpath=//a[contains(text(), 'Wellington Road')]
        ...  market-link
-       ${note} =  Add pointy note  market-link
+       ${note} =  Add note  market-link
        ...  Click the result to see the available routes.
        ...  position=bottom  width=300
        Capture page screenshot  navigatorwindow-results.png
