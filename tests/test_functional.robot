@@ -5,6 +5,10 @@ Resource  selenium.robot
 Test setup  Open test browser
 Test teardown  Close all browsers
 
+*** Variables ***
+
+${counter}  0
+
 *** Test cases ***
 
 App is loaded
@@ -13,8 +17,8 @@ App is loaded
 
 Find nearest services
     Given front page
-    When click link 'Find nearest services'
-    Then service directory
+    When click link 'Menu'
+    And click link 'Find nearest services'
     And no front page
 
 *** Keywords ***
@@ -32,11 +36,12 @@ No front page
 
 Click link '${text}'
     Assign id to element
-    ...    xpath=//*[contains(text(), '${text}')]/ancestor::a  link
-    Element should be visible  link
-    Click element  link
+    ...    xpath=//*[contains(text(), '${text}')]/ancestor::a
+    ...    link-${counter}
+    Element should be visible  link-${counter}
+    Click element  link-${counter}
+    Increment counter
 
-Service directory
-    Element should become visible  css=#service-directory h1.ui-title
-    Element should contain  css=#service-directory h1.ui-title
-    ...    Find nearest services
+Increment counter
+    ${counter} =  Evaluate  ${counter} + 1
+    Set suite variable  ${counter}  ${counter}

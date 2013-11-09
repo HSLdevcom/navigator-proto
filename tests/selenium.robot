@@ -7,7 +7,7 @@ Library  Selenium2Library  timeout=${SELENIUM_TIMEOUT}
 
 ${HOSTNAME}  localhost
 ${PORT}  9001
-${START_URL}  http://${HOSTNAME}:${PORT}/
+${START_URL}  http://${HOSTNAME}:${PORT}/#testem
 
 ${SELENIUM_IMPLICIT_WAIT}  0.5
 ${SELENIUM_TIMEOUT}  30
