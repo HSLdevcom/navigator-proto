@@ -1,16 +1,18 @@
-src/local_config.coffee
-static/js/
+syntax: glob
 *~
-node_modules
-sauce_connect.log
-test_functional.tap
-testem.json
+.idea
 .installed.cfg
 bin
-eggs
 develop-eggs
-parts
+eggs
 log.html
-report.html
+node_modules
 output.xml
+parts
+report.html
+sauce_connect.log
 selenium-screenshot-*.png
+src/local_config.coffee
+static/js/
+test_functional.tap
+testem.json
