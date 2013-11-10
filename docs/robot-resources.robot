@@ -3,6 +3,8 @@
 Library  Selenium2Library  timeout=${SELENIUM_TIMEOUT}
 ...                        implicit_wait=${SELENIUM_IMPLICIT_WAIT}
 
+Resource  Selenium2Screenshots/keywords.robot
+
 *** Variables ***
 
 ${HOSTNAME}  localhost
@@ -15,18 +17,16 @@ ${SELENIUM_TIMEOUT}  30
 ${BROWSER}  Firefox
 ${REMOTE_URL}
 ${FF_PROFILE_DIR}
-${DESIRED_CAPABILITIES}
-${BUILD_NUMBER}  manual
+
+${counter}  0
 
 *** Keywords ***
 
 Open test browser
-    ${BUILD_INFO} =  Set variable
-    ...           build:${BUILD_NUMBER},name:${SUITE_NAME} | ${TEST_NAME}
     Open browser  ${START_URL}  ${BROWSER}
     ...           remote_url=${REMOTE_URL}
-    ...           desired_capabilities=${DESIRED_CAPABILITIES},${BUILD_INFO}
     ...           ff_profile_dir=${FF_PROFILE_DIR}
+    Set window size  400  800
 
 Wait until location is
     [Arguments]  ${expected_url}
@@ -91,3 +91,19 @@ Input text and validate
     Input text  ${locator}  ${text}
     ${value} =  Get value  ${locator}
     Should be equal  ${text}  ${value}
+
+Click link '${text}'
+   Assign id to element
+   ...    xpath=//*[contains(text(), '${text}')]/ancestor::a
+   ...    link-${counter}
+   Element should be visible  link-${counter}
+   Click element  link-${counter}
+   Increment counter
+
+Increment counter
+   ${counter} =  Evaluate  ${counter} + 1
+   Set suite variable  ${counter}  ${counter}
+
+Pause
+   Import library  Dialogs
+   Pause execution

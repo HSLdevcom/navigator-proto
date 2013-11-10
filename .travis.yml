@@ -1,35 +1,43 @@
----
 language: node_Js
-node_js: "0.10"
+node_js: '0.10'
+addons:
+  sauce_connect:
+  - username: $SAUCE_USERNAME
+  - access_key: $SAUCE_ACCESS_KEY
 install:
-- curl -O http://saucelabs.com/downloads/Sauce-Connect-latest.zip
-- unzip Sauce-Connect-latest.zip
-- java -jar Sauce-Connect.jar $SAUCE_USERNAME $SAUCE_ACCESS_KEY -i $TRAVIS_JOB_ID
-  -f CONNECTED 1>/dev/null &
-- JAVA_PID=$!
 - npm install -g grunt-cli testem coffee-script
 - npm install
-- python bootstrap.py --version 2.1.1 # compatible with old setuptools
+- python bootstrap.py --version 2.1.1
 - bin/buildout
 before_script:
-- bash -c "while [ ! -f CONNECTED ]; do sleep 2; done"
-script: grunt test$TARGET
+- export DISPLAY=:99.0
+- sh -e /etc/init.d/xvfb start
+- gem install travis-artifacts
+after_script:
+- travis-artifacts upload --path html --target-path docs
+- travis-artifacts upload --path *.png
+- travis-artifacts upload --path log.html
+- travis-artifacts upload --path report.html
+- travis-artifacts upload --path output.xml
+script:
+- grunt test$TARGET
+- grunt sphinx-build
+- grunt sphinx-test
 env:
+  global:
+  - ARTIFACTS_S3_BUCKET=citynavigator
+  - secure: DZ7Ec4tX9L06hmL0UDu+ThOD8EKzpyXKsP4wmoDhCnRFIjVTdXsjZFUHqWUP25VHlIC4ocw2pAiKETZ9LT+vojrbTpVM6o7fDB104IPZY/wwox4F6lIwQzn7BqC2TytTsP/z+yFwXcsCjXpxMkii5S05Q4k4hEelgF7Fs4w2F2A=
+  - secure: QlhJLIilkkBI4MYDa2vxLT0rIim6WXFPusCxbsIVLpOnsVrvP1B0HFllRODnDrI107ORY6FO7t6S71/YQpeu+wC5lVJMzN3/JMlBGtR524v7r3et5snZYm69wFGlqe2/hxivrMZe5bbU//hcI5MCl+2EFa05GugPf/ThJyv89LA=
+  - secure: cV9IBRSj8ua38IHNIEbksM5BcyioHs3Xc34ER/ndWJQsn9qNQ/3yNK1s7TG8+L9BkcpUNSE4bt4owT4oujNG4pZKh9AxyWuXgCd9/rq0l2BcqZFCPNg6xvCuOrkUx475iwECFzxj63Ja8A7Z0EzGwRz7hG7RDTsOlCQTqtlPaug=
+  - secure: arm0+X+HLa4bPZir3gYCpLEBGijpcsjoPHMhWNKemWY774pcgaenEHeF09GumRC/3MbjFiyIHwssTb09qtbXVVI7d1eTEjJusGQankdGp/KNJ+gzC9WAlP03gXLbd/q+ZoTBd5T/jdeTSPYmkWjss8h8YtS1UlFW1lqObtj6VsQ=
   matrix:
   - TARGET=
   - TARGET=-robot
-#  - TARGET=-mobile
-  global:
-  - SAUCE_USERNAME=navigator-proto
-  # From https://github.com/theintern/intern/wiki/Travis-CI-integration
-  # Sauce Labs are OK with this and it is currently necessary to expose this information for testing pull requests;
-  # please get your own free key if you want to test yourself
-  - SAUCE_ACCESS_KEY=5b6e172d-edb6-41ba-bde0-c284b475f7fe
-  - secure: |-
-      NSa08sEGEb2aaiv4kUGdB/gi4h2QJWghc9Syzy7vIelHPSkKJl1aG7OPbVXX
-      XVAlbGRSkP++3ShW/mFJ/ntZpWxcSt8K/p4mRE1f3r9aGv/PkkNlJKODC143
-      s8GTjslJgi9Ll/ao1Ys9aeCkRdYKfqMWM4fJMWkeucuh3lZ+HAw=
-  - secure: |-
-      foXH7e95axy5JLZBd8vA3nr5OuALylDu9X4032k0kK2JFxMY7GQJ9s4XTJ88
-      RP1noE/ClfmdCICnvrT5kWRQUkwKNc+bpXxRDmhioumooKUAfRcQi9mEvt6O
-      a8B/1BTjjTXuv3LPr7wwNNTn8l22n40Qpum2mrTi6k1ZjN6uiEE=
+notifications:
+  irc:
+    channels:
+    - irc.freenode.org#hsldevcom
+    template:
+    - ! '%{repository}#%{build_number} (%{branch} | %{commit} | %{author}): %{message}'
+    - ! 'Tests: http://citynavigator.s3-website-us-east-1.amazonaws.com/artifacts/%{build_number}/%{build_number}.1/report.html'
+    - ! 'Docs: http://citynavigator.s3-website-us-east-1.amazonaws.com/docs'
