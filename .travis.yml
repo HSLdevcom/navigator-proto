@@ -26,10 +26,10 @@ script:
 env:
   global:
   - ARTIFACTS_S3_BUCKET=citynavigator
-  - secure: iKkfwYrWWjLHoInEo3vZuzWlwyC+Rugrght18zaaptApf3lmqwu5V7OKBFVzZUMjPIwpm0Wy4pPQJN9V2nkSoQuCStVFAOcQEpWUy5Ute5wZ8LKEb2p++/f8lwSPyD9pVDv2qBbRCTgf9yYpaLlw79+F6MAccTeqaSGBjPKoa+w=
-  - secure: VHOOopGows3b9gXGJWRy1fJEtNJv6bH3PfpyaX/fBUUdQ4JsE9+fWoJgpeGKlLhLK3t5889CiiBwNUDmV4QZE0uCpJJxEOzi9u33+a15vVvlL5hZDKImTpRw1RP2EGv5Rivhtnn4T+tYoIM8VVkkda54c7AXWXWhyqgkILSOPJY=
-  - secure: YWc1/FVKv7KSRwUFhnIvvM5f8z0B6FEv8ja7Cs4D0zG6yiWwcJFe9TiZo/QpDmxasIcdw9kzuyXLhJzF8SHMFncOBsS2JtVmvpg2jzFNrKnbqmJTQFrsTESxR8dWTn5yJgOn/LwiiiPADx6NcVvUnE/eo+NcUxxsUcBnY1J7eIM=
-  - secure: EfewPD4hwouG2kWe3o7ATAmwbcjSslYYgQb9LxLTgCqvyTf0HGyCU/cc5OHJ+4C41fGYOS9FrFFT7F+Trr6TfsrkpJNqCpcJJjxnLpnkcyNxT8DoKYrpWDUeDuOZ0XPWnonp2pchvhKCUaOA4jdmDfqpbrWssO+z8bU2xwO+V1A=
+  - secure: DZ7Ec4tX9L06hmL0UDu+ThOD8EKzpyXKsP4wmoDhCnRFIjVTdXsjZFUHqWUP25VHlIC4ocw2pAiKETZ9LT+vojrbTpVM6o7fDB104IPZY/wwox4F6lIwQzn7BqC2TytTsP/z+yFwXcsCjXpxMkii5S05Q4k4hEelgF7Fs4w2F2A=
+  - secure: QlhJLIilkkBI4MYDa2vxLT0rIim6WXFPusCxbsIVLpOnsVrvP1B0HFllRODnDrI107ORY6FO7t6S71/YQpeu+wC5lVJMzN3/JMlBGtR524v7r3et5snZYm69wFGlqe2/hxivrMZe5bbU//hcI5MCl+2EFa05GugPf/ThJyv89LA=
+  - secure: cV9IBRSj8ua38IHNIEbksM5BcyioHs3Xc34ER/ndWJQsn9qNQ/3yNK1s7TG8+L9BkcpUNSE4bt4owT4oujNG4pZKh9AxyWuXgCd9/rq0l2BcqZFCPNg6xvCuOrkUx475iwECFzxj63Ja8A7Z0EzGwRz7hG7RDTsOlCQTqtlPaug=
+  - secure: arm0+X+HLa4bPZir3gYCpLEBGijpcsjoPHMhWNKemWY774pcgaenEHeF09GumRC/3MbjFiyIHwssTb09qtbXVVI7d1eTEjJusGQankdGp/KNJ+gzC9WAlP03gXLbd/q+ZoTBd5T/jdeTSPYmkWjss8h8YtS1UlFW1lqObtj6VsQ=
   matrix:
   - TARGET=
   - TARGET=-robot
@@ -38,8 +38,6 @@ notifications:
     channels:
     - irc.freenode.org#hsldevcom
     template:
-    - "%{repository}#%{build_number} (%{branch} | %{commit} | %{author}): %{message}"
-#   - "Change: %{compare_url}"
-#   - "Details: %{build_url}"
-    - "Tests: http://citynavigator.s3-website-us-east-1.amazonaws.com/artifacts/%{build_number}/%{build_number}.1/report.html"
-    - "Docs: http://citynavigator.s3-website-us-east-1.amazonaws.com/docs"
+    - ! '%{repository}#%{build_number} (%{branch} | %{commit} | %{author}): %{message}'
+    - ! 'Tests: http://citynavigator.s3-website-us-east-1.amazonaws.com/artifacts/%{build_number}/%{build_number}.1/report.html'
+    - ! 'Docs: http://citynavigator.s3-website-us-east-1.amazonaws.com/docs'
