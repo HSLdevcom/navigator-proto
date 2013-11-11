@@ -94,7 +94,7 @@ Input text and validate
 
 Click link '${text}'
    Assign id to element
-   ...    xpath=//*[contains(text(), '${text}')]/ancestor::a
+   ...    xpath=//div[contains(concat(' ',normalize-space(@class),' '),' ui-page-active ')]//*[contains(text(), '${text}')]/ancestor::a
    ...    link-${counter}
    Element should be visible  link-${counter}
    Click element  link-${counter}
@@ -102,7 +102,7 @@ Click link '${text}'
 
 Click link "${text}"
    Assign id to element
-   ...    xpath=//*[contains(text(), "${text}")]/ancestor::a
+   ...    xpath=//div[contains(concat(' ',normalize-space(@class),' '),' ui-page-active ')]//*[contains(text(), "${text}")]/ancestor::a
    ...    link-${counter}
    Element should be visible  link-${counter}
    Click element  link-${counter}

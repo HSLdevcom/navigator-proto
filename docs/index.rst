@@ -126,13 +126,13 @@ When you are ready to start with the chosen itinerary, tap "Let's go":
    *** Test cases ***
 
    Choose another itinerary alternative
-       Click element  css=.route-buttons-1
+       Click element  css=.ui-page-active .route-buttons-1
        Sleep  1 s
        Capture page screenshot  navigatorwindow-alternative-itinerary.png
 
 That's all - now you can get on your way!
 
-.. figure:: navigatorwindow-final.png
+.. figure:: navigatorwindow-navigation.png
 
 .. code:: robotframework
    :class: hidden
@@ -141,4 +141,37 @@ That's all - now you can get on your way!
 
    Start navigation
        Click link "Let's go"
-       Capture page screenshot  navigatorwindow-final.png
+       Capture page screenshot  navigatorwindow-navigation.png
+
+In the top-right corner, there's a menu with more features:
+
+.. figure:: navigatorwindow-menu.png
+
+.. code:: robotframework
+   :class: hidden
+
+   *** Test cases ***
+
+   Open menu
+       Click link "Back"
+       Sleep  1 s
+       Click link "Back"
+       Sleep  1 s
+       Click link "Menu"
+       Sleep  1 s
+       Capture page screenshot  navigatorwindow-menu.png
+
+For instance, instead of typing in a destination, you can choose from
+a list of nearest services:
+
+.. figure:: navigatorwindow-services.png
+
+.. code:: robotframework
+   :class: hidden
+
+   *** Test cases ***
+
+   Display list of services
+       Click link "Find nearest services"
+       Sleep  1 s
+       Capture page screenshot  navigatorwindow-services.png
