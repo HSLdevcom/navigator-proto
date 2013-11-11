@@ -100,6 +100,14 @@ Click link '${text}'
    Click element  link-${counter}
    Increment counter
 
+Click link "${text}"
+   Assign id to element
+   ...    xpath=//*[contains(text(), "${text}")]/ancestor::a
+   ...    link-${counter}
+   Element should be visible  link-${counter}
+   Click element  link-${counter}
+   Increment counter
+
 Increment counter
    ${counter} =  Evaluate  ${counter} + 1
    Set suite variable  ${counter}  ${counter}

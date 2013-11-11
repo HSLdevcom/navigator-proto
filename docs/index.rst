@@ -79,7 +79,7 @@ Once City Navigator has located you, just type, where you are planning to go:
        Capture page screenshot  navigatorwindow-annotated.png
        Remove elements  ${note}
 
-And pick the right result from the list:
+And pick the intended destination from the list:
 
 .. figure:: navigatorwindow-results.png
 
@@ -100,9 +100,11 @@ And pick the right result from the list:
        Capture page screenshot  navigatorwindow-results.png
        Remove elements  ${note}
 
-That's all! Now you are ready to navigate and have fun!
+City Navigator suggests an itinerary and displays it on the map. At
+the bottom of the screen, below the itinerary overview, there may be a
+couple of alternatives that can be chosen by tapping them.
 
-.. figure:: navigatorwindow-final.png
+.. figure:: navigatorwindow-itineraries.png
 
 .. code:: robotframework
    :class: hidden
@@ -112,4 +114,31 @@ That's all! Now you are ready to navigate and have fun!
    Show search result
        Click link  market-link
        Sleep  10 s
+       Capture page screenshot  navigatorwindow-itineraries.png
+
+When you are ready to start with the chosen itinerary, tap "Let's go":
+
+.. figure:: navigatorwindow-alternative-itinerary.png
+
+.. code:: robotframework
+   :class: hidden
+
+   *** Test cases ***
+
+   Choose another itinerary alternative
+       Click element  css=.route-buttons-1
+       Sleep  1 s
+       Capture page screenshot  navigatorwindow-alternative-itinerary.png
+
+That's all - now you can get on your way!
+
+.. figure:: navigatorwindow-final.png
+
+.. code:: robotframework
+   :class: hidden
+
+   *** Test cases ***
+
+   Start navigation
+       Click link "Let's go"
        Capture page screenshot  navigatorwindow-final.png
