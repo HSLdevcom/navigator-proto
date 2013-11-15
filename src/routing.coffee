@@ -43,13 +43,19 @@ $(document).bind "pagebeforechange", (e, data) ->
     u = $.mobile.path.parseUrl(data.toPage)
 
     if u.hash.indexOf('#navigation-page') == 0
-        # start from the beginning
-        start_bounds = L.latLngBounds([sourceMarker.getLatLng()])
+        # determine bounds for initial map view
+        start_bounds = L.latLngBounds([])
+        # include the source marker
+        if sourceMarker?
+            start_bounds.extend sourceMarker.getLatLng()
         # include the current device position as well
         if position_bounds?
             start_bounds.extend position_bounds
-        zoom = Math.min(map.getBoundsZoom(start_bounds), 18)
-        map.setView(start_bounds.getCenter(), zoom)
+        # XXX include at least the start of the first leg as well
+        # if we got bounds data, zoom to that (no closer than level 18 though)
+        if start_bounds.isValid()
+            zoom = Math.min(map.getBoundsZoom(start_bounds), 18)
+            map.setView(start_bounds.getCenter(), zoom)
 
     # The "#map-page?service" is used with the palvelukartta.coffee.
     if u.hash.indexOf('#map-page?service=') == 0
