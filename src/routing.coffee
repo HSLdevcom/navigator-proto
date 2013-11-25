@@ -900,7 +900,8 @@ transform_location = (point) ->
             return
 
 map.on 'locationerror', (e) ->
-    alert(e.message)
+    if e.message != "Geolocation error: The operation couldn’t be completed. (kCLErrorDomain error 0.)."
+        alert(e.message)
 
 # Triggered whenever user location has changed.
 map.on 'locationfound', (e) ->
