@@ -114,7 +114,10 @@
                 </ul>
                 <form id="comment-box" style="display: none; width: 100%; height: 100%; border: 0;">
                     <textarea style="width: 100%; height: 100%;"></textarea>
-                    <button>Submit</button>
+                    <fieldset class="ui-grid-a">
+                    <div class="ui-block-a"><button type="button" class="cancel-button" data-theme="c">Cancel</button></div>
+                    <div class="ui-block-b"><button type="submit" data-theme="b">Submit</button></div>
+                    </fieldset>
                 </form>
             </div>
             <div id="error-popup" data-role="popup" data-rel="dialog" data-transition="pop" data-overlay-theme="a">

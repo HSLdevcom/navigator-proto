@@ -1013,6 +1013,14 @@ map.on 'contextmenu', (e) ->
         osmnotes.addTo(map)
         # Comment box with id "comment-box" has been defined in the index.html.
         $('#comment-box').show()
+        hide = () ->
+            $('#comment-box').hide()
+            resize_map() # causes map redraw & notes update
+            set_comment_marker()
+        $('#comment-box .cancel-button').unbind 'click'
+        $('#comment-box .cancel-button').bind 'click', ->
+            hide()
+            return false # event handled
         $('#comment-box').unbind 'submit'
         $('#comment-box').bind 'submit', ->
             text = $('#comment-box textarea').val()
@@ -1020,10 +1028,10 @@ map.on 'contextmenu', (e) ->
             lon = commentMarker.getLatLng().lng
             uri = osm_notes_url
             $.post uri, {lat: lat, lon: lon, text: text}, ()->
-                $('#comment-box').hide()
-                resize_map() # causes map redraw & notes update
-                set_comment_marker()
+                $('#comment-box textarea').val("")
+                hide()
             return false # don't submit form
+        $.mobile.changePage '#map-page'
         resize_map()
         map.removeLayer(contextmenu)
         return false
