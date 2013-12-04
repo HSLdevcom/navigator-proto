@@ -24,6 +24,38 @@ vehicles = []
 previous_positions = []
 interpolations = []
 
+
+siri_to_live = (vehicle) ->
+    vehicle:
+        id: vehicle.MonitoredVehicleJourney.VehicleRef.value
+    trip:
+        route: vehicle.MonitoredVehicleJourney.LineRef.value
+    position:
+        latitude: vehicle.MonitoredVehicleJourney.VehicleLocation.Latitude
+        longitude: vehicle.MonitoredVehicleJourney.VehicleLocation.Longitude
+        bearing: vehicle.MonitoredVehicleJourney.Bearing
+
+
+interpret_jore = (routeId) ->
+    if citynavi.config.id != "helsinki"
+        # no JORE codes in use, assume bus
+        [mode, routeType, route] = ["BUS", 3, routeId]
+    else if routeId?.match /^1019/
+        [mode, routeType, route] = ["FERRY", 4, "Ferry"]
+    else if routeId?.match /^1300/
+        [mode, routeType, route] = ["SUBWAY", 1, routeId.substring(4,5)]
+    else if routeId?.match /^300/
+        [mode, routeType, route] = ["RAIL", 2, routeId.substring(4,5)]
+    else if routeId?.match /^10(0|10)/
+        [mode, routeType, route] = ["TRAM", 0, "#{parseInt routeId.substring(2,4)}"]
+    else if routeId?.match /^(1|2|4).../
+        [mode, routeType, route] = ["BUS", 3, "#{parseInt routeId.substring(1)}"]
+    else
+        # unknown, assume bus
+        [mode, routeType, route] = ["BUS", 3, routeId]
+
+    return [mode, routeType, route]
+
 ## Events before a page is shown
 
 # set a class on the html root element based on the active page, for css use
@@ -607,15 +639,30 @@ render_route_layer = (itinerary, routeLayer) ->
                 # that has been defined in the realtime.coffee file. The routeId can be, for example,
                 # 23 for a bus at Tampere, Finland.
                 console.log "subscribing to #{leg.routeId}"
-                citynavi.realtime?.subscribe_route leg.routeId, (msg) ->
+                $.getJSON citynavi.config.siri_url, {lineRef: leg.routeId}, (data) ->
+                    for vehicle in data.Siri.ServiceDelivery.VehicleMonitoringDelivery[0].VehicleActivity
+                        handle_vehicle_update true, siri_to_live(vehicle)
+
+                    console.log "Got #{data.Siri.ServiceDelivery.VehicleMonitoringDelivery[0].VehicleActivity.length} vehicles on route #{leg.routeId}"
+                    citynavi.realtime?.subscribe_route leg.routeId, (msg) ->
+                        handle_vehicle_update false, msg
+
+            # The row causes all legs polylines to be returned as array from the render_route_layer function.
+            # polyline is graphical representation of the leg.
+            polyline
+
+
+handle_vehicle_update = (initial, msg) ->
                     id = msg.vehicle.id
                     pos = [msg.position.latitude, msg.position.longitude]
+                    [mode, routeType, route] = interpret_jore(msg.trip.route)
                     if not (id of vehicles) # Data for a new vehicle was given from the server
                         # Draw icon for the vehicle
-                        icon = L.divIcon({className: "navigator-div-icon", html: "<img src='static/images/#{google_icons[leg.routeType ? leg.mode]}' height='20px' />"})
+                        icon = L.divIcon({className: "navigator-div-icon", html: "<div id='vehicle-#{id}' style='background: #{google_colors[routeType ? mode]}'><span>#{route}</span><img src='static/images/#{google_icons[routeType ? mode]}' height='20px' /></div>"})
                         vehicles[id] = L.marker(pos, {icon: icon})
                             .addTo(routeLayer)
-                        console.log "new vehicle #{id} on route #{leg.routeId}"
+                        if not initial
+                            console.log "new vehicle #{id} on route #{msg.trip.route}"
                     else
                         # Update the vehicle icon's place on the map.
                         # Use interpolation to make updates smoother.
@@ -634,9 +681,9 @@ render_route_layer = (itinerary, routeLayer) ->
                                 clearTimeout(interpolations[id])
                             interpolation 1, id, old_pos
                     previous_positions[id] = pos
-            # The row causes all legs polylines to be returned as array from the render_route_layer function.
-            # polyline is graphical representation of the leg.
-            polyline
+                    $("#vehicle-#{id}").css('transform', "rotate(#{msg.position.bearing+90}deg)")
+#                    $("#vehicle-#{id} img").css('transform', "rotate(-#{msg.position.bearing+90}deg)")
+                    $("#vehicle-#{id} span").css('transform', "rotate(-#{msg.position.bearing+90}deg)")
 
 # Renders the route buttons in the map page footer.
 # Itienary is the  itienary suggested for the user to get from source to target.
