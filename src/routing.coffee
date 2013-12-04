@@ -130,7 +130,10 @@ $('#map-page').bind 'pageshow', (e, data) ->
         zoom = Math.min(map.getBoundsZoom(position_bounds), 15)
         map.setView(position_point, zoom)
 
-$('#map-page [data-rel="back"]').on 'click', (e) ->
+
+$('#map-page [data-rel="back"]').on 'click', (e) -> reset_map()
+
+reset_map = () ->
         if routeLayer?
             map.removeLayer routeLayer
             routeLayer = null
@@ -156,6 +159,28 @@ $('#map-page [data-rel="back"]').on 'click', (e) ->
         else
             map.setView(citynavi.config.center, citynavi.config.min_zoom)
 
+        vehicles = []
+        previous_positions = []
+        interpolations = []
+
+
+$('#live-page').bind 'pageshow', (e, data) ->
+    map.setView(citynavi.config.center, citynavi.config.min_zoom)
+    console.log "live map - subscribing to all vehicles"
+    routeLayer = L.featureGroup().addTo(map)
+    $.getJSON citynavi.config.siri_url, (data) ->
+        for vehicle in data.Siri.ServiceDelivery.VehicleMonitoringDelivery[0].VehicleActivity
+            handle_vehicle_update true, siri_to_live(vehicle)
+
+        console.log "Got #{data.Siri.ServiceDelivery.VehicleMonitoringDelivery[0].VehicleActivity.length} vehicles in #{citynavi.config.name}"
+        sub = citynavi.realtime?.client.subscribe "/location/#{citynavi.config.id}/**", (msg) ->
+            handle_vehicle_update false, msg
+        $('#live-page [data-rel="back"]').on 'click', (e) ->
+            sub.cancel()
+
+
+$('#live-page [data-rel="back"]').on 'click', (e) ->
+    reset_map()
 
 ## Utilities
 
