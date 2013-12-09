@@ -1151,8 +1151,10 @@ mapfitBounds = (bounds) ->
         paddingTopLeft: [0, topPadding]
         paddingBottomRight: [0, bottomPadding]
 
+simulation_timestep_default = 10000
+
 simulation_timeoutId = null
-simulation_timestep = 10000
+simulation_timestep = simulation_timestep_default
 
 $('.pause-navigation-link').on 'click', (e) ->
     if $('.pause-navigation-link').attr('data-icon') == 'pause'
@@ -1164,7 +1166,7 @@ $('.pause-navigation-link').on 'click', (e) ->
         $('.pause-navigation-link .ui-btn-text').text "Continue"
     else
         console.log "Playing"
-        simulation_timestep = 10000
+        simulation_timestep = simulation_timestep_default
         $('.pause-navigation-link').attr 'data-icon', 'pause'
         $('.pause-navigation-link .ui-icon').attr 'class', 'ui-icon ui-icon-pause ui-icon-shadow'
         $('.pause-navigation-link').buttonMarkup 'option', 'icon', 'pause'
@@ -1184,6 +1186,12 @@ $('.journey-preview-link').on 'click', (e) ->
     console.log "Starting simulation"
     simulation_step(itinerary, itinerary.startTime - 60*1000)
 
+
+lastLeg = null
+currentStep = null
+currentStepIndex = null
+speak_queue = []
+
 $('#navigation-page [data-rel="back"]').on 'click', (e) ->
     if simulation_timeoutId?
         clearTimeout simulation_timeoutId
@@ -1196,6 +1204,101 @@ $('#navigation-page [data-rel="back"]').on 'click', (e) ->
         position_point = null
         # XXX restore latest real geolocation
         citynavi.set_source_location null
+
+    lastLeg = null
+    currentStep = null
+    currentStepIndex = null
+    speak_queue = []
+
+$('#use-speech').change () ->
+    if $('#use-speech').attr('checked')
+        if not meSpeak?
+            $.getScript "mespeak/mespeak.full.js", ()->
+                if meSpeak?
+                    meSpeak?.loadConfig("mespeak/mespeak_config.json");
+#                    meSpeak?.loadVoice("mespeak/voices/en/en.json");
+                    meSpeak?.loadVoice("mespeak/voices/fi.json");
+
+speak_real = (text) ->
+    if meSpeak? and $('#use-speech').attr('checked')
+        console.log("*** Speaking", text)
+        meSpeak.speak(text, {}, speak_callback)
+    else
+        console.log("*** Not speaking", text)
+        speak_callback() # done immediately as doing nothing
+
+display_detail = (text) ->
+    $('.control-details').html("<div class='route-details'><div>#{text}</div></div>")
+
+speak = (text) ->
+    if speak_queue.length == 0
+        speak_queue.unshift(text)
+        speak_real(text)
+    else
+        speak_queue.unshift(text)
+
+speak_callback = () ->
+    console.log "... speech done."
+    speak_queue.pop()
+    if speak_queue.length != 0
+        text = speak_queue[0]
+        speak_real(text)
+
+dir_to_finnish =
+    NORTH: "Kulje pohjoiseen katua"
+    SOUTH: "Kulje etelään katua"
+    EAST: "Kulje itään katua"
+    WEST: "Kulje länteen katua"
+    NORTHWEST: "Kulje luoteeseen katua"
+    SOUTHEAST: "Kulje kaakkoon katua"
+    NORTHEAST: "Kulje koilliseen katua"
+    SOUTHWEST: "Kulje lounaaseen katua"
+    CONTINUE: "Jatka eteenpäin kadulle"
+    LEFT: "Käänny vasemmalle kadulle"
+    RIGHT: "Käänny oikealle kadulle"
+    SLIGHTLY_LEFT: "Käänny viistosti vasemmalle kadulle"
+    SLIGHTLY_RIGHT: "Käänny viistosti oikealle kadulle"
+
+path_to_finnish =
+    "bike path": "pyörätie"
+    path: "polku"
+    "open area": "aukio"
+    bridleway: "kärrypolku"
+
+    platform: "laituri"
+
+    footbridge: "ylikulkusilta"
+    underpass: "alikulku"
+
+    road: "tie"
+    ramp: "liittymä"
+    link: "linkki"
+    "service road": "pihatie"
+    alley: "kuja"
+    "parking aisle": "parkkipaikka"
+    byway: "sivutie"
+    track: "ajoura"
+    sidewalk: "jalkakäytävä"
+
+    steps: "portaat"
+
+    cycleway: "pyörätie"
+
+step_to_finnish_speech = (step) ->
+    if step.relativeDirection
+       text = dir_to_finnish[step.relativeDirection] or step.relativeDirection
+    else
+       text = dir_to_finnish[step.absoluteDirection] or step.asboluteDirection
+
+    text += " " + (path_to_finnish[step.streetName] or step.streetName or 'nimetön')
+
+    return text
+
+display_step = (step) ->
+    icon = L.divIcon({className: "navigator-div-icon"})
+
+    marker = L.marker(new L.LatLng(step.lat, step.lon), {icon: icon}).addTo(routeLayer).bindLabel("#{(step.relativeDirection or step.absoluteDirection).toLowerCase().replace('_', ' ')} on #{step.streetName or 'unnamed path'}", {noHide: true}).showLabel()
+
 
 simulation_step = (itinerary, time) ->
     simulation_timeoutId = setTimeout (-> simulation_step itinerary, time+simulation_timestep), 1000
@@ -1228,6 +1331,22 @@ simulation_step = (itinerary, time) ->
         console.log "No current leg"
         return
 
+    if not lastLeg?
+        display_detail "Instructions start at "+itinerary.legs[0].from.name+"."
+        speak "Ohjeet alkavat kadulta "+(itinerary.legs[0].from.name or "tuntematon")
+        if itinerary.legs[0].steps?[0]
+            currentStep = itinerary.legs[0].steps?[0]
+            currentStepIndex = 0
+            display_step(currentStep)
+            console.log "current step", currentStep
+
+    if leg != lastLeg and leg?.steps?[0]
+        currentStep = leg.steps[0]
+        currentStepIndex = 0
+
+    lastLeg = leg
+    legIndex = itinerary.legs.indexOf(leg)+1
+
     geometry = ([p[0]*1e-5, p[1]*1e-5] for p in leg.legGeometry.points)
 
     share = (time-leg.startTime) / (leg.endTime-leg.startTime)
@@ -1238,6 +1357,28 @@ simulation_step = (itinerary, time) ->
         [latLng, predecessor] = [L.latLng(geometry[0]), -1]
 
 #    console.log leg, leg.startTime-itinerary.startTime, time-itinerary.startTime, leg.endTime-itinerary.startTime, {points: geometry}, share, "->", latLng.toString(), predecessor
+
+    if currentStep? && latLng.distanceTo(new L.LatLng(currentStep.lat, currentStep.lon)) < 5
+        step = currentStep
+        display_detail "Next, go #{(step.relativeDirection or step.absoluteDirection).toLowerCase().replace('_', ' ')} on #{step.streetName or 'unnamed path'}."
+        speak step_to_finnish_speech(step)
+        currentStepIndex = currentStepIndex + 1
+        currentStep = leg.steps?[currentStepIndex]
+
+        if not currentStep?
+            nextLeg = itinerary.legs?[legIndex+1]
+            console.log "nextLeg", nextLeg
+            if nextLeg?.steps?[0]
+                currentStep = nextLeg?.steps?[0]
+                currentStepIndex = 0
+            else
+                currentStep = null
+
+        if currentStep?
+            display_step currentStep
+        else
+            display_detail "Arriving at destination."
+            speak "Saavutaan perille"
 
     accuracy = 50
 
