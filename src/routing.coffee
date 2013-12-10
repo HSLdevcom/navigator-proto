@@ -568,7 +568,7 @@ display_route_result = (data) ->
             else
                 polylines = null
             $list.css('width', itinerary.duration/maxDuration*100+"%")
-            render_route_buttons($list, itinerary, routeLayer, polylines)
+            render_route_buttons($list, itinerary, routeLayer, polylines, maxDuration)
 
     resize_map() # adjust map height to match space left by itineraries
 
@@ -587,7 +587,7 @@ render_route_layer = (itinerary, routeLayer) ->
     route_includes_transit = _.any(leg.routeType? for leg in legs)
 
     # coffeescript parser would fail with string interpolation syntax here:
-    $('.control-details').html("<div class='route-details'><div>Itinerary total:&nbsp;&nbsp; &nbsp;&nbsp;<i><img src='static/images/clock.svg'> "+Math.ceil(itinerary.duration/1000/60)+"min<\/i>&nbsp;&nbsp; &nbsp;&nbsp;<i><img src='static/images/walking.svg'> "+Math.ceil(total_walking_duration/1000/60)+"min / "+Math.ceil(total_walking_distance/100)/10+"km<\/i></div></div>")
+    $('.control-details').html("<div class='route-details'><div>Itinerary:&nbsp;&nbsp;<i><img src='static/images/clock.svg'> "+Math.ceil(itinerary.duration/1000/60)+"min<\/i>&nbsp;&nbsp;<i><img src='static/images/walking.svg'> "+Math.ceil(total_walking_duration/1000/60)+"min / "+Math.ceil(total_walking_distance/100)/10+"km<\/i></div></div>")
 
     for leg in legs
         do (leg) ->
@@ -714,7 +714,7 @@ handle_vehicle_update = (initial, msg) ->
 # Itienary is the  itienary suggested for the user to get from source to target.
 # Route_layer is needed to resize the map when info is added to the footer here.
 # polylines contains graphical representation of the itienary legs.
-render_route_buttons = ($list, itinerary, route_layer, polylines) ->
+render_route_buttons = ($list, itinerary, route_layer, polylines, max_duration) ->
     trip_duration = itinerary.duration
     trip_start = itinerary.startTime
 
@@ -743,16 +743,14 @@ render_route_buttons = ($list, itinerary, route_layer, polylines) ->
     # label with itinerary start time
     $start = $("<li class='leg'><div class='leg-bar'><i><img src='static/images/walking.svg' height='100%' style='visibility: hidden' /></i><div class='leg-indicator' style='font-style: italic; text-align: left'>#{moment(trip_start).format("HH:mm")}</div></div></li>")
     $start.css("left", "#{0}%")
-    $start.css("width", "#{10}%")
+    $start.css("width", "#{15}%")
     $list.append($start)
 
     # label with itinerary end time
     $end = $("<li class='leg'><div class='leg-bar'><i><img src='static/images/walking.svg' height='100%' style='visibility: hidden' /></i><div class='leg-indicator' style='font-style: italic; text-align: right'>#{moment(trip_start+trip_duration).format("HH:mm")}</div></div></li>")
     $end.css("right", "#{0}%")
-    $end.css("width", "#{10}%")
+    $end.css("width", "#{15}%")
     $list.append($end)
-
-    max_duration = trip_duration # use all width for trip duration
 
     # Draw a button for each leg.
     for leg, index in itinerary.legs
@@ -766,12 +764,12 @@ render_route_buttons = ($list, itinerary, route_layer, polylines) ->
         color = google_colors[leg.routeType ? leg.mode]
 
 # GoodEnoughJourneyPlanner style:
-        leg_start = (leg.startTime-trip_start)/max_duration
-        leg_duration = leg.duration/max_duration
+        leg_start = (leg.startTime-trip_start)/trip_duration
+        leg_duration = leg.duration/trip_duration
         leg_label = "<img src='static/images/#{icon_name}' height='100%' />"
 
         # for long non-transit legs, display distance in place of route
-        if not leg.routeType? and leg.distance? and leg_duration > 0.2
+        if not leg.routeType? and leg.distance? and leg.duration/max_duration > 0.35
             leg_subscript = "<div class='leg-indicator' style='font-weight: normal'>#{Math.ceil(leg.distance/100)/10}km</div>"
         else
             leg_subscript = "<div class='leg-indicator'>#{leg.route}</div>"
@@ -978,7 +976,8 @@ transform_location = (point) ->
             return
 
 map.on 'locationerror', (e) ->
-    alert(e.message)
+    if e.message != "Geolocation error: The operation couldn’t be completed. (kCLErrorDomain error 0.)."
+        alert(e.message)
 
 # Triggered whenever user location has changed.
 map.on 'locationfound', (e) ->
@@ -1091,6 +1090,14 @@ map.on 'contextmenu', (e) ->
         osmnotes.addTo(map)
         # Comment box with id "comment-box" has been defined in the index.html.
         $('#comment-box').show()
+        hide = () ->
+            $('#comment-box').hide()
+            resize_map() # causes map redraw & notes update
+            set_comment_marker()
+        $('#comment-box .cancel-button').unbind 'click'
+        $('#comment-box .cancel-button').bind 'click', ->
+            hide()
+            return false # event handled
         $('#comment-box').unbind 'submit'
         $('#comment-box').bind 'submit', ->
             text = $('#comment-box textarea').val()
@@ -1098,10 +1105,10 @@ map.on 'contextmenu', (e) ->
             lon = commentMarker.getLatLng().lng
             uri = osm_notes_url
             $.post uri, {lat: lat, lon: lon, text: text}, ()->
-                $('#comment-box').hide()
-                resize_map() # causes map redraw & notes update
-                set_comment_marker()
+                $('#comment-box textarea').val("")
+                hide()
             return false # don't submit form
+        $.mobile.changePage '#map-page'
         resize_map()
         map.removeLayer(contextmenu)
         return false
