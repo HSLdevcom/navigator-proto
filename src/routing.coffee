@@ -881,6 +881,19 @@ $(window).on 'resize', () ->
 window.map_dbg = map = L.map('map', {minZoom: citynavi.config.min_zoom, zoomControl: false, attributionControl: false})
     .setView(citynavi.config.center, citynavi.config.min_zoom)
 
+
+map.whenReady () ->
+    console.log "map ready"
+    setTimeout () -> map.fire 'zoomend', 0
+
+# set a class on the map root element based on the current zoom, for css use
+map.on 'zoomend', (e) ->
+    console.log "zoomend"
+    zoom = map.getZoom()
+    minzooms = ("minzoom-"+i for i in [0..zoom]).join(" ")
+    # XXX toggle instead of set:
+    $('#map').attr('class', "leaflet-container leaflet-fade-anim "+minzooms)
+
 $(document).ready () ->
     resize_map()
     map.invalidateSize()
