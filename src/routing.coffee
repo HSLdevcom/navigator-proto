@@ -125,7 +125,7 @@ $('#map-page').bind 'pageshow', (e, data) ->
         sourceMarker.openPopup()
 
     if routeLayer?
-        map.fitBounds(routeLayer.getBounds())
+        mapfitBounds(routeLayer.getBounds())
     else if position_point?
         zoom = Math.min(map.getBoundsZoom(position_bounds), 15)
         map.setView(position_point, zoom)
@@ -298,10 +298,10 @@ marker_changed = (options) ->
     if sourceMarker? and targetMarker?
         find_route sourceMarker.getLatLng(), targetMarker.getLatLng(), (route) ->
             if options?.zoomToFit
-                map.fitBounds(route.getBounds())
+                mapfitBounds(route.getBounds())
             else if options?.zoomToShow
                 if not map.getBounds().contains(route.getBounds())
-                    map.fitBounds(route.getBounds())
+                    mapfitBounds(route.getBounds())
 
 
 ## Routing
@@ -605,7 +605,7 @@ render_route_layer = (itinerary, routeLayer) ->
             # Make zooming to the leg via click possible.
             polyline = new L.Polyline(points, {color: color, opacity: 0.4, dashArray: dashArray})
                 .on 'click', (e) ->
-                    map.fitBounds(polyline.getBounds())
+                    mapfitBounds(polyline.getBounds())
                     if marker?
                         marker.openPopup()
             polyline.addTo(routeLayer)
@@ -734,7 +734,7 @@ render_route_buttons = ($list, itinerary, route_layer, polylines, max_duration) 
     # Add event handler to zoom to show whole itienary on map if
     # there is no other click event defined for a button. The "Total" button is such.
     $full_trip.click (e) ->
-        map.fitBounds(route_layer.getBounds())
+        mapfitBounds(route_layer.getBounds())
         sourceMarker.closePopup()
         targetMarker.closePopup()
         sourceMarker.openPopup()
@@ -796,7 +796,7 @@ render_route_buttons = ($list, itinerary, route_layer, polylines, max_duration) 
                 $list.parent().siblings().removeClass('active')
                 polylines = render_route_layer(itinerary, routeLayer)
                 $list.parent().addClass('active')
-                map.fitBounds(routeLayer.getBounds())
+                mapfitBounds(routeLayer.getBounds())
 
         # if the i is a block, it needs a separate event handler
         $leg.find('i').click (e) ->
@@ -835,7 +835,7 @@ find_route_reittiopas = (source, target, callback) ->
             color = transport_colors[leg.type]
             polyline = new L.Polyline(points, {color: color})
                 .on 'click', (e) ->
-                    map.fitBounds(e.target.getBounds())
+                    mapfitBounds(e.target.getBounds())
                     if marker?
                         marker.openPopup()
             polyline.addTo(route)
@@ -847,7 +847,7 @@ find_route_reittiopas = (source, target, callback) ->
                     .bindPopup("<b><Time: #{format_time(stop.depTime)}</b><br /><b>From:</b> {stop.name}<br /><b>To:</b> #{last_stop.name}")
 
         if not map.getBounds().contains(route.getBounds())
-            map.fitBounds(route.getBounds())
+            mapfitBounds(route.getBounds())
 
 
 ## Map initialisation
@@ -1125,3 +1125,12 @@ map.on 'contextmenu', (e) ->
         resize_map()
         map.removeLayer(contextmenu)
         return false
+
+mapfitBounds = (bounds) ->
+    # map.fitBounds taking into account the map area that is covered by
+    # the header, the footer or the trip details control
+    topPadding = $(".ui-header").height() + $(".control-details").height()
+    bottomPadding = $(".ui-footer").height()
+    map.fitBounds bounds,
+        paddingTopLeft: [0, topPadding]
+        paddingBottomRight: [0, bottomPadding]
