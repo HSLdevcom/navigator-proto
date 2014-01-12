@@ -2,6 +2,7 @@
 
 # map
 map = null
+map_under_drag = false # drag state
 
 # Background map layers.
 layers = {}
@@ -988,6 +989,11 @@ transform_location = (point) ->
             point.lng = t.dest.lng
             return
 
+map.on 'dragstart', (e) ->
+    map_under_drag = true
+map.on 'dragend', (e) ->
+    map_under_drag = false
+
 map.on 'locationerror', (e) ->
     if e.message != "Geolocation error: The operation couldn’t be completed. (kCLErrorDomain error 0.)."
         alert(e.message)
@@ -1021,6 +1027,12 @@ map.on 'locationfound', (e) ->
         radius = 50 # draw small grey circle
         measure = "nowhere near"
         e.bounds = L.latLngBounds(bbox_sw, bbox_ne)
+
+    # if position was visible, pan to keep it visible
+    if positionMarker? && map.getBounds().contains(positionMarker.getLatLng())
+        if not map.getBounds().contains(e.bounds)
+            if not map_under_drag
+                map.panTo(point)
 
     # save latest position info for later page change
     position_point = point
