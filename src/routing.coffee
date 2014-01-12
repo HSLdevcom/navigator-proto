@@ -622,11 +622,12 @@ render_route_layer = (itinerary, routeLayer) ->
                 # that has uid specific to this leg once per second by calling this function
                 # again. Uid has been calculated randomly above in the beginning of the for loop.
                 secondsCounter = () ->
-                    if leg.startTime >= moment()
-                        duration = moment.duration(leg.startTime-moment())
+                    now = citynavi.time()
+                    if leg.startTime >= now
+                        duration = moment.duration(leg.startTime-now)
                         sign = ""
                     else
-                        duration = moment.duration(moment()-leg.startTime)
+                        duration = moment.duration(now-leg.startTime)
                         sign = "-"
                     seconds = (duration.seconds()+100).toString().substring(1)
                     minutes = duration.minutes()
