@@ -138,6 +138,7 @@ reset_map = () ->
         if routeLayer?
             map.removeLayer routeLayer
             routeLayer = null
+            citynavi.set_itinerary null
 
         $('.route-list ul').empty().hide().parent().removeClass("active")
 
@@ -566,6 +567,7 @@ display_route_result = (data) ->
             if index == 0
                 polylines = render_route_layer(itinerary, routeLayer)
                 $list.parent().addClass("active")
+                citynavi.set_itinerary itinerary
             else
                 polylines = null
             $list.css('width', itinerary.duration/maxDuration*100+"%")
@@ -799,6 +801,7 @@ render_route_buttons = ($list, itinerary, route_layer, polylines, max_duration) 
                 polylines = render_route_layer(itinerary, routeLayer)
                 $list.parent().addClass('active')
                 mapfitBounds(routeLayer.getBounds())
+                citynavi.set_itinerary itinerary
 
         # if the i is a block, it needs a separate event handler
         $leg.find('i').click (e) ->
