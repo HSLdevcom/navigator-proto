@@ -131,7 +131,7 @@ defaults =
 tampere =
     name: "Tampere"
     country: "fi"
-    cities: ["Tampere"]
+    cities: ["Tampere", "Tammerfors"]
     google_autocomplete_append: "Tampere"
     bbox_ne: [61.8237444, 24.1064742]
     bbox_sw: [61.42863, 23.5611791]
@@ -189,7 +189,9 @@ manchester =
 helsinki =
     name: "Helsinki Region"
     country: "fi"
-    cities: ["Helsinki", "Vantaa", "Espoo", "Kauniainen", "Kerava", "Sipoo", "Kirkkonummi"]
+    cities: ["Helsinki", "Vantaa", "Espoo", "Kauniainen", "Kerava", "Sipoo", "Kirkkonummi", # names in finnish
+             "Helsingfors", "Vanda", "Esbo", "Grankulla", "Kervo", "Sibbo", "Kyrkslätt"
+    ] # names in swedish
     bbox_ne: [60.653728, 25.576590]
     bbox_sw: [59.903339, 23.692820]
     center: [60.170833, 24.9375]
