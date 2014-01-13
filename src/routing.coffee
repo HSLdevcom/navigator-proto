@@ -1154,6 +1154,22 @@ mapfitBounds = (bounds) ->
 simulation_timeoutId = null
 simulation_timestep = 10000
 
+$('.pause-navigation-link').on 'click', (e) ->
+    if $('.pause-navigation-link').attr('data-icon') == 'pause'
+        console.log "Pausing"
+        simulation_timestep = 0
+        $('.pause-navigation-link').attr 'data-icon', 'play'
+        $('.pause-navigation-link .ui-icon').attr 'class', 'ui-icon ui-icon-play ui-icon-shadow'
+        $('.pause-navigation-link').buttonMarkup 'option', 'icon', 'play'
+        $('.pause-navigation-link .ui-btn-text').text "Continue"
+    else
+        console.log "Playing"
+        simulation_timestep = 10000
+        $('.pause-navigation-link').attr 'data-icon', 'pause'
+        $('.pause-navigation-link .ui-icon').attr 'class', 'ui-icon ui-icon-pause ui-icon-shadow'
+        $('.pause-navigation-link').buttonMarkup 'option', 'icon', 'pause'
+        $('.pause-navigation-link .ui-btn-text').text "Pause"
+
 $('.journey-preview-link').on 'click', (e) ->
     itinerary = citynavi.get_itinerary()
 
