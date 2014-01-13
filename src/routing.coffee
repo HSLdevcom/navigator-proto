@@ -1150,3 +1150,95 @@ mapfitBounds = (bounds) ->
     map.fitBounds bounds,
         paddingTopLeft: [0, topPadding]
         paddingBottomRight: [0, bottomPadding]
+
+simulation_timeoutId = null
+simulation_timestep = 10000
+
+$('.journey-preview-link').on 'click', (e) ->
+    itinerary = citynavi.get_itinerary()
+
+    for route_id of citynavi.realtime?.subs or []
+        citynavi.realtime.unsubscribe_route route_id
+    for vehicle in vehicles
+        routeLayer.removeLayer(vehicle)
+    vehicles = []
+    previous_positions = []
+    interpolations = []
+
+    console.log "Starting simulation"
+    simulation_step(itinerary, itinerary.startTime - 60*1000)
+
+$('#navigation-page [data-rel="back"]').on 'click', (e) ->
+    if simulation_timeoutId?
+        clearTimeout simulation_timeoutId
+        simulation_timeoutId = null
+        citynavi.set_simulation_time null
+    if positionMarker?
+        map.removeLayer positionMarker
+        map.removeLayer positionMarker2
+        positionMarker = null
+        position_point = null
+        # XXX restore latest real geolocation
+        citynavi.set_source_location null
+
+simulation_step = (itinerary, time) ->
+    simulation_timeoutId = setTimeout (-> simulation_step itinerary, time+simulation_timestep), 1000
+    # XXX how to switch itinerary?
+
+    citynavi.set_simulation_time moment(time)
+
+    leg = null
+
+    for l in itinerary.legs
+        if l.startTime <= time < l.endTime # this leg is in progress
+            leg = l
+
+    if time < itinerary.legs[0].startTime
+        leg =
+            startTime: itinerary.startTime
+            endTime: itinerary.legs[0].startTime
+            legGeometry:
+                points:
+                    [[sourceMarker.getLatLng().lat*1e5, sourceMarker.getLatLng().lng*1e5]]
+    else if time >= itinerary.legs[itinerary.legs.length-1].endTime
+        leg =
+            startTime: itinerary.legs[itinerary.legs.length-1].endTime
+            endTime: itinerary.endTime
+            legGeometry:
+                points:
+                    [[targetMarker.getLatLng().lat*1e5, targetMarker.getLatLng().lng*1e5]]
+
+    if not leg?
+        console.log "No current leg"
+        return
+
+    geometry = ([p[0]*1e-5, p[1]*1e-5] for p in leg.legGeometry.points)
+
+    share = (time-leg.startTime) / (leg.endTime-leg.startTime)
+
+    if geometry.length > 1 and share != 0
+        {latLng, predecessor} = L.GeometryUtil.interpolateOnLine(map, geometry, share)
+    else
+        [latLng, predecessor] = [L.latLng(geometry[0]), -1]
+
+#    console.log leg, leg.startTime-itinerary.startTime, time-itinerary.startTime, leg.endTime-itinerary.startTime, {points: geometry}, share, "->", latLng.toString(), predecessor
+
+    accuracy = 50
+
+    map.fire 'locationfound', construct_locationfound_event(latLng, accuracy)
+
+
+construct_locationfound_event = (latLng, accuracy) ->
+    lat = latLng.lat
+    lng = latLng.lng
+
+    latAccuracy = 180 * accuracy / 40075017
+    lngAccuracy = latAccuracy / Math.cos(L.LatLng.DEG_TO_RAD * lat)
+    bounds = L.latLngBounds(
+        [lat - latAccuracy, lng - lngAccuracy],
+        [lat + latAccuracy, lng + lngAccuracy])
+    return {
+        accuracy: accuracy
+        latlng: L.latLng(lat, lng)
+        bounds: bounds
+    }
