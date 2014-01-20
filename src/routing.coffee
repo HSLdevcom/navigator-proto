@@ -1245,6 +1245,7 @@ speak_callback = () ->
         speak_real(text)
 
 dir_to_finnish =
+    DEPART: ""
     NORTH: "Kulje pohjoiseen katua"
     SOUTH: "Kulje etelään katua"
     EAST: "Kulje itään katua"
@@ -1258,6 +1259,13 @@ dir_to_finnish =
     RIGHT: "Käänny oikealle kadulle"
     SLIGHTLY_LEFT: "Käänny viistosti vasemmalle kadulle"
     SLIGHTLY_RIGHT: "Käänny viistosti oikealle kadulle"
+    HARD_LEFT: "Käänny jyrkästi vasemmalle kadulle"
+    HARD_RIGHT: "Käänny jyrkästi oikealle kadulle"
+    UTURN_LEFT: "Tee U-käännös vasemmalle kadulle"
+    UTURN_RIGHT: "Tee U-käännös oikealle kadulle"
+    CIRCLE_CLOCKWISE: "Kulje myötäpäivään liikenneympyrää"
+    CIRCLE_COUNTERCLOCKWISE: "Kulje vastapäivään liikenneympyrää"
+    ELEVATOR: "Mene hissillä kadulle"
 
 path_to_finnish =
     "bike path": "pyörätie"
@@ -1284,8 +1292,20 @@ path_to_finnish =
 
     cycleway: "pyörätie"
 
+    "Elevator": "hissi"
+
+    "default level": "maantaso"
+
+location_to_finnish = (location) ->
+    corner = location.name.match(/corner of (.*) and (.*)/)
+
+    if corner?
+        return "katujen #{corner[1]} ja #{corner[2]} kulma"
+
+    return path_to_finnish[location.name] or location.name or 'nimetön'
+
 step_to_finnish_speech = (step) ->
-    if step.relativeDirection
+    if step.relativeDirection and step.relativeDirection != "DEPART"
        text = dir_to_finnish[step.relativeDirection] or step.relativeDirection
     else
        text = dir_to_finnish[step.absoluteDirection] or step.asboluteDirection
@@ -1297,7 +1317,7 @@ step_to_finnish_speech = (step) ->
 display_step = (step) ->
     icon = L.divIcon({className: "navigator-div-icon"})
 
-    marker = L.marker(new L.LatLng(step.lat, step.lon), {icon: icon}).addTo(routeLayer).bindLabel("#{(step.relativeDirection or step.absoluteDirection).toLowerCase().replace('_', ' ')} on #{step.streetName or 'unnamed path'}", {noHide: true}).showLabel()
+    marker = L.marker(new L.LatLng(step.lat, step.lon), {icon: icon}).addTo(routeLayer).bindLabel("#{((step.relativeDirection and step.relativeDirection != "DEPART") or step.absoluteDirection).toLowerCase().replace('_', ' ')} on #{step.streetName or 'unnamed path'}", {noHide: true}).showLabel()
 
 
 simulation_step = (itinerary, time) ->
@@ -1333,7 +1353,7 @@ simulation_step = (itinerary, time) ->
 
     if not lastLeg?
         display_detail "Instructions start at "+itinerary.legs[0].from.name+"."
-        speak "Ohjeet alkavat kadulta "+(itinerary.legs[0].from.name or "tuntematon")
+        speak "Ohjeet alkavat kadulta "+ location_to_finnish(itinerary.legs[0].from)
         if itinerary.legs[0].steps?[0]
             currentStep = itinerary.legs[0].steps?[0]
             currentStepIndex = 0
@@ -1360,7 +1380,7 @@ simulation_step = (itinerary, time) ->
 
     if currentStep? && latLng.distanceTo(new L.LatLng(currentStep.lat, currentStep.lon)) < 5
         step = currentStep
-        display_detail "Next, go #{(step.relativeDirection or step.absoluteDirection).toLowerCase().replace('_', ' ')} on #{step.streetName or 'unnamed path'}."
+        display_detail "Next, go #{((step.relativeDirection and step.relativeDirection != "DEPART") or step.absoluteDirection).toLowerCase().replace('_', ' ')} on #{step.streetName or 'unnamed path'}."
         speak step_to_finnish_speech(step)
         currentStepIndex = currentStepIndex + 1
         currentStep = leg.steps?[currentStepIndex]
