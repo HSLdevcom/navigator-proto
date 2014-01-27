@@ -115,6 +115,7 @@ defaults =
             name: "OpenStreetMap"
             url_template: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
             opts:
+                maxZoom: 19
                 attribution: 'Map data &copy; 2011 OpenStreetMap contributors'
         opencyclemap:
             name: "OpenCyclemap"
@@ -125,6 +126,7 @@ defaults =
             name: "MapQuest"
             url_template: 'http://otile{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg'
             opts:
+                maxZoom: 19
                 subdomains: '1234'
                 attribution: 'Map data &copy; 2013 OpenStreetMap contributors, Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">'
 
