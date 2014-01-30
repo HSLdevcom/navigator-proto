@@ -1213,11 +1213,23 @@ $('#navigation-page [data-rel="back"]').on 'click', (e) ->
 $('#use-speech').change () ->
     if $('#use-speech').attr('checked')
         if not meSpeak?
-            $.getScript "mespeak/mespeak.full.js", ()->
+            xhr = $.ajax
+                url: "mespeak/mespeak.js"
+                dataType: "script"
+                cache: true
+
+            xhr.done () ->
                 if meSpeak?
                     meSpeak?.loadConfig("mespeak/mespeak_config.json");
 #                    meSpeak?.loadVoice("mespeak/voices/en/en.json");
                     meSpeak?.loadVoice("mespeak/voices/fi.json");
+                    console.log "meSpeak loaded"
+                else
+                    console.log "meSpeak failed"
+
+            xhr.fail (jqXHR, textStatus, errorThrown) ->
+                console.log "meSpeak failed to load: #{textStatus} #{errorThrown}"
+
 
 speak_real = (text) ->
     if meSpeak? and $('#use-speech').attr('checked')
