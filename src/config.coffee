@@ -109,7 +109,7 @@ defaults =
             url_template: 'http://{s}.tile.cloudmade.com/{key}/{style}/256/{z}/{x}/{y}.png'
             opts:
                 attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2012 CloudMade'
-                key: 'BC9A493B41014CAABB98F0471D759707'
+                key: 'dde3e76809d54a2fb29ac08bbc08335a'
                 style: 998
         osm:
             name: "OpenStreetMap"
