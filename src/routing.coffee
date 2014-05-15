@@ -934,7 +934,7 @@ create_tile_layer = (map_config) ->
 for key, value of citynavi.config.maps
     layers[key] = create_tile_layer(value)
 
-layers["cloudmade"].addTo(map)
+layers[citynavi.config.defaultmap].addTo(map)
 
 # Use the leafletOsmNotes() function in file file "static/js/leaflet-osm-notes.js"
 # to create layer for showing error notes from OSM in the map.

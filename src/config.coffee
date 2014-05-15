@@ -103,32 +103,32 @@ defaults =
             4: 'port.svg'
             109: 'train_station2.svg'
 
+    defaultmap: "osm"
+
     maps:
-        cloudmade:
-            name: "CloudMade"
-            url_template: 'http://{s}.tile.cloudmade.com/{key}/{style}/256/{z}/{x}/{y}.png'
-            opts:
-                attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2012 CloudMade'
-                key: 'dde3e76809d54a2fb29ac08bbc08335a'
-                style: 998
         osm:
             name: "OpenStreetMap"
             url_template: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
             opts:
                 maxZoom: 19
-                attribution: 'Map data &copy; 2011 OpenStreetMap contributors'
+                attribution: 'Map data &copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap contributors</a>'
         opencyclemap:
-            name: "OpenCyclemap"
-            url_template: 'http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png'
+            name: "OpenCycleMap"
+            url_template: 'http://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png'
             opts:
-                attribution: 'Map data &copy; 2011 OpenStreetMap contributors, Imagery by <a href="http://www.opencyclemap.org/" target="_blank">OpenCycleMap</a>'
+                attribution: 'Map &copy; <a href="http://www.thunderforest.com/" target="_blank">Thunderforest</a>, Map data &copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap contributors</a>'
+        transport:
+            name: "Public transport"
+            url_template: 'http://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png'
+            opts:
+                attribution: 'Map &copy; <a href="http://www.thunderforest.com/" target="_blank">Thunderforest</a>, Map data &copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap contributors</a>'
         mapquest:
             name: "MapQuest"
             url_template: 'http://otile{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg'
             opts:
                 maxZoom: 19
                 subdomains: '1234'
-                attribution: 'Map data &copy; 2013 OpenStreetMap contributors, Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">'
+                attribution: 'Map data &copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap contributors</a>, Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">'
 
 tampere =
     name: "Tampere"
