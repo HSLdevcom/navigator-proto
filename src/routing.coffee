@@ -1066,8 +1066,14 @@ map.on 'locationfound', (e) ->
     positionMarker = L.circle(point, radius, {color: 'red', weight: 1, opacity: 0.4}).addTo(map)
         .on 'click', (e) ->
             set_source_marker(point, {accuracy: radius, measure: measure})
-    # Draw position center as a fixed-size circle
-    positionMarker2 = L.circleMarker(point, {radius: 7, color: 'red', weight: 2, fillOpacity: 1, }).addTo(map)
+    # If heading direction available draws the arrow marker
+    # otherwise draws position center as a fixed-size circle
+    # TODO: filter to avoid sudden switch between those two markers
+    positionMarker2 = (
+      if e.heading? and not isNaN e.heading
+      then L.rotatedMarker point, angle: e.heading, icon: L.icon(iconUrl: 'static/images/arrow.svg', iconSize: [20, 20])
+      else L.circleMarker(point, {radius: 7, color: 'red', weight: 2, fillOpacity: 1})
+    ).addTo(map)
         .on 'click', (e) ->
             set_source_marker(point, {accuracy: radius, measure: measure})
 
