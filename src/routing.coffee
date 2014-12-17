@@ -48,9 +48,9 @@ interpret_jore = (routeId) ->
     else if routeId?.match /^300/
         [mode, routeType, route] = ["RAIL", 2, routeId.substring(4,5)]
     else if routeId?.match /^10(0|10)/
-        [mode, routeType, route] = ["TRAM", 0, "#{parseInt routeId.substring(2,4)}"]
+        [mode, routeType, route] = ["TRAM", 0, routeId.replace(/^.0*/,"")]
     else if routeId?.match /^(1|2|4).../
-        [mode, routeType, route] = ["BUS", 3, "#{parseInt routeId.substring(1)}"]
+        [mode, routeType, route] = ["BUS", 3, routeId.replace(/^.0*/,"")]
     else
         # unknown, assume bus
         [mode, routeType, route] = ["BUS", 3, routeId]
