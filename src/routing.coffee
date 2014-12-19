@@ -583,6 +583,9 @@ display_route_result = (data) ->
 render_route_layer = (itinerary, routeLayer) ->
     legs = itinerary.legs
 
+    for route_id of citynavi.realtime?.subs or []
+        citynavi.realtime.unsubscribe_route route_id
+
     vehicles = []
     previous_positions = []
 
