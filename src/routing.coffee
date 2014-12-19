@@ -643,7 +643,12 @@ render_route_layer = (itinerary, routeLayer) ->
                     if (hours > 0)
                         minutes = (minutes+100).toString().substring(1)
                         minutes = "#{hours}:#{minutes}"
-                    $("#counter#{uid}").text "#{sign}#{minutes}:#{seconds}"
+                    if leg.realTime
+                        real_time = "*"
+                    else
+                        real_time = "~"
+
+                    $("#counter#{uid}").text "#{real_time}#{sign}#{minutes}:#{seconds}"
                     setTimeout secondsCounter, 1000
 
                 marker = L.marker(new L.LatLng(point.y, point.x), {icon: icon}).addTo(routeLayer)
