@@ -31,10 +31,13 @@ siri_to_live = (vehicle) ->
         id: vehicle.MonitoredVehicleJourney.VehicleRef.value
     trip:
         route: vehicle.MonitoredVehicleJourney.LineRef.value
+        direction: vehicle.MonitoredVehicleJourney.DirectionRef.value
+        start_time: vehicle.MonitoredVehicleJourney.FramedVehicleJourneyRef.DatedVehicleJourneyRef
     position:
         latitude: vehicle.MonitoredVehicleJourney.VehicleLocation.Latitude
         longitude: vehicle.MonitoredVehicleJourney.VehicleLocation.Longitude
         bearing: vehicle.MonitoredVehicleJourney.Bearing
+        delay: vehicle.MonitoredVehicleJourney.Delay
 
 
 interpret_jore = (routeId) ->
