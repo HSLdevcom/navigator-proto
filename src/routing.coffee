@@ -720,6 +720,8 @@ handle_vehicle_update = (initial, msg) ->
                             if interpolations[id]
                                 clearTimeout(interpolations[id])
                             interpolation 1, id, old_pos
+                            if not msg.position.bearing
+                                msg.position.bearing = (L.GeometryUtil.computeAngle map.latLngToLayerPoint(old_pos), map.latLngToLayerPoint(pos))+90
                     previous_positions[id] = pos
                     itinerary = citynavi.get_itinerary()
                     if itinerary?
@@ -738,8 +740,8 @@ handle_vehicle_update = (initial, msg) ->
 
 
                     $("#vehicle-#{id}").css('transform', "rotate(#{msg.position.bearing+90}deg)")
-#                    $("#vehicle-#{id} img").css('transform', "rotate(-#{msg.position.bearing+90}deg)")
-                    $("#vehicle-#{id} span").css('transform', "rotate(-#{msg.position.bearing+90}deg)")
+#                    $("#vehicle-#{id} img").css('transform', "rotate(#{(msg.position.bearing+90)*-1}deg)")
+                    $("#vehicle-#{id} span").css('transform', "rotate(#{(msg.position.bearing+90)*-1}deg)")
 
 # Renders the route buttons in the map page footer.
 # Itienary is the  itienary suggested for the user to get from source to target.
