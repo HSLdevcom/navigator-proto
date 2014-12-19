@@ -721,6 +721,22 @@ handle_vehicle_update = (initial, msg) ->
                                 clearTimeout(interpolations[id])
                             interpolation 1, id, old_pos
                     previous_positions[id] = pos
+                    itinerary = citynavi.get_itinerary()
+                    if itinerary?
+                        for leg in itinerary.legs
+                            if leg.routeType?
+                                [route, ... , direction, start_time] = leg.tripId.split '_'
+                                if route == msg.trip.route and direction == msg.trip.direction and
+                                        start_time == msg.trip.start_time
+                                    $("#vehicle-#{id}").css 'box-shadow', "0px 0px 10px 10px #{google_colors[routeType ? mode]}"
+                                    leg.realTime = true
+                                    leg.startTime += (msg.position.delay-leg.departureDelay)*1000
+                                    leg.endTime += (msg.position.delay-leg.arrivalDelay)*1000
+                                    leg.departureDelay = leg.arrivalDelay = msg.position.delay
+                                else if route == msg.trip.route and direction != msg.trip.direction
+                                    $("#vehicle-#{id}").css 'display', 'none'
+
+
                     $("#vehicle-#{id}").css('transform', "rotate(#{msg.position.bearing+90}deg)")
 #                    $("#vehicle-#{id} img").css('transform', "rotate(-#{msg.position.bearing+90}deg)")
                     $("#vehicle-#{id} span").css('transform', "rotate(-#{msg.position.bearing+90}deg)")
