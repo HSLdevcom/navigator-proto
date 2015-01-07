@@ -372,9 +372,9 @@ create_wait_leg = (start_time, duration, point, placename) ->
         mode: "WAIT"
         routeType: null # non-transport
         route: ""
-        duration: duration
+        duration: duration/1000
         startTime: start_time
-        endTime: start_time + duration
+        endTime: start_time + duration/1000
         legGeometry: {points: [point]}
         from:
             lat: point[0]*1e-5
@@ -596,7 +596,7 @@ render_route_layer = (itinerary, routeLayer) ->
     route_includes_transit = _.any(leg.routeType? for leg in legs)
 
     # coffeescript parser would fail with string interpolation syntax here:
-    $('.control-details').html("<div class='route-details'><div>Itinerary:&nbsp;&nbsp;<i><img src='static/images/clock.svg'> "+Math.ceil(itinerary.duration/1000/60)+"min<\/i>&nbsp;&nbsp;<i><img src='static/images/walking.svg'> "+Math.ceil(total_walking_duration/1000/60)+"min / "+Math.ceil(total_walking_distance/100)/10+"km<\/i></div></div>")
+    $('.control-details').html("<div class='route-details'><div>Itinerary:&nbsp;&nbsp;<i><img src='static/images/clock.svg'> "+Math.ceil(itinerary.duration/60)+"min<\/i>&nbsp;&nbsp;<i><img src='static/images/walking.svg'> "+Math.ceil(total_walking_duration/60)+"min / "+Math.ceil(total_walking_distance/100)/10+"km<\/i></div></div>")
 
     for leg in legs
         do (leg) ->
@@ -747,7 +747,7 @@ handle_vehicle_update = (initial, msg) ->
 # Route_layer is needed to resize the map when info is added to the footer here.
 # polylines contains graphical representation of the itienary legs.
 render_route_buttons = ($list, itinerary, route_layer, polylines, max_duration) ->
-    trip_duration = itinerary.duration
+    trip_duration = itinerary.duration*1000
     trip_start = itinerary.startTime
 
     length = itinerary.legs.length + 1 # Include space for the "Total" button.
@@ -797,7 +797,7 @@ render_route_buttons = ($list, itinerary, route_layer, polylines, max_duration) 
 
 # GoodEnoughJourneyPlanner style:
         leg_start = (leg.startTime-trip_start)/trip_duration
-        leg_duration = leg.duration/trip_duration
+        leg_duration = leg.duration*1000/trip_duration
         leg_label = "<img src='static/images/#{icon_name}' height='100%' />"
 
         # for long non-transit legs, display distance in place of route
