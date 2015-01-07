@@ -668,8 +668,7 @@ render_route_layer = (itinerary, routeLayer) ->
                 # a bus drives.
                 # FIXME This should be drawn before the leg part is drawn because otherwise
                 # this is drawn on top of it and click events for the line  below are not triggered.
-                $.getJSON citynavi.config.otp_base_url + "transit/variantForTrip", {tripId: leg.tripId, tripAgency: leg.agencyId}, (data) ->
-                    geometry = data.geometry
+                $.getJSON citynavi.config.otp_base_url + "index/trips/#{leg.agencyId}:#{leg.tripId}/geometry", (geometry) ->
                     points = (new L.LatLng(point[0]*1e-5, point[1]*1e-5) for point in decode_polyline(geometry.points, 2))
                     line_layer = new L.Polyline(points, {color: color, opacity: 0.2})
                     line_layer.addTo(routeLayer)
