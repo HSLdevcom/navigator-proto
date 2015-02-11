@@ -249,6 +249,35 @@ nl =
         ]
     autocompletion_providers: ["poi_categories", "osm", "bag42", "google"]
 
+fi =
+    name: "Finland"
+    country: "fi"
+    cities: null
+    google_url: "http://api.okf.fi/gis/1/"
+    google_autocomplete_append: "Finland"
+    google_suffix: ", Finland"
+    bbox_ne: [67.2, 31.6]
+    bbox_sw: [59.8, 21.05]
+    center: [63.2467777,25.9209164]
+    min_zoom: 6
+    otp_base_url: "http://matka-aika.com/reittiopas/otp/routers/default/"
+    poi_muni_id: null
+    waag_id: "admr.fi.suomi"
+    poi_providers:
+        "waag": [
+            {type: "library"}
+            {type: "park"}
+            {type: "swimming_pool"}
+            {type: "restaurant"}
+            {type: "cafe"}
+            {type: "bar"}
+            {type: "pub"}
+            {type: "supermarket"}
+            {type: "toilet"}
+            {type: "recycling"}
+        ]
+    autocompletion_providers: ["poi_categories", "osm", "google"]
+
 
 # Save and set configuration.
 #############################
@@ -259,6 +288,7 @@ citynavi.update_configs {
     manchester
     tampere
     nl
+    fi
 }
 
 citynavi.set_config("manchester")
