@@ -89,6 +89,7 @@ defaults =
             3: hsl_colors[5]
             4: hsl_colors[7]
             109: hsl_colors[12]
+            1100: '#ff88ff' # Air traffic
 
     icons:
         google:
@@ -102,6 +103,7 @@ defaults =
             3: 'bus_stop.svg'
             4: 'port.svg'
             109: 'train_station2.svg'
+            1100: 'airplane.svg'
 
     defaultmap: "osm"
 
