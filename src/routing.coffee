@@ -266,7 +266,7 @@ set_source_marker = (latlng, options) ->
     else
         sourceMarker.bindPopup("The starting point for journey<br>(drag the marker to change)")
 
-    if options.popup
+    if options?.popup
         sourceMarker.openPopup()
 
     marker_changed(options)
