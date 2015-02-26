@@ -266,7 +266,7 @@ set_source_marker = (latlng, options) ->
     else
         sourceMarker.bindPopup("The starting point for journey<br>(drag the marker to change)")
 
-    if options.popup
+    if options?.popup
         sourceMarker.openPopup()
 
     marker_changed(options)
@@ -927,7 +927,62 @@ map.on 'zoomend', (e) ->
     # XXX toggle instead of set:
     $('#map').attr('class', "leaflet-container leaflet-fade-anim "+minzooms)
 
-$(document).ready () ->
+$(document).on 'pageinit', ->
+    if location.search? and location.search.length > 0
+        console.log "location.search", location.search
+        searchString = location.search.substring(1, location.search.length)
+        searchParams = searchString.split("&")
+        source = undefined
+        target = undefined
+        mode = undefined
+        destname = undefined
+        for param in searchParams
+            if param == "usetransit=yes"
+                #console.log "usetransit=yes"
+                $('input[name=usetransit]').prop('checked', true)
+                #$('#modesettings').find('input[name=BUS]').prop('checked', true)
+                #$('#modesettings').find('input[name=TRAM]').prop('checked', true)
+                #$('#modesettings').find('input[name=RAIL]').prop('checked', true)
+                #$('#modesettings').find('input[name=SUBWAY]').prop('checked', true)
+            else if param == "usetransit=no"
+                #console.log "usetransit=no"
+                $('input[name=usetransit]').prop('checked', false)
+                #$('#modesettings').find('input[name=BUS]').prop('checked', false)
+                #$('#modesettings').find('input[name=TRAM]').prop('checked', false)
+                #$('#modesettings').find('input[name=RAIL]').prop('checked', false)
+                #$('#modesettings').find('input[name=SUBWAY]').prop('checked', false)
+            else if param.indexOf("mode=") == 0
+                mode = param.substring(5, param.length)
+                console.log "mode", mode
+                $('input[name=vehiclesettings][value=' + mode + ']').prop('checked', true)
+            else if param.indexOf("destname=") == 0
+                destname = decodeURIComponent(param.substring(9, param.length))
+            else if param.indexOf("start=") == 0
+                start = param.substring(6, param.length)
+                console.log "start", start
+                if start.indexOf(',') != -1
+                    parts = start.split(',')
+                    lat = parts[0]
+                    lng = parts[1]
+                    source = new L.LatLng(parseFloat(lat), parseFloat(lng))
+            else if param.indexOf("destination=") == 0
+                destination = param.substring(12, param.length)
+                console.log "destination", destination
+                if destination.indexOf(',') != -1
+                    parts = destination.split(',')
+                    lat = parts[0]
+                    lng = parts[1]
+                    target = new L.LatLng(parseFloat(lat), parseFloat(lng))
+        #$('#wheelchair').prop('checked', false)
+        #$('#prefer-free').prop('checked', false)
+        #$('#use-speech').prop('checked', false)
+        if source?
+            set_source_marker(source)
+        if target?
+            if destname?
+                set_target_marker(target, {description: destname})
+            else
+                set_target_marker(target)
     resize_map()
     map.invalidateSize()
 
