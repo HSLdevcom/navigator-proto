@@ -201,6 +201,7 @@ helsinki =
     center: [60.170833, 24.9375]
     otp_base_url: "http://dev.hsl.fi/opentripplanner-api-webapp/ws/"
     siri_url: "http://dev.hsl.fi/siriaccess/vm/json?operatorRef=HSL"
+    faye_id: "helsinki"
     poi_muni_id: null # XXX is this ok?
     waag_id: "admr.fi.uusimaa" # XXX should be HSL area
     poi_providers:
@@ -261,6 +262,8 @@ fi =
     center: [63.2467777,25.9209164]
     min_zoom: 6
     otp_base_url: "http://matka-aika.com/reittiopas/otp/routers/default/"
+    siri_url: "http://dev.hsl.fi/siriaccess/vm/json"
+    faye_id: "helsinki"
     poi_muni_id: null
     waag_id: "admr.fi.suomi"
     poi_providers:

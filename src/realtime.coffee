@@ -13,7 +13,7 @@ class Realtime
         # Replace all spaces with "_" and all ":" with "-".
         route_path = route_id.replace(/\ /g, "_").replace(/:/g, "-")
         # The path/channel that returns any vehicles for the route_id.
-        path = "/location/#{citynavi.config.id}/#{route_path}/**"
+        path = "/location/#{citynavi.config.faye_id}/#{route_path}/**"
         # Subscribe messages from the path/channel and call callback
         # function defined in render_route_layer in routing.coffee
         # when there is a message.

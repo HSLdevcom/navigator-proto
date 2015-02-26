@@ -41,7 +41,7 @@ siri_to_live = (vehicle) ->
 
 
 interpret_jore = (routeId) ->
-    if citynavi.config.id != "helsinki"
+    if (citynavi.config.id != "helsinki" && citynavi.config.id != "fi")
         # no JORE codes in use, assume bus
         [mode, routeType, route] = ["BUS", 3, routeId]
     else if routeId?.match /^1019/
@@ -178,7 +178,7 @@ $('#live-page').bind 'pageshow', (e, data) ->
             handle_vehicle_update true, siri_to_live(vehicle)
 
         console.log "Got #{data.Siri.ServiceDelivery.VehicleMonitoringDelivery[0].VehicleActivity.length} vehicles in #{citynavi.config.name}"
-        sub = citynavi.realtime?.client.subscribe "/location/#{citynavi.config.id}/**", (msg) ->
+        sub = citynavi.realtime?.client.subscribe "/location/#{citynavi.config.faye_id}/**", (msg) ->
             handle_vehicle_update false, msg
         $('#live-page [data-rel="back"]').on 'click', (e) ->
             sub.cancel()
