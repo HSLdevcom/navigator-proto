@@ -261,7 +261,7 @@ fi =
     bbox_sw: [59.8, 21.05]
     center: [63.2467777,25.9209164]
     min_zoom: 6
-    otp_base_url: "http://matka-aika.com/reittiopas/otp/routers/default/"
+    otp_base_url: "http://matka.hsl.fi/otp/routers/default/"
     siri_url: "http://dev.hsl.fi/siriaccess/vm/json"
     faye_id: "helsinki"
     poi_muni_id: null
