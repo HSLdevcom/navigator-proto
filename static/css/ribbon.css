@@ -14,8 +14,8 @@
 }
 
 .ribbon-wrapper {
-  width: 85px;
-  height: 88px;
+  width: 185px;
+  height: 188px;
   overflow: hidden;
   position: absolute;
   top: -3px;
@@ -33,10 +33,10 @@
   -ms-transform:     rotate(45deg);
   -o-transform:      rotate(45deg);
   position: relative;
-  padding: 7px 0;
+  padding: 1px 0;
   left: -5px;
   top: 15px;
-  width: 120px;
+  width: 256px;
   background-color: #EAC610;
   background-image: -webkit-gradient(linear, left top, left bottom, from(#EAC610), to(#EFFF00)); 
   background-image: -webkit-linear-gradient(top, #EAC610, #EFFF00); 
@@ -63,4 +63,7 @@
 }
 .ribbon:after {
   right: 0;
+}
+.ribbon p {
+  padding-left: 20px;
 }
