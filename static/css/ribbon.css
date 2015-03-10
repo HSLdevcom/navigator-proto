@@ -64,3 +64,6 @@
 .ribbon:after {
   right: 0;
 }
+.ribbon p {
+  padding-left: 20px;
+}
