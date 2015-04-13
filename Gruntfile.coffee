@@ -17,7 +17,7 @@ module.exports = (grunt) ->
         'Gruntfile.coffee'
         'src/*.coffee'
       ]
-      tasks: 'default'
+      tasks: 'newer:coffee'
 
     testem:
       headless:
@@ -81,6 +81,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-connect'
   grunt.loadNpmTasks 'grunt-exec'
   grunt.loadNpmTasks 'grunt-testem'
+  grunt.loadNpmTasks 'grunt-newer'
 
   grunt.registerTask 'default', ['coffee']
   grunt.registerTask 'server', ['coffee', 'connect', 'watch']
