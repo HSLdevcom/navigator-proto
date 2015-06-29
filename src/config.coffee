@@ -89,6 +89,7 @@ defaults =
             3: hsl_colors[5]
             4: hsl_colors[7]
             109: hsl_colors[12]
+            1100: '#ff88ff' # Air traffic
 
     icons:
         google:
@@ -102,6 +103,7 @@ defaults =
             3: 'bus_stop.svg'
             4: 'port.svg'
             109: 'train_station2.svg'
+            1100: 'airplane.svg'
 
     defaultmap: "osm"
 
@@ -199,6 +201,7 @@ helsinki =
     center: [60.170833, 24.9375]
     otp_base_url: "http://dev.hsl.fi/opentripplanner-api-webapp/ws/"
     siri_url: "http://dev.hsl.fi/siriaccess/vm/json?operatorRef=HSL"
+    faye_id: "helsinki"
     poi_muni_id: null # XXX is this ok?
     waag_id: "admr.fi.uusimaa" # XXX should be HSL area
     poi_providers:
@@ -247,6 +250,37 @@ nl =
         ]
     autocompletion_providers: ["poi_categories", "osm", "bag42", "google"]
 
+fi =
+    name: "Finland"
+    country: "fi"
+    cities: null
+    google_url: "http://api.okf.fi/gis/1/"
+    google_autocomplete_append: "Finland"
+    google_suffix: ", Finland"
+    bbox_ne: [67.2, 31.6]
+    bbox_sw: [59.8, 21.05]
+    center: [63.2467777,25.9209164]
+    min_zoom: 6
+    otp_base_url: "http://matka.hsl.fi/otp/routers/default/"
+    siri_url: "http://dev.hsl.fi/siriaccess/vm/json"
+    faye_id: "helsinki"
+    poi_muni_id: null
+    waag_id: "admr.fi.suomi"
+    poi_providers:
+        "waag": [
+            {type: "library"}
+            {type: "park"}
+            {type: "swimming_pool"}
+            {type: "restaurant"}
+            {type: "cafe"}
+            {type: "bar"}
+            {type: "pub"}
+            {type: "supermarket"}
+            {type: "toilet"}
+            {type: "recycling"}
+        ]
+    autocompletion_providers: ["poi_categories", "osm", "google"]
+
 
 # Save and set configuration.
 #############################
@@ -257,6 +291,7 @@ citynavi.update_configs {
     manchester
     tampere
     nl
+    fi
 }
 
 citynavi.set_config("manchester")

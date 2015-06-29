@@ -41,7 +41,7 @@ siri_to_live = (vehicle) ->
 
 
 interpret_jore = (routeId) ->
-    if citynavi.config.id != "helsinki"
+    if (citynavi.config.id != "helsinki" && citynavi.config.id != "fi")
         # no JORE codes in use, assume bus
         [mode, routeType, route] = ["BUS", 3, routeId]
     else if routeId?.match /^1019/
@@ -178,7 +178,7 @@ $('#live-page').bind 'pageshow', (e, data) ->
             handle_vehicle_update true, siri_to_live(vehicle)
 
         console.log "Got #{data.Siri.ServiceDelivery.VehicleMonitoringDelivery[0].VehicleActivity.length} vehicles in #{citynavi.config.name}"
-        sub = citynavi.realtime?.client.subscribe "/location/#{citynavi.config.id}/**", (msg) ->
+        sub = citynavi.realtime?.client.subscribe "/location/#{citynavi.config.faye_id}/**", (msg) ->
             handle_vehicle_update false, msg
         $('#live-page [data-rel="back"]').on 'click', (e) ->
             sub.cancel()
@@ -266,7 +266,7 @@ set_source_marker = (latlng, options) ->
     else
         sourceMarker.bindPopup("The starting point for journey<br>(drag the marker to change)")
 
-    if options.popup
+    if options?.popup
         sourceMarker.openPopup()
 
     marker_changed(options)
@@ -372,9 +372,9 @@ create_wait_leg = (start_time, duration, point, placename) ->
         mode: "WAIT"
         routeType: null # non-transport
         route: ""
-        duration: duration
+        duration: duration/1000
         startTime: start_time
-        endTime: start_time + duration
+        endTime: start_time + duration/1000
         legGeometry: {points: [point]}
         from:
             lat: point[0]*1e-5
@@ -596,7 +596,7 @@ render_route_layer = (itinerary, routeLayer) ->
     route_includes_transit = _.any(leg.routeType? for leg in legs)
 
     # coffeescript parser would fail with string interpolation syntax here:
-    $('.control-details').html("<div class='route-details'><div>Itinerary:&nbsp;&nbsp;<i><img src='static/images/clock.svg'> "+Math.ceil(itinerary.duration/1000/60)+"min<\/i>&nbsp;&nbsp;<i><img src='static/images/walking.svg'> "+Math.ceil(total_walking_duration/1000/60)+"min / "+Math.ceil(total_walking_distance/100)/10+"km<\/i></div></div>")
+    $('.control-details').html("<div class='route-details'><div>Itinerary:&nbsp;&nbsp;<i><img src='static/images/clock.svg'> "+Math.ceil(itinerary.duration/60)+"min<\/i>&nbsp;&nbsp;<i><img src='static/images/walking.svg'> "+Math.ceil(total_walking_duration/60)+"min / "+Math.ceil(total_walking_distance/100)/10+"km<\/i></div></div>")
 
     for leg in legs
         do (leg) ->
@@ -668,8 +668,7 @@ render_route_layer = (itinerary, routeLayer) ->
                 # a bus drives.
                 # FIXME This should be drawn before the leg part is drawn because otherwise
                 # this is drawn on top of it and click events for the line  below are not triggered.
-                $.getJSON citynavi.config.otp_base_url + "transit/variantForTrip", {tripId: leg.tripId, tripAgency: leg.agencyId}, (data) ->
-                    geometry = data.geometry
+                $.getJSON citynavi.config.otp_base_url + "index/trips/#{leg.agencyId}:#{leg.tripId}/geometry", (geometry) ->
                     points = (new L.LatLng(point[0]*1e-5, point[1]*1e-5) for point in decode_polyline(geometry.points, 2))
                     line_layer = new L.Polyline(points, {color: color, opacity: 0.2})
                     line_layer.addTo(routeLayer)
@@ -748,7 +747,7 @@ handle_vehicle_update = (initial, msg) ->
 # Route_layer is needed to resize the map when info is added to the footer here.
 # polylines contains graphical representation of the itienary legs.
 render_route_buttons = ($list, itinerary, route_layer, polylines, max_duration) ->
-    trip_duration = itinerary.duration
+    trip_duration = itinerary.duration*1000
     trip_start = itinerary.startTime
 
     length = itinerary.legs.length + 1 # Include space for the "Total" button.
@@ -798,7 +797,7 @@ render_route_buttons = ($list, itinerary, route_layer, polylines, max_duration) 
 
 # GoodEnoughJourneyPlanner style:
         leg_start = (leg.startTime-trip_start)/trip_duration
-        leg_duration = leg.duration/trip_duration
+        leg_duration = leg.duration*1000/trip_duration
         leg_label = "<img src='static/images/#{icon_name}' height='100%' />"
 
         # for long non-transit legs, display distance in place of route
@@ -928,7 +927,62 @@ map.on 'zoomend', (e) ->
     # XXX toggle instead of set:
     $('#map').attr('class', "leaflet-container leaflet-fade-anim "+minzooms)
 
-$(document).ready () ->
+$(document).on 'pageinit', ->
+    if location.search? and location.search.length > 0
+        console.log "location.search", location.search
+        searchString = location.search.substring(1, location.search.length)
+        searchParams = searchString.split("&")
+        source = undefined
+        target = undefined
+        mode = undefined
+        destname = undefined
+        for param in searchParams
+            if param == "usetransit=yes"
+                #console.log "usetransit=yes"
+                $('input[name=usetransit]').prop('checked', true)
+                #$('#modesettings').find('input[name=BUS]').prop('checked', true)
+                #$('#modesettings').find('input[name=TRAM]').prop('checked', true)
+                #$('#modesettings').find('input[name=RAIL]').prop('checked', true)
+                #$('#modesettings').find('input[name=SUBWAY]').prop('checked', true)
+            else if param == "usetransit=no"
+                #console.log "usetransit=no"
+                $('input[name=usetransit]').prop('checked', false)
+                #$('#modesettings').find('input[name=BUS]').prop('checked', false)
+                #$('#modesettings').find('input[name=TRAM]').prop('checked', false)
+                #$('#modesettings').find('input[name=RAIL]').prop('checked', false)
+                #$('#modesettings').find('input[name=SUBWAY]').prop('checked', false)
+            else if param.indexOf("mode=") == 0
+                mode = param.substring(5, param.length)
+                console.log "mode", mode
+                $('input[name=vehiclesettings][value=' + mode + ']').prop('checked', true)
+            else if param.indexOf("destname=") == 0
+                destname = decodeURIComponent(param.substring(9, param.length))
+            else if param.indexOf("start=") == 0
+                start = param.substring(6, param.length)
+                console.log "start", start
+                if start.indexOf(',') != -1
+                    parts = start.split(',')
+                    lat = parts[0]
+                    lng = parts[1]
+                    source = new L.LatLng(parseFloat(lat), parseFloat(lng))
+            else if param.indexOf("destination=") == 0
+                destination = param.substring(12, param.length)
+                console.log "destination", destination
+                if destination.indexOf(',') != -1
+                    parts = destination.split(',')
+                    lat = parts[0]
+                    lng = parts[1]
+                    target = new L.LatLng(parseFloat(lat), parseFloat(lng))
+        #$('#wheelchair').prop('checked', false)
+        #$('#prefer-free').prop('checked', false)
+        #$('#use-speech').prop('checked', false)
+        if source?
+            set_source_marker(source)
+        if target?
+            if destname?
+                set_target_marker(target, {description: destname})
+            else
+                set_target_marker(target)
     resize_map()
     map.invalidateSize()
 
